@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="12.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>370</x>
+      <y>60</y>
+      <w>210</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>Ship
+--
+-shipparts
+--
++is_dstroyed() : boolean
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>80</x>
+      <y>60</y>
+      <w>210</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>Field
+--
+-hit
+-position
+--
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>20</x>
+      <y>260</y>
+      <w>370</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>BattleField
+--
+-fields[ ][ ]
+-ships
+-ready : boolean
+--
++add_ship(int length, int orientation, pos_t position)
++all_ships_destroyed()
++remove_ships(int length, int orientation, pos_t position)
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>510</x>
+      <y>270</y>
+      <w>280</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>Game
+--
+-players
+-currentplayer
+--
++shoot(Player targetPlayer, pos_t position)
++ask_game_state()
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>90</x>
+      <y>510</y>
+      <w>210</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>Player
+--
+-name
+-battlefield
+-identity
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>500</x>
+      <y>490</y>
+      <w>280</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>Server
+--
+ 
+--
++handle_command()
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

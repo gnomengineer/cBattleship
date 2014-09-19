@@ -26,6 +26,3 @@
 *.exe
 *.out
 *.app
-
-#UML tool
-*.uxf
