@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 project(cBattleship)
 
+set(CMAKE_CXX_FLAGS "-std=c++11")
+
 # common library
 set(CBATTLESHIP_COMMON_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/common)
 file(GLOB_RECURSE CBATTLESHIP_COMMON_SOURCE_FILES ${CBATTLESHIP_COMMON_SOURCE_PATH}/*.cpp)
