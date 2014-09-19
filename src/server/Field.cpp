@@ -12,6 +12,6 @@ bool Field::is_hit() {
     return hit;
 }
 
-bool Field::set_hit() {
+void Field::set_hit() {
     hit = true;
 }

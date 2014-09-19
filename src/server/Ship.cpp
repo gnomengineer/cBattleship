@@ -1,7 +1,7 @@
 #include "Ship.h"
 
 // make  a copy so the field list can't be manipulated from outside
-Ship::Ship(std::list<Field*> ship_parts)
+Ship::Ship(std::list<std::shared_ptr<Field>> ship_parts)
     : ship_parts(ship_parts) {
 }
 

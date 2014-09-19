@@ -3,15 +3,14 @@
 
 #include "Field.h"
 #include <list>
+#include <memory>
 
 class Ship {
     private:
-        // TODO: will cause problems if the field pointed to
-        //       in this list gets deleted
-        std::list<Field*> ship_parts;
+        std::list<std::shared_ptr<Field>> ship_parts;
 
     public:
-        Ship(std::list<Field*> ship_parts);
+        Ship(std::list<std::shared_ptr<Field>> ship_parts);
 
         bool is_destroyed();
         unsigned int get_length();

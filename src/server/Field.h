@@ -13,7 +13,7 @@ class Field {
 
         position_t get_position();
         bool is_hit();
-        bool set_hit();
+        void set_hit();
 
 };
 #endif
