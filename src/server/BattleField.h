@@ -22,6 +22,10 @@ class BattleField {
         BattleField();
         void add_ship(unsigned int length, orientation_t orientation, position_t position);
         bool all_ships_destroyed() const;
+
+    private:
+        bool check_ship_collision(Ship &new_ship) const;
+        bool check_ship_length_available(unsigned int length) const;
 };
 
 #endif 

@@ -14,5 +14,7 @@ class Ship {
 
         bool is_destroyed();
         unsigned int get_length();
+
+        std::list<std::shared_ptr<Field>> get_ship_parts();
 };
 #endif

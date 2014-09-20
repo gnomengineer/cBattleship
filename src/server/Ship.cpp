@@ -18,3 +18,8 @@ bool Ship::is_destroyed() {
 unsigned int Ship::get_length() {
     return ship_parts.size();
 }
+
+
+std::list<std::shared_ptr<Field>> Ship::get_ship_parts() {
+    return ship_parts;
+}
