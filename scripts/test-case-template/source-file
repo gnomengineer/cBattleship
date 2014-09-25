@@ -1,0 +1,15 @@
+#include "@NAME@Test.h"
+
+CPPUNIT_TEST_SUITE_REGISTRATION(@NAME@Test);
+
+
+void @NAME@Test::setUp()
+{
+}
+
+
+void @NAME@Test::tearDown()
+{
+}
+
+@METHOD_IMPLEMENTATIONS@
