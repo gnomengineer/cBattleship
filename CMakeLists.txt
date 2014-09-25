@@ -3,6 +3,10 @@ project(cBattleship)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 
+# add src to include directories so, every module can include headers
+# from common
+include_directories(${PROJECT_SOURCE_DIR}/src)
+
 # common library
 set(CBATTLESHIP_COMMON_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/common)
 file(GLOB_RECURSE CBATTLESHIP_COMMON_SOURCE_FILES ${CBATTLESHIP_COMMON_SOURCE_PATH}/*.cpp)
