@@ -16,16 +16,16 @@ void FieldTest::tearDown()
 
 void FieldTest::test_hit()
 {
-    CPPUNIT_ASSERT(field->is_hit() == false);
+    CPPUNIT_ASSERT(!field->is_hit());
     field->set_hit();
-    CPPUNIT_ASSERT(field->is_hit() == true);
+    CPPUNIT_ASSERT(field->is_hit());
 }
 
 void FieldTest::test_position()
 {
-    position position = field->get_position();
-    CPPUNIT_ASSERT(position.y == 23);
-    CPPUNIT_ASSERT(position.x == 123);
+    position_t position = field->get_position();
+    CPPUNIT_ASSERT_EQUAL(23, (int)position.y);
+    CPPUNIT_ASSERT_EQUAL(123, (int)position.x);
 }
 
 
