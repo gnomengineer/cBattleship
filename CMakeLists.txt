@@ -41,3 +41,6 @@ else()
     target_link_libraries(cBattleshipClient rt)
   endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif()
+
+# automatically run tests after build
+add_custom_command(TARGET cBattleshipTest POST_BUILD COMMAND ${PROJECT_BINARY_DIR}/cBattleshipTest)
