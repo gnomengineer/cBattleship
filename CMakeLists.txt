@@ -20,6 +20,12 @@ file(GLOB_RECURSE CBATTLESHIP_CLIENT_SOURCE_FILES ${CBATTLESHIP_CLIENT_SOURCE_PA
 add_executable(cBattleshipClient ${CBATTLESHIP_CLIENT_SOURCE_FILES})
 target_link_libraries(cBattleshipClient cBattleshipLibrary)
 
+# test cases
+set(CBATTLESHIP_TEST_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/test)
+file(GLOB_RECURSE CBATTLESHIP_TEST_SOURCE_FILES ${CBATTLESHIP_TEST_SOURCE_PATH}/*.cpp)
+add_executable(cBattleshipTest ${CBATTLESHIP_TEST_SOURCE_FILES})
+target_link_libraries(cBattleshipTest cBattleshipLibrary cppunit)
+
 # use ncurses library
 set(CURSES_NEED_NCURSES TRUE)
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
