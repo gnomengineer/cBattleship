@@ -17,6 +17,8 @@ class BattleField {
     private:
         std::array<std::array<std::shared_ptr<Field>, BATTLEFIELD_HEIGHT>, BATTLEFIELD_WIDTH> fields;
         std::list<std::unique_ptr<Ship>> ships;
+		//key: ship length, value: max ship quantity
+		std::map<unsigned int, int> ships_available;
         
     public:
         BattleField();
@@ -25,7 +27,6 @@ class BattleField {
 		void remove_ship(usigned int length, orientation_t orientation, position_t position);
     private:
         bool check_ship_collision(Ship &new_ship) const;
-        bool check_ship_length_available(unsigned int length) const;
 };
 
 #endif 

@@ -8,12 +8,18 @@ BattleField::BattleField() {
             fields[y][x] = std::shared_ptr<Field>(new Field(position(y, x)));
         }
     }
+
+	//define possible ship lengths	
+    ships_available[2] = 3;
+    ships_available[3] = 2;
+    ships_available[4] = 2;
+    ships_available[5] = 1;
 }
 
 void BattleField::add_ship(unsigned int length, orientation_t orientation, position_t start_position) {
     if(!is_valid_orientation(orientation)) throw std::invalid_argument("invalid orientation");
     if(!check_position(start_position, BATTLEFIELD_WIDTH, BATTLEFIELD_HEIGHT)) throw std::invalid_argument("position out of range");
-    if(!check_ship_length_available(length)) throw std::invalid_argument("no more ships of this length available");
+    if(ships_available[length] < 1) throw std::invalid_argument("no more ships of this length available");
 
     // check if length laps over the border of the battlefield
     position_t end_position = start_position;
@@ -32,6 +38,7 @@ void BattleField::add_ship(unsigned int length, orientation_t orientation, posit
 
     // everythings ok with the ship, so use it
     ships.push_back(std::unique_ptr<Ship>(new Ship(ship_parts)));
+	ships_available[legnth]--;
 }
 
 bool BattleField::all_ships_destroyed() const {
@@ -68,22 +75,3 @@ bool BattleField::check_ship_collision(Ship &new_ship) const {
     return false;
 }
 
-// TODO: ships available should be a member, so it's more efficient
-bool BattleField::check_ship_length_available(unsigned int new_length) const {
-    // list of ships available
-    // key: ship length, value: max ship quantity>
-    std::map<unsigned int, int> ships_available;
-    ships_available[2] = 3;
-    ships_available[3] = 2;
-    ships_available[4] = 2;
-    ships_available[5] = 1;
-
-    for(auto it = ships.begin(); it != ships.end(); it++) {
-        Ship &ship = **it;
-        int ship_size = ship.get_ship_parts().size();
-        ships_available[ship_size]--;
-        if(ships_available[ship_size] < 0) return false;
-    }
-
-    return ships_available[new_length] >= 1;
-}
