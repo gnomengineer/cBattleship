@@ -1,5 +1,4 @@
 #include "BattleField.h"
-#include <map>
 
 BattleField::BattleField() {
     // fill battlefield with Field instances
@@ -9,7 +8,7 @@ BattleField::BattleField() {
         }
     }
 
-	//define possible ship lengths	
+    //define possible ship lengths    
     ships_available[2] = 3;
     ships_available[3] = 2;
     ships_available[4] = 2;
@@ -38,7 +37,7 @@ void BattleField::add_ship(unsigned int length, orientation_t orientation, posit
 
     // everythings ok with the ship, so use it
     ships.push_back(std::unique_ptr<Ship>(new Ship(ship_parts)));
-	ships_available[legnth]--;
+    ships_available[length]--;
 }
 
 bool BattleField::all_ships_destroyed() const {

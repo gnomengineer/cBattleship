@@ -5,6 +5,7 @@
 #include "Ship.h"
 #include <array>
 #include <list>
+#include <map>
 #include <memory>
 
 #define BATTLEFIELD_WIDTH 10
@@ -17,14 +18,15 @@ class BattleField {
     private:
         std::array<std::array<std::shared_ptr<Field>, BATTLEFIELD_HEIGHT>, BATTLEFIELD_WIDTH> fields;
         std::list<std::unique_ptr<Ship>> ships;
-		//key: ship length, value: max ship quantity
-		std::map<unsigned int, int> ships_available;
+        //key: ship length, value: max ship quantity
+        std::map<unsigned int, int> ships_available;
         
     public:
         BattleField();
         void add_ship(unsigned int length, orientation_t orientation, position_t position);
         bool all_ships_destroyed() const;
-		void remove_ship(usigned int length, orientation_t orientation, position_t position);
+        void remove_ship(unsigned int length, orientation_t orientation, position_t position);
+
     private:
         bool check_ship_collision(Ship &new_ship) const;
 };
