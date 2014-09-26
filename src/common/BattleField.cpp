@@ -12,18 +12,18 @@ BattleField::BattleField() {
 
 void BattleField::add_ship(unsigned int length, orientation_t orientation, position_t start_position) {
     if(!is_valid_orientation(orientation)) throw std::invalid_argument("invalid orientation");
-    if(!check_position(start_position, BATTLEFIELD_WIDTH, BATTLEFIELD_HEIGHT)) throw std::invalid_argument("position out of range");
+    if(!check_position(start_position, BATTLEFIELD_WIDTH, BATTLEFIELD_HEIGHT)) throw std::out_of_range("position out of range");
     if(!check_ship_length_available(length)) throw std::invalid_argument("no more ships of this length available");
 
     // check if length laps over the border of the battlefield
     position_t end_position = start_position;
-    end_position[orientation] += length;
-    if(!check_position(end_position, BATTLEFIELD_WIDTH, BATTLEFIELD_HEIGHT)) throw std::invalid_argument("length out of range");
+    end_position[orientation] += length - 1;
+    if(!check_position(end_position, BATTLEFIELD_WIDTH, BATTLEFIELD_HEIGHT)) throw std::out_of_range("length out of range");
     
     // make a list of the fields the ship uses
     // and check for collision of ships
     std::list<std::shared_ptr<Field>> ship_parts;
-    for(; start_position[orientation] < end_position[orientation]; start_position[orientation]++) {
+    for(; start_position[orientation] <= end_position[orientation]; start_position[orientation]++) {
         ship_parts.push_back(fields[start_position.y][start_position.x]);
     }
 
@@ -57,15 +57,15 @@ bool BattleField::check_ship_collision(Ship &new_ship) const {
 
     // check if the new ship uses a field already used by previously added ships
     for(auto it = used_fields.begin(); it != used_fields.end(); it++) {
-        auto used_field = **it;
+        Field &used_field = **it;
         for(auto it = new_ship_parts.begin(); it != new_ship_parts.end(); it++) {
-            auto new_ship_part = **it;
+            Field &new_ship_part = **it;
             if(&used_field == &new_ship_part) {
-                return true;
+                return false;
             }
         }
     }
-    return false;
+    return true;
 }
 
 // TODO: ships available should be a member, so it's more efficient
