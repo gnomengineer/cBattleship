@@ -1,5 +1,10 @@
 #include "PlayerJoinCommand.h"
 
+command_nr_t PlayerJoinCommand::get_command_nr() {
+    return 1;
+}
+
+
 std::vector<unsigned char> PlayerJoinCommand::encode_payload() {
     return std::vector<unsigned char>(player_name.begin(), player_name.end());
 }

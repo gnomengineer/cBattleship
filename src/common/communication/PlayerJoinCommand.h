@@ -10,6 +10,7 @@ class PlayerJoinCommand : public NetworkCommand {
         std::string player_name;
 
     public:
+        virtual command_nr_t get_command_nr();
         virtual std::vector<unsigned char> encode_payload();
         virtual void dencode_payload(std::vector<unsigned char> command_data);
 
