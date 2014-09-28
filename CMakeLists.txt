@@ -3,6 +3,17 @@ project(cBattleship)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 
+
+set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_USE_MULTITHREAD ON)
+find_package(Boost 1.54.0 REQUIRED COMPONENTS system thread regex)
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    link_directories(${Boost_LIBRARY_DIRS})
+endif(Boost_FOUND)
+
+set(BOOST_USED_LIBS ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY} ${Boost_REGEX_LIBRARY} pthread)
+
 # add src to include directories so, every module can include headers
 # from common
 include_directories(${PROJECT_SOURCE_DIR}/src)
@@ -16,13 +27,13 @@ add_library(cBattleshipLibrary ${CBATTLESHIP_COMMON_SOURCE_FILES})
 set(CBATTLESHIP_SERVER_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/server)
 file(GLOB_RECURSE CBATTLESHIP_SERVER_SOURCE_FILES ${CBATTLESHIP_SERVER_SOURCE_PATH}/*.cpp)
 add_executable(cBattleshipServer ${CBATTLESHIP_SERVER_SOURCE_FILES})
-target_link_libraries(cBattleshipServer cBattleshipLibrary)
+target_link_libraries(cBattleshipServer cBattleshipLibrary ${BOOST_USED_LIBS})
 
 # client
 set(CBATTLESHIP_CLIENT_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/client)
 file(GLOB_RECURSE CBATTLESHIP_CLIENT_SOURCE_FILES ${CBATTLESHIP_CLIENT_SOURCE_PATH}/*.cpp)
 add_executable(cBattleshipClient ${CBATTLESHIP_CLIENT_SOURCE_FILES})
-target_link_libraries(cBattleshipClient cBattleshipLibrary)
+target_link_libraries(cBattleshipClient cBattleshipLibrary ${BOOST_USED_LIBS})
 
 # test cases
 set(CBATTLESHIP_TEST_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/test)
