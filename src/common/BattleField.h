@@ -17,14 +17,16 @@
 class BattleField {
     private:
         std::array<std::array<std::shared_ptr<Field>, BATTLEFIELD_HEIGHT>, BATTLEFIELD_WIDTH> fields;
-        std::list<std::unique_ptr<Ship>> ships;
+        std::list<std::shared_ptr<Ship>> ships;
         //key: ship length, value: max ship quantity
         std::map<unsigned int, int> ships_available;
-        
+
     public:
         BattleField();
         void add_ship(unsigned int length, orientation_t orientation, position_t position);
         bool all_ships_destroyed() const;
+        bool hit_field(position_t position);
+
         void remove_ship(unsigned int length, orientation_t orientation, position_t position);
 
     private:
