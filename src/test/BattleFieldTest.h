@@ -12,7 +12,6 @@ class BattleFieldTest : public CppUnit::TestFixture
     CPPUNIT_TEST(test_add_ship_position);
     CPPUNIT_TEST(test_add_ship_over_border);
     CPPUNIT_TEST(test_add_ship_collision);
-    CPPUNIT_TEST(test_add_ship);
     CPPUNIT_TEST(test_all_ships_destroyed);
 
     CPPUNIT_TEST_SUITE_END();

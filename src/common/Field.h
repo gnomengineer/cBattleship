@@ -9,6 +9,7 @@ class Field {
     private:
         position_t position;
         bool hit;
+        bool ship_part;
 
     public:
         Field(position_t position);
@@ -16,7 +17,8 @@ class Field {
         position_t get_position() const;
         bool is_hit() const;
         void set_hit();
-
+        bool is_ship_part() const;
+        void set_ship_part(bool is_ship_part);
 };
 #endif
 
