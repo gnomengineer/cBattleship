@@ -43,4 +43,6 @@ else()
 endif()
 
 # automatically run tests after build
-add_custom_command(TARGET cBattleshipTest POST_BUILD COMMAND ${PROJECT_BINARY_DIR}/cBattleshipTest)
+enable_testing()
+set(BUILD_TESTING ON)
+add_test(NAME unit_test COMMAND ${PROJECT_BINARY_DIR}/cBattleshipTest)
