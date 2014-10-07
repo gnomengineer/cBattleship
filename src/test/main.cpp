@@ -9,5 +9,5 @@ int main( int argc, char **argv)
     runner.addTest(registry.makeTest());
     runner.setOutputter(new CppUnit::CompilerOutputter(&runner.result(), std::cerr));
     bool wasSuccessful = runner.run("", false);
-    return !wasSuccessful;
+    return wasSuccessful;
 }

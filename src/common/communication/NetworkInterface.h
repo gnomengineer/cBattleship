@@ -7,15 +7,14 @@
 
 class NetworkInterface {
     private:
-        std::map<command_nr_t, std::shared_ptr<NetworkCommand>> network_commands;
+        std::map<command_nr_t, std::unique_ptr<NetworkCommand>> network_commands;
 
     public:
         NetworkInterface();
-        std::vector<unsigned char> encode_command(NetworkCommand command);
-        std::shared_ptr<NetworkCommand> decode_command(std::vector<unsigned char> command_data);
+        std::vector<unsigned char> encode_command(NetworkCommand& command);
+        NetworkCommand& decode_command(std::vector<unsigned char> command_data);
 
-    private:
-        void add_network_command(NetworkCommand *command);
+        void add_network_command(NetworkCommand* command);
 };
 
 #endif
