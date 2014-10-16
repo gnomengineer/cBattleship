@@ -1,6 +1,6 @@
-#include "BattleShipServer.h"
+#include "GameServer.h"
 int main() {
-    BattleShipServer server;
-    while(1);
+    GameServer server;
+    server.run();
     return 0;
 }

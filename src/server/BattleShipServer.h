@@ -24,6 +24,10 @@ class BattleShipServer {
     public:
         BattleShipServer();
 
+        void handle_io();
+
+        std::list<std::unique_ptr<Connection>>& get_connections();
+
     private:
         void accept_connections();
 };
