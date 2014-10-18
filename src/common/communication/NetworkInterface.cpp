@@ -2,8 +2,8 @@
 
 #define PACKAGE_TERMINATOR 0xCD
 
-NetworkInterface network_interface;
 std::map<command_nr_t, std::unique_ptr<NetworkCommand>> NetworkInterface::network_commands;
+static NetworkInterface network_interface();
 
 NetworkInterface::NetworkInterface() {
     NetworkInterface::add_network_command(new PlayerJoinCommand());
