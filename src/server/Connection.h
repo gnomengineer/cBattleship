@@ -6,19 +6,22 @@
 
 namespace asio = boost::asio;
 
-typedef struct read_command_handler {
-    void operator()(std::vector<unsigned char> data) const;
-} ReadCommandHandler;
+typedef std::function<void(NetworkCommand& command)> ReadCommandHandler;
 
 class Connection {
     private:
         asio::streambuf buffer;
         asio::ip::tcp::socket socket;
 
+        bool joined;
+
     public:
         Connection(asio::ip::tcp::socket socket);
 
         void read(ReadCommandHandler handler);
-        void write(std::vector<unsigned char> data);
+        void write(NetworkCommand& command);
+
+        void set_joined(bool joined);
+        bool get_joined();
 };
 #endif

@@ -4,17 +4,22 @@
 #include <map>
 #include <memory>
 #include "NetworkCommand.h"
+#include "PlayerJoinCommand.h"
+#include "PlayerJoinAnswerCommand.h"
 
 class NetworkInterface {
     private:
-        std::map<command_nr_t, std::unique_ptr<NetworkCommand>> network_commands;
+        static std::map<command_nr_t, std::unique_ptr<NetworkCommand>> network_commands;
 
     public:
         NetworkInterface();
-        std::vector<unsigned char> encode_command(NetworkCommand& command);
-        NetworkCommand& decode_command(std::vector<unsigned char> command_data);
+        static std::vector<unsigned char> encode_command(NetworkCommand& command);
+        static NetworkCommand& decode_command(std::vector<unsigned char> command_data);
 
-        void add_network_command(NetworkCommand* command);
+        static bool check_packaging(std::vector<unsigned char> command_data);
+        static int get_package_size(std::vector<unsigned char> command_data);
+
+        static void add_network_command(NetworkCommand* command);
 };
 
 #endif

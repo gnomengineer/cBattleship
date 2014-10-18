@@ -2,6 +2,7 @@
 #define _GAMESERVER_H
 
 #include "BattleShipServer.h"
+#include <common/communication/NetworkInterface.h>
 #include <map>
 
 enum GameServerState {

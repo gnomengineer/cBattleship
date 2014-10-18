@@ -1,10 +1,13 @@
 #include "NetworkInterface.h"
-#include "PlayerJoinCommand.h"
 
 #define PACKAGE_TERMINATOR 0xCD
 
+NetworkInterface network_interface;
+std::map<command_nr_t, std::unique_ptr<NetworkCommand>> NetworkInterface::network_commands;
+
 NetworkInterface::NetworkInterface() {
-    add_network_command(new PlayerJoinCommand());
+    NetworkInterface::add_network_command(new PlayerJoinCommand());
+    NetworkInterface::add_network_command(new PlayerJoinAnswerCommand());
 }
 
 std::vector<unsigned char> NetworkInterface::encode_command(NetworkCommand& command) {
@@ -23,15 +26,11 @@ std::vector<unsigned char> NetworkInterface::encode_command(NetworkCommand& comm
 }
 
 NetworkCommand& NetworkInterface::decode_command(std::vector<unsigned char> command_data) {
-    if(command_data.size() < 4) throw std::runtime_error("invalid package size");
+    if(!NetworkInterface::check_packaging(command_data)) throw std::runtime_error("frame is packaged incorrectly");
     unsigned char command_nr = command_data[0];
-    unsigned short size = 0;
-    size |= command_data[1];
-    size |= command_data[2] << 8;
+    int size = NetworkInterface::get_package_size(command_data);
 
     if(network_commands.find(command_data[0]) == network_commands.end()) throw std::runtime_error("invalid command nr");
-    if(command_data.size() != size) throw std::runtime_error("invalid package size");
-    if(command_data[size - 1] != PACKAGE_TERMINATOR) throw std::runtime_error("invalid package terminator");
 
     // remove terminator & header
     command_data.erase(command_data.begin() + (size - 1));
@@ -43,6 +42,24 @@ NetworkCommand& NetworkInterface::decode_command(std::vector<unsigned char> comm
     return command;
 }
 
+bool NetworkInterface::check_packaging(std::vector<unsigned char> command_data) {
+    int size = NetworkInterface::get_package_size(command_data);
+    if(size == -1) return false;
+    if(size < 4) return false;
+    if(command_data.size() >= size) return false;
+    if(command_data[size - 1] != PACKAGE_TERMINATOR) return false;
+    return true;
+}
+
+int NetworkInterface::get_package_size(std::vector<unsigned char> command_data) {
+    if(command_data.size() < 4) return -1;
+    unsigned short size = 0;
+    size |= command_data[1];
+    size |= command_data[2] << 8;
+    return size;
+}
+
 void NetworkInterface::add_network_command(NetworkCommand* command) {
     network_commands[command->get_command_nr()] = std::unique_ptr<NetworkCommand>(command);
 }
+
