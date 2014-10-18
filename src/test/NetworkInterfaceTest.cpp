@@ -23,21 +23,19 @@ void NetworkInterfaceTest::TestNetworkCommand::decode_payload(std::vector<unsign
 
 void NetworkInterfaceTest::setUp()
 {
-    network_interface = new NetworkInterface();
-    network_interface->add_network_command(new TestNetworkCommand());
+    NetworkInterface::add_network_command(new TestNetworkCommand());
 }
 
 
 void NetworkInterfaceTest::tearDown()
 {
-    delete network_interface;
 }
 
 void NetworkInterfaceTest::encode_command_test()
 {
     TestNetworkCommand test_command;
     test_command.some_payload = 0x12345678;
-    auto vector = network_interface->encode_command(test_command);
+    auto vector = NetworkInterface::encode_command(test_command);
     CPPUNIT_ASSERT_EQUAL((unsigned char)0xEF, vector[0]);
     CPPUNIT_ASSERT_EQUAL((unsigned char)0x00, vector[1]);
     CPPUNIT_ASSERT_EQUAL((unsigned char)0x08, vector[2]);
@@ -53,7 +51,7 @@ void NetworkInterfaceTest::decode_command_test()
     const int payload = 0x12345678;
     TestNetworkCommand test_command;
     test_command.some_payload = payload;
-    NetworkCommand& network_command = network_interface->decode_command(network_interface->encode_command(test_command));
+    NetworkCommand& network_command = NetworkInterface::decode_command(NetworkInterface::encode_command(test_command));
     int decoded_payload = dynamic_cast<TestNetworkCommand*>(&network_command)->some_payload;
     CPPUNIT_ASSERT_EQUAL(payload, decoded_payload);
  

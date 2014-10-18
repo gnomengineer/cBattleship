@@ -15,8 +15,6 @@ class NetworkInterfaceTest : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
     private:
-        NetworkInterface *network_interface;
-
         class TestNetworkCommand : public NetworkCommand {
             public:
                 int some_payload;
