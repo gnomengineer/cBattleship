@@ -22,4 +22,6 @@ class NetworkInterface {
         static void add_network_command(NetworkCommand* command);
 };
 
+extern NetworkInterface network_interface;
+
 #endif
