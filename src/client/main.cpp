@@ -16,8 +16,8 @@ int main(int argc, char *argv[]){
 
     unsigned char commandNr = 0x01;
     unsigned char packageLengthH = 0x00;
-    unsigned char packageLengthL = 0x09;
-    unsigned char buffer[] = { commandNr, packageLengthL, packageLengthH, 'C', 'l', 'i', 'e', 'n', 't'};
+    unsigned char packageLengthL = 0x0A;
+    unsigned char buffer[] = { commandNr, packageLengthL, packageLengthH, 'C', 'l', 'i', 'e', 'n', 't', 0xCD};
 
     boost::system::error_code ec;
     socket.write_some(boost::asio::buffer(buffer), ec);
