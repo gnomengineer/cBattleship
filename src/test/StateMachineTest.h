@@ -2,33 +2,35 @@
 #define _STATEMACHINETEST_H
 
 #include <cppunit/extensions/HelperMacros.h>
+#include <common/state-machine/StateMachine.h>
 
 class StateMachineTest : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE(StateMachineTest);
 
-    CPPUNIT_TEST(initialization);
     CPPUNIT_TEST(run);
     CPPUNIT_TEST(run_state);
     CPPUNIT_TEST(is_end_state);
 
     CPPUNIT_TEST_SUITE_END();
 
-    enum LeetState {
+    typedef enum LeetState {
         ONE = 1,
         THREE = 3,
         SEVEN = 7,
         END = -1
-    };
+    } LeetState;
 
     class LeetStateMachine {
         private:
             std::vector<int> numbers;
             int idx;
+            bool have_three;
 
         public:
-            LeetStateMachine(std::vector numbers);
-            std::map<LeetState, int> get_state_map();
+            typedef StateMachine<StateMachineTest::LeetState, StateMachineTest::LeetStateMachine, int>::StateMap StateMap;
+            LeetStateMachine(std::vector<int> numbers);
+            StateMap get_state_map();
             int get_input();
 
             LeetState state_one(int in);

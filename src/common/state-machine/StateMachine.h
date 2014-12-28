@@ -5,8 +5,11 @@
 
 template<typename E, class M, class I> 
 class StateMachine {
-    private:
+    public:
         typedef E (M::*StateFuncPtr)(I input);
+        typedef std::map<E, StateFuncPtr> StateMap;
+
+    private:
         std::map<E, StateFuncPtr> state_map;
         M & instance;
         E current_state;
@@ -19,19 +22,30 @@ class StateMachine {
         virtual ~StateMachine() {}
 
         E run() {
-            while(!is_end_state(current_state)) {
-                run_state(instance.get_input());
+            while(!has_terminated()) {
+                I input = instance.get_input();
+                run_state(input);
             }
+            return current_state;
         }
 
-        E run_state(I & input) {
+        E run_state(I input) {
             return current_state = run_single_state(input);
         }
 
+        E get_current_state() {
+            return current_state;
+        }
+
+        bool has_terminated() {
+            return is_end_state(current_state);
+        }
+
     private:
-        E run_single_state(I & input) {
-            auto fptr = state_map.find(current_state);
-            if(fptr == state_map.end()) return -1;
+        E run_single_state(I input) {
+            auto fptr_found = state_map.find(current_state);
+            if(fptr_found == state_map.end()) return static_cast<E>(-1);
+            auto fptr = fptr_found->second;
             return (instance.*fptr)(input);
         }
 
