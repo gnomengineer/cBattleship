@@ -1,12 +1,17 @@
 #include "Connection.h"
 #include <common/communication/NetworkInterface.h>
 
-Connection::Connection(asio::ip::tcp::socket socket)
-    : header(3),
+Connection::Connection(conn_id_t conn_id, asio::ip::tcp::socket socket)
+    : conn_id(conn_id),
+      header(3),
       payload(1024),
       socket(std::move(socket)) {
 
 
+}
+
+conn_id_t Connection::get_id() {
+    return conn_id;
 }
 
 void Connection::read(ReadCommandHandler handler) {
@@ -46,12 +51,4 @@ void Connection::write(NetworkCommand& command) {
     auto data = NetworkInterface::encode_command(command);
     asio::async_write(socket, asio::buffer(data), [this](const boost::system::error_code& err_code, std::size_t bytes_written) {
     });
-}
-
-void Connection::set_joined(bool joined) {
-    this->joined = joined;
-}
-
-bool Connection::get_joined() {
-    return joined;
 }
