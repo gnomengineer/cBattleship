@@ -3,12 +3,11 @@
 #define PACKAGE_TERMINATOR 0xCD
 
 std::map<command_nr_t, std::unique_ptr<NetworkCommand>> NetworkInterface::network_commands;
-NetworkInterface network_interface;
 
-NetworkInterface::NetworkInterface() {
-    NetworkInterface::add_network_command(new PlayerJoinCommand());
-    NetworkInterface::add_network_command(new PlayerJoinAnswerCommand());
-}
+NETWORK_INTERFACE_COMMAND_LIST
+NETWORK_INTERFACE_COMMAND(PlayerJoinCommand)
+NETWORK_INTERFACE_COMMAND(PlayerJoinAnswerCommand)
+NETWORK_INTERFACE_COMMAND_LIST_END
 
 std::vector<unsigned char> NetworkInterface::encode_command(NetworkCommand& command) {
     std::vector<unsigned char> encoded(3);
