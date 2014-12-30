@@ -27,6 +27,7 @@ class Connection {
         void write(NetworkPackage& command);
 
         bool is_connected();
+        void disconnect();
 
     private:
         ReadCallback get_read_callback(ReadCommandHandler handler, int package_size);

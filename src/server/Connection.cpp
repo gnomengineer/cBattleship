@@ -31,9 +31,7 @@ ReadCallback Connection::get_read_callback(ReadCommandHandler handler, int packa
             auto& network_command = NetworkPackageManager::decode_command(command);
             handler(network_command);
         } else {
-            boost::system::error_code ec;
-            socket.shutdown(asio::ip::tcp::socket::shutdown_both, ec);
-            socket.close();
+            disconnect();
         }
     };
 }
@@ -48,9 +46,7 @@ ReadCallback Connection::get_read_header_callback(ReadHeaderCommandHandler handl
                 handler(package_size);
             }
         } else {
-            boost::system::error_code ec;
-            socket.shutdown(asio::ip::tcp::socket::shutdown_both, ec);
-            socket.close();
+            disconnect();
         }
     };
 }
@@ -63,4 +59,10 @@ void Connection::write(NetworkPackage& command) {
 
 bool Connection::is_connected() {
     return socket.is_open();
+}
+
+void Connection::disconnect() {
+    boost::system::error_code ec;
+    socket.shutdown(asio::ip::tcp::socket::shutdown_both, ec);
+    socket.close();
 }

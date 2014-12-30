@@ -18,7 +18,16 @@ GameServer::StateMachineType::StateMap GameServer::get_state_map() {
 
 PlayerNetworkPackage GameServer::get_input() {
     while(input_queue.empty()) {
-        auto& connections = server.get_connections();
+        auto & connections = server.get_connections();
+        for(auto it = players.begin(); it != players.end(); it++) {
+            conn_id_t id = it->first;
+            bool still_connected = std::any_of(connections.begin(), connections.end(), [id](std::unique_ptr<Connection> & connection) {
+                return connection->get_id() == id;
+            });
+            if(!still_connected) {
+                players.erase(id);
+            }
+        }
         for(auto it = connections.begin(); it != connections.end(); it++) {
             auto& connection = **it;
             handle_connection(connection);
@@ -37,7 +46,7 @@ void GameServer::handle_connection(Connection & connection) {
         if(can_handle_new_connection()) {
             register_new_connection(connection);
         } else {
-             // TODO: drop connection
+            connection.disconnect();
         }
     } else {
         handle_player_connection(connection);
@@ -71,12 +80,8 @@ void GameServer::run() {
 }
 
 GameServerState GameServer::check_for_connections(PlayerNetworkPackage command) {
-
-    
     if(server.get_connections().size() >= 2) {
         return STOP;
     }
     return CHECK_FOR_CONNECTIONS;
-};
-
-
+}
