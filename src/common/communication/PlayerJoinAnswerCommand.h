@@ -4,14 +4,14 @@
 #include <string>
 #include <vector>
 
-#include "NetworkCommand.h"
-class PlayerJoinAnswerCommand : public NetworkCommand {
+#include "NetworkPackage.h"
+class PlayerJoinAnswerCommand : public NetworkPackage {
     private:
         bool accepted;
         std::string identity;
 
     public:
-        virtual command_nr_t get_command_nr();
+        virtual package_nr_t get_package_nr();
         virtual std::vector<unsigned char> encode_payload();
         virtual void decode_payload(std::vector<unsigned char> command_data);
 

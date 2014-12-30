@@ -1,6 +1,6 @@
 #include "PlayerJoinAnswerCommand.h"
 
-command_nr_t PlayerJoinAnswerCommand::get_command_nr() {
+package_nr_t PlayerJoinAnswerCommand::get_package_nr() {
     return 2;
 }
 

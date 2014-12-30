@@ -1,5 +1,5 @@
 #include "Connection.h"
-#include <common/communication/NetworkInterface.h>
+#include <common/communication/NetworkPackageManager.h>
 
 Connection::Connection(conn_id_t conn_id, asio::ip::tcp::socket socket)
     : conn_id(conn_id),
@@ -28,7 +28,7 @@ ReadCallback Connection::get_read_callback(ReadCommandHandler handler, int packa
         if(!err_code && bytes_read >= package_size - 3) {
             std::vector<unsigned char> command(header.begin(), header.end());
             command.insert(command.end(), payload.begin(), payload.end());
-            auto& network_command = NetworkInterface::decode_command(command);
+            auto& network_command = NetworkPackageManager::decode_command(command);
             handler(network_command);
         } else {
             boost::system::error_code ec;
@@ -42,7 +42,7 @@ ReadCallback Connection::get_read_header_callback(ReadHeaderCommandHandler handl
     return [this, handler](const boost::system::error_code& err_code, std::size_t bytes_read) {
         std::cout << "read " << bytes_read << " from client, err_code: " << err_code << std::endl;
         if(!err_code && bytes_read == 3) {
-            int package_size = NetworkInterface::get_package_size(header);
+            int package_size = NetworkPackageManager::get_package_size(header);
             std::cout << "read header, package of size " << package_size << " incoming." << std::endl;
             if(package_size != -1) {
                 handler(package_size);
@@ -55,8 +55,8 @@ ReadCallback Connection::get_read_header_callback(ReadHeaderCommandHandler handl
     };
 }
 
-void Connection::write(NetworkCommand& command) {
-    auto data = NetworkInterface::encode_command(command);
+void Connection::write(NetworkPackage& command) {
+    auto data = NetworkPackageManager::encode_command(command);
     asio::async_write(socket, asio::buffer(data), [this](const boost::system::error_code& err_code, std::size_t bytes_written) {
     });
 }

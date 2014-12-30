@@ -16,7 +16,7 @@ GameServer::StateMachineType::StateMap GameServer::get_state_map() {
     return map;
 }
 
-PlayerNetworkCommand GameServer::get_input() {
+PlayerNetworkPackage GameServer::get_input() {
     while(input_queue.empty()) {
         auto& connections = server.get_connections();
         for(auto it = connections.begin(); it != connections.end(); it++) {
@@ -27,7 +27,7 @@ PlayerNetworkCommand GameServer::get_input() {
     }
 
     std::lock_guard<std::mutex> lock(queue_lock);
-    PlayerNetworkCommand player_command = input_queue.front();
+    PlayerNetworkPackage player_command = input_queue.front();
     input_queue.pop();
     return player_command;
 }
@@ -46,10 +46,10 @@ void GameServer::handle_connection(Connection & connection) {
 
 void GameServer::handle_player_connection(Connection & connection) {
     auto & player = *players[connection.get_id()].get();
-    connection.read([this, &player](NetworkCommand& command) {
+    connection.read([this, &player](NetworkPackage& command) {
         std::lock_guard<std::mutex> lock(queue_lock);
-        std::cout << "received command #" << std::to_string(command.get_command_nr()) << " from client" << std::endl;
-        PlayerNetworkCommand pcmd(command, player);
+        std::cout << "received command #" << std::to_string(command.get_package_nr()) << " from client" << std::endl;
+        PlayerNetworkPackage pcmd(command, player);
         input_queue.push(pcmd);
     });
 }
@@ -70,7 +70,7 @@ void GameServer::run() {
     state_machine.run();
 }
 
-GameServerState GameServer::check_for_connections(PlayerNetworkCommand command) {
+GameServerState GameServer::check_for_connections(PlayerNetworkPackage command) {
 
     
     if(server.get_connections().size() >= 2) {

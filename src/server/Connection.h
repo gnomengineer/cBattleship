@@ -2,11 +2,11 @@
 #define _CONNECTION_H
 
 #include <boost/asio.hpp>
-#include <common/communication/NetworkCommand.h>
+#include <common/communication/NetworkPackage.h>
 
 namespace asio = boost::asio;
 
-typedef std::function<void(NetworkCommand& command)> ReadCommandHandler;
+typedef std::function<void(NetworkPackage& command)> ReadCommandHandler;
 typedef std::function<void(int package_size)> ReadHeaderCommandHandler;
 typedef std::function<void(const boost::system::error_code& err_code, std::size_t bytes_read)> ReadCallback;
 typedef int conn_id_t;
@@ -24,7 +24,7 @@ class Connection {
         conn_id_t get_id();
 
         void read(ReadCommandHandler handler);
-        void write(NetworkCommand& command);
+        void write(NetworkPackage& command);
 
         bool is_connected();
 

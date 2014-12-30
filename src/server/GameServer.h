@@ -3,8 +3,8 @@
 
 #include "BattleShipServer.h"
 #include <common/state-machine/StateMachine.h>
-#include <common/communication/NetworkInterface.h>
-#include <common/communication/PlayerNetworkCommand.h>
+#include <common/communication/NetworkPackageManager.h>
+#include <common/communication/PlayerNetworkPackage.h>
 #include <map>
 #include <queue>
 #include <mutex>
@@ -17,13 +17,13 @@ enum GameServerState {
 
 class GameServer {
     private:
-        typedef StateMachine<GameServerState, GameServer, PlayerNetworkCommand> StateMachineType;
+        typedef StateMachine<GameServerState, GameServer, PlayerNetworkPackage> StateMachineType;
 
         StateMachineType state_machine;
         BattleShipServer server;
 
         std::map<conn_id_t, std::shared_ptr<Player>> players;
-        std::queue<PlayerNetworkCommand> input_queue;
+        std::queue<PlayerNetworkPackage> input_queue;
         std::mutex queue_lock;
 
     public:
@@ -31,11 +31,11 @@ class GameServer {
         virtual ~GameServer();
 
         StateMachineType::StateMap get_state_map();
-        PlayerNetworkCommand get_input();
+        PlayerNetworkPackage get_input();
 
         void run();
 
-        GameServerState check_for_connections(PlayerNetworkCommand command);
+        GameServerState check_for_connections(PlayerNetworkPackage command);
 
     private:
         void handle_connection(Connection & conn);
