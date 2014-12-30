@@ -12,7 +12,10 @@ class Player {
 
     public:
         Player(std::string name);
+        Player(int id);
+
         std::string get_name() const;
+        void set_name(std::string new_name);
         std::string get_identity() const;
         void set_identity(std::string new_identity);
         BattleField &get_battle_field();

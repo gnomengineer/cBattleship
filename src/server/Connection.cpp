@@ -30,6 +30,10 @@ ReadCallback Connection::get_read_callback(ReadCommandHandler handler, int packa
             command.insert(command.end(), payload.begin(), payload.end());
             auto& network_command = NetworkInterface::decode_command(command);
             handler(network_command);
+        } else {
+            boost::system::error_code ec;
+            socket.shutdown(asio::ip::tcp::socket::shutdown_both, ec);
+            socket.close();
         }
     };
 }
@@ -39,10 +43,14 @@ ReadCallback Connection::get_read_header_callback(ReadHeaderCommandHandler handl
         std::cout << "read " << bytes_read << " from client, err_code: " << err_code << std::endl;
         if(!err_code && bytes_read == 3) {
             int package_size = NetworkInterface::get_package_size(header);
-            std::cout << "read header, packaage of size " << package_size << " incoming." << std::endl;
+            std::cout << "read header, package of size " << package_size << " incoming." << std::endl;
             if(package_size != -1) {
                 handler(package_size);
             }
+        } else {
+            boost::system::error_code ec;
+            socket.shutdown(asio::ip::tcp::socket::shutdown_both, ec);
+            socket.close();
         }
     };
 }
@@ -51,4 +59,8 @@ void Connection::write(NetworkCommand& command) {
     auto data = NetworkInterface::encode_command(command);
     asio::async_write(socket, asio::buffer(data), [this](const boost::system::error_code& err_code, std::size_t bytes_written) {
     });
+}
+
+bool Connection::is_connected() {
+    return socket.is_open();
 }

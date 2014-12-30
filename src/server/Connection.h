@@ -26,6 +26,8 @@ class Connection {
         void read(ReadCommandHandler handler);
         void write(NetworkCommand& command);
 
+        bool is_connected();
+
     private:
         ReadCallback get_read_callback(ReadCommandHandler handler, int package_size);
         ReadCallback get_read_header_callback(ReadHeaderCommandHandler handler);

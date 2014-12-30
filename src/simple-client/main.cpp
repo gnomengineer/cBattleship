@@ -21,7 +21,9 @@ int main(int argc, char *argv[]){
 
     boost::system::error_code ec;
     socket.write_some(boost::asio::buffer(buffer), ec);
+    socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+    socket.close();
 
-    io_service.run();
+    //io_service.run();
     return 0;
 }

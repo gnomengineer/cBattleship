@@ -3,42 +3,77 @@
 #include <boost/thread/thread.hpp> 
 
 GameServer::GameServer()
-    : current_state(CHECK_FOR_CONNECTIONS), server() {
-
+    : state_machine(CHECK_FOR_CONNECTIONS, *this), server() {
     std::cout << "BattleShipServer listening on 0.0.0.0:13477 ..." << std::endl;
 }
 
 GameServer::~GameServer() {
 }
 
-typedef GameServerState (GameServer::* GameServerFunc)(void);
-typedef std::map<GameServerState, GameServerFunc> GameStateFuncMap;
+GameServer::StateMachineType::StateMap GameServer::get_state_map() {
+    StateMachineType::StateMap map;
+    map[CHECK_FOR_CONNECTIONS] =  &GameServer::check_for_connections;
+    return map;
+}
 
-void GameServer::run() {
-    GameStateFuncMap state_func_map;
-    state_func_map.insert(std::make_pair(CHECK_FOR_CONNECTIONS, &GameServer::check_for_connections_state));
+PlayerNetworkCommand GameServer::get_input() {
+    while(input_queue.empty()) {
+        auto& connections = server.get_connections();
+        for(auto it = connections.begin(); it != connections.end(); it++) {
+            auto& connection = **it;
+            handle_connection(connection);
+        }
+        boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+    }
 
-    while(state_func_map.find(current_state) != state_func_map.end()) {
-       auto function_ptr = state_func_map[current_state];
-       current_state = (this->*function_ptr)();
-       boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+    std::lock_guard<std::mutex> lock(queue_lock);
+    PlayerNetworkCommand player_command = input_queue.front();
+    input_queue.pop();
+    return player_command;
+}
+
+void GameServer::handle_connection(Connection & connection) {
+    if(is_new_connection(connection)) {
+        if(can_handle_new_connection()) {
+            register_new_connection(connection);
+        } else {
+             // TODO: drop connection
+        }
+    } else {
+        handle_player_connection(connection);
     }
 }
 
-GameServerState GameServer::check_for_connections_state() {
-    auto& connections = server.get_connections();
-    for(auto it = connections.begin(); it != connections.end(); it++) {
-        auto& connection = **it;
-        if(!connection.get_joined()) {
-            std::cout << "waiting for PlayerJoinCommand from client" << std::endl;
-            connection.read([this](NetworkCommand& command) {
-                std::cout << "received command from client" << std::endl;
-                auto join_cmd = dynamic_cast<PlayerJoinCommand&>(command);
-                std::cout << "Player " << join_cmd.get_player_name() << " joined" << std::endl;
-            });
-        }
-    }
-    if(connections.size() >= 2) {
+void GameServer::handle_player_connection(Connection & connection) {
+    auto & player = *players[connection.get_id()].get();
+    connection.read([this, &player](NetworkCommand& command) {
+        std::lock_guard<std::mutex> lock(queue_lock);
+        std::cout << "received command #" << std::to_string(command.get_command_nr()) << " from client" << std::endl;
+        PlayerNetworkCommand pcmd(command, player);
+        input_queue.push(pcmd);
+    });
+}
+
+bool GameServer::is_new_connection(Connection & connection) {
+    return players.find(connection.get_id()) == players.end();
+}
+
+bool GameServer::can_handle_new_connection() {
+    return players.size() < 2;
+}
+
+void GameServer::register_new_connection(Connection & conn) {
+    players[conn.get_id()] = std::unique_ptr<Player>(new Player(conn.get_id()));
+}
+
+void GameServer::run() {
+    state_machine.run();
+}
+
+GameServerState GameServer::check_for_connections(PlayerNetworkCommand command) {
+
+    
+    if(server.get_connections().size() >= 2) {
         return STOP;
     }
     return CHECK_FOR_CONNECTIONS;

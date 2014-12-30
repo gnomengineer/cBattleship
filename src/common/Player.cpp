@@ -4,8 +4,16 @@ Player::Player(std::string name)
     : name(name) {
 }
 
+Player::Player(int id)
+    : Player(std::string("unnamed player #") + std::to_string(id)) {
+}
+
 std::string Player::get_name() const {
     return name;
+}
+
+void Player::set_name(std::string new_name) {
+    name = new_name;
 }
 
 std::string Player::get_identity() const {

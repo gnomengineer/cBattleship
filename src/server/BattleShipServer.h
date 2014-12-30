@@ -21,6 +21,8 @@ class BattleShipServer {
 
         std::list<std::unique_ptr<Connection>> connections;
 
+        conn_id_t conn_id_gen;
+
     public:
         BattleShipServer();
 
