@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+
+import sys
+
+def read_template(file, vars):
+    f = open(file, "r")
+    contents = f.read()
+    f.close()
+    for var, value in vars.items():
+        contents = contents.replace("@" + var + "@", value)
+
+    return contents
+
+
+
+method_implementations = ""
+method_declarations = ""
+methods_add_suite = ""
+
+name = sys.argv[1]
+command_nr = sys.argv[2]
+template_vars = {"NAME": name,
+                 "UP_NAME": name.upper(), 
+                 "COMMAND_NR": command_nr,
+                 "METHOD_IMPLEMENTATIONS": "",
+                 "METHOD_DECLARATIONS": "",
+                 "PROPERTY_LIST": ""}
+
+
+properties = sys.argv[3:]
+for property in properties:
+    split = property.split(':')
+    property_name, property_type = split[0], split[1]
+    template_vars["PROPERTY"] = property_name
+    template_vars["TYPE"] = property_type
+    template_vars["METHOD_IMPLEMENTATIONS"] += read_template("scripts/network-package-template/method-implementation", template_vars)
+    template_vars["METHOD_DECLARATIONS"]    += read_template("scripts/network-package-template/method-declaration", template_vars)
+    template_vars["PROPERTY_LIST"]    += read_template("scripts/network-package-template/property-list", template_vars)
+
+
+source_file = read_template("scripts/network-package-template/source-file", template_vars)
+header_file = read_template("scripts/network-package-template/header-file", template_vars)
+
+
+f = open("src/common/communication/" + name + "Command.cpp", "w")
+f.write(source_file)
+f.close()
+f = open("src/common/communication/" + name + "Command.h", "w")
+f.write(header_file)
+f.close()
+

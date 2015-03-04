@@ -1,0 +1,22 @@
+#include "@NAME@Command.h"
+
+package_nr_t @NAME@Command::get_package_nr() {
+    return @COMMAND_NR@;
+}
+
+
+std::vector<unsigned char> @NAME@Command::encode_payload() {
+    std::vector<unsigned char> encoded;
+    /* add the following members to the vector
+    @PROPERTY_LIST@
+    */
+    return encoded;
+}
+
+void @NAME@Command::decode_payload(std::vector<unsigned char> command_data) {
+    /* retrieve the following members from the vector
+    @PROPERTY_LIST@
+    */
+}
+
+@METHOD_IMPLEMENTATIONS@

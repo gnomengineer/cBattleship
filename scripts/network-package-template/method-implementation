@@ -1,0 +1,7 @@
+void @NAME@Command::set_@PROPERTY@(@TYPE@ @PROPERTY@) {
+    this->@PROPERTY@ = @PROPERTY@;
+}
+
+@TYPE@ @NAME@Command::get_@PROPERTY@() {
+    return @PROPERTY@;
+}
