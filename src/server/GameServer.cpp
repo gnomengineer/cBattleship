@@ -48,7 +48,7 @@ void GameServer::handle_player_connection(Connection & connection) {
     auto & player = *players[connection.get_id()].get();
     connection.read([this, &player](NetworkPackage& command) {
         std::lock_guard<std::mutex> lock(queue_lock);
-        std::cout << "received command #" << std::to_string(command.get_package_nr()) << " from client" << std::endl;
+        std::cout << "received command #" << (int)command.get_package_nr() << " from client" << std::endl;
         PlayerNetworkPackage pcmd(command, player);
         input_queue.push(pcmd);
     });

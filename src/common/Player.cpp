@@ -1,11 +1,15 @@
 #include "Player.h"
+#include <sstream>
 
 Player::Player(std::string name)
     : name(name) {
 }
 
 Player::Player(int id)
-    : Player(std::string("unnamed player #") + std::to_string(id)) {
+    : Player(std::string("unnamed player #")) {
+    std::stringstream ss;
+    ss << id;
+    name += ss.str();
 }
 
 std::string Player::get_name() const {
