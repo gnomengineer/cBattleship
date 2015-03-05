@@ -4,7 +4,7 @@ PlayerNetworkPackage::PlayerNetworkPackage(NetworkPackage & command, Player & pl
     : command(command), player(player) {
 }
 
-NetworkPackage & PlayerNetworkPackage::get_network_command() {
+NetworkPackage & PlayerNetworkPackage::get_package() {
     return command;
 }
 

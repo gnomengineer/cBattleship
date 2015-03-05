@@ -1,11 +1,12 @@
 #include "Player.h"
 
-Player::Player(std::string name)
-    : name(name) {
+Player::Player(Connection & connection)
+    : name(std::string("unnamed player #") + std::to_string((long)connection.get_id())),
+      connection(connection) {
 }
 
-Player::Player(int id)
-    : Player(std::string("unnamed player #") + std::to_string(id)) {
+Connection & Player::get_connection() {
+    return connection;
 }
 
 std::string Player::get_name() const {

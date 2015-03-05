@@ -1,19 +1,21 @@
 #ifndef _PLAYER_H
 #define _PLAYER_H
 
-#include "BattleField.h"
+#include <common/BattleField.h>
+#include "Connection.h"
 #include <string>
 
 class Player {
     private:
+        Connection & connection;
         std::string name;
         std::string identity;
         BattleField battle_field;
 
     public:
-        Player(std::string name);
-        Player(int id);
+        Player(Connection & connection);
 
+        Connection & get_connection();
         std::string get_name() const;
         void set_name(std::string new_name);
         std::string get_identity() const;

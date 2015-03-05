@@ -1,11 +1,11 @@
-#ifndef _PLAYERJOINCOMMAND_H
-#define _PLAYERJOINCOMMAND_H
+#ifndef _PLAYERJOINPACKAGE_H
+#define _PLAYERJOINPACKAGE_H
 
 #include <string>
 #include <vector>
 
 #include "NetworkPackage.h"
-class PlayerJoinCommand : public NetworkPackage {
+class PlayerJoinPackage : public NetworkPackage {
     private:
         std::string player_name;
 
