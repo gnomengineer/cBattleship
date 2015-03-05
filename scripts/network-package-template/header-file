@@ -1,10 +1,10 @@
-#ifndef _@UP_NAME@COMMAND_H
-#define _@UP_NAME@COMMAND_H
+#ifndef _@UP_NAME@PACKAGE_H
+#define _@UP_NAME@PACKAGE_H
 
 #include <vector>
 
 #include "NetworkPackage.h"
-class @NAME@Command : public NetworkPackage {
+class @NAME@Package : public NetworkPackage {
     private:
 @MEMBERS@
 
@@ -15,4 +15,4 @@ class @NAME@Command : public NetworkPackage {
 
 @METHOD_DECLARATIONS@
 };
-#endif /* _@UP_NAME@COMMAND_H */
+#endif /* _@UP_NAME@PACKAGE_H */

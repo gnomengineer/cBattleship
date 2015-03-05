@@ -21,7 +21,7 @@ template_vars = {"NAME": name,
 
 properties = sys.argv[3:]
 for property in properties:
-    split = property.split(':')
+    split = property.split('|')
     property_name, property_type = split[0], split[1]
     template_vars["PROPERTY"] = property_name
     template_vars["TYPE"] = property_type
@@ -35,10 +35,10 @@ source_file = read_template("scripts/network-package-template/source-file", temp
 header_file = read_template("scripts/network-package-template/header-file", template_vars)
 
 
-f = open("src/common/communication/" + name + "Command.cpp", "w")
+f = open("src/common/communication/" + name + "Package.cpp", "w")
 f.write(source_file)
 f.close()
-f = open("src/common/communication/" + name + "Command.h", "w")
+f = open("src/common/communication/" + name + "Package.h", "w")
 f.write(header_file)
 f.close()
 
