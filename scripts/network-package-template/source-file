@@ -8,15 +8,15 @@ package_nr_t @NAME@Package::get_package_nr() {
 std::vector<unsigned char> @NAME@Package::encode_payload() {
     std::vector<unsigned char> encoded;
     /* add the following members to the vector
-    @PROPERTY_LIST@
-    */
+@PROPERTY_LIST@
+     */
     return encoded;
 }
 
 void @NAME@Package::decode_payload(std::vector<unsigned char> command_data) {
     /* retrieve the following members from the vector
-    @PROPERTY_LIST@
-    */
+@PROPERTY_LIST@
+     */
 }
 
 @METHOD_IMPLEMENTATIONS@
