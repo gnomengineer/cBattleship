@@ -6,7 +6,7 @@
 #include "NetworkPackage.h"
 class @NAME@Command : public NetworkPackage {
     private:
-        std::string player_name;
+@MEMBERS@
 
     public:
         virtual package_nr_t get_package_nr();
