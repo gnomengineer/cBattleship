@@ -1,8 +1,11 @@
 #include "Player.h"
+#include <sstream>
 
 Player::Player(Connection & connection)
-    : name(std::string("unnamed player #") + std::to_string((long)connection.get_id())),
-      connection(connection) {
+    : name(std::string("unnamed player #")), connection(connection) {
+    std::stringstream ss;
+    ss << (long)connection.get_id();
+    name += ss.str();
 }
 
 Connection & Player::get_connection() {

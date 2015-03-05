@@ -39,14 +39,14 @@ void NetworkPackageManagerTest::encode_command_test()
     TestNetworkPackage test_command;
     test_command.some_payload = 0x12345678;
     auto vector = network_package_manager->encode_command(test_command);
-    CPPUNIT_ASSERT_EQUAL((unsigned char)0xEF, vector[0]);
-    CPPUNIT_ASSERT_EQUAL((unsigned char)0x00, vector[1]);
-    CPPUNIT_ASSERT_EQUAL((unsigned char)0x08, vector[2]);
-    CPPUNIT_ASSERT_EQUAL((unsigned char)0x12, vector[3]);
-    CPPUNIT_ASSERT_EQUAL((unsigned char)0x34, vector[4]);
-    CPPUNIT_ASSERT_EQUAL((unsigned char)0x56, vector[5]);
-    CPPUNIT_ASSERT_EQUAL((unsigned char)0x78, vector[6]);
-    CPPUNIT_ASSERT_EQUAL((unsigned char)0xCD, vector[7]);
+    CPPUNIT_ASSERT_EQUAL((int)0xEF, (int)vector[0]);
+    CPPUNIT_ASSERT_EQUAL((int)0x08, (int)vector[1]);
+    CPPUNIT_ASSERT_EQUAL((int)0x00, (int)vector[2]);
+    CPPUNIT_ASSERT_EQUAL((int)0x12, (int)vector[3]);
+    CPPUNIT_ASSERT_EQUAL((int)0x34, (int)vector[4]);
+    CPPUNIT_ASSERT_EQUAL((int)0x56, (int)vector[5]);
+    CPPUNIT_ASSERT_EQUAL((int)0x78, (int)vector[6]);
+    CPPUNIT_ASSERT_EQUAL((int)0xCD, (int)vector[7]);
 }
 
 void NetworkPackageManagerTest::decode_command_test()
