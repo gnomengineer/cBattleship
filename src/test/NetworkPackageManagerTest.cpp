@@ -23,19 +23,22 @@ void NetworkPackageManagerTest::TestNetworkPackage::decode_payload(std::vector<u
 
 void NetworkPackageManagerTest::setUp()
 {
-    NetworkPackageManager::add_network_command(new TestNetworkPackage());
+    network_package_manager = new NetworkPackageManager();
+    // doesn't need to be added everytime, is just overwritten
+    network_package_manager->add_network_commands<TestNetworkPackage>();
 }
 
 
 void NetworkPackageManagerTest::tearDown()
 {
+    delete network_package_manager;
 }
 
 void NetworkPackageManagerTest::encode_command_test()
 {
     TestNetworkPackage test_command;
     test_command.some_payload = 0x12345678;
-    auto vector = NetworkPackageManager::encode_command(test_command);
+    auto vector = network_package_manager->encode_command(test_command);
     CPPUNIT_ASSERT_EQUAL((unsigned char)0xEF, vector[0]);
     CPPUNIT_ASSERT_EQUAL((unsigned char)0x00, vector[1]);
     CPPUNIT_ASSERT_EQUAL((unsigned char)0x08, vector[2]);
@@ -51,10 +54,9 @@ void NetworkPackageManagerTest::decode_command_test()
     const int payload = 0x12345678;
     TestNetworkPackage test_command;
     test_command.some_payload = payload;
-    NetworkPackage& network_command = NetworkPackageManager::decode_command(NetworkPackageManager::encode_command(test_command));
+    NetworkPackage& network_command = network_package_manager->decode_command(network_package_manager->encode_command(test_command));
     int decoded_payload = dynamic_cast<TestNetworkPackage*>(&network_command)->some_payload;
     CPPUNIT_ASSERT_EQUAL(payload, decoded_payload);
- 
 }
 
 
