@@ -4,10 +4,13 @@
 
 std::map<package_nr_t, std::unique_ptr<NetworkPackage>> NetworkPackageManager::network_commands;
 
-NETWORK_PACKAGE_MANAGER_COMMAND_LIST
-NETWORK_PACKAGE_MANAGER_COMMAND(PlayerJoinCommand)
-NETWORK_PACKAGE_MANAGER_COMMAND(PlayerJoinAnswerCommand)
-NETWORK_PACKAGE_MANAGER_COMMAND_LIST_END
+NetworkPackageManager::NetworkPackageManager() {
+    if(network_commands.size() == 0) {
+        add_network_commands<PlayerJoinPackage,
+                             PlayerJoinAnswerPackage,
+                             GameReadyPackage>();
+    }
+}
 
 std::vector<unsigned char> NetworkPackageManager::encode_command(NetworkPackage& command) {
     std::vector<unsigned char> encoded(3);
@@ -27,7 +30,7 @@ std::vector<unsigned char> NetworkPackageManager::encode_command(NetworkPackage&
 NetworkPackage& NetworkPackageManager::decode_command(std::vector<unsigned char> command_data) {
     if(!NetworkPackageManager::check_packaging(command_data)) throw std::runtime_error("frame is packaged incorrectly");
     unsigned char package_nr = command_data[0];
-    int size = NetworkPackageManager::get_package_size(command_data);
+    int size = this->get_package_size(command_data);
 
     if(network_commands.find((int)command_data[0]) == network_commands.end()) throw std::runtime_error("invalid command nr");
 
@@ -42,7 +45,7 @@ NetworkPackage& NetworkPackageManager::decode_command(std::vector<unsigned char>
 }
 
 bool NetworkPackageManager::check_packaging(std::vector<unsigned char> command_data) {
-    int size = NetworkPackageManager::get_package_size(command_data);
+    int size = this->get_package_size(command_data);
     if(size == -1) return false;
     if(size < 4) return false;
     if(command_data.size() < size) return false;
@@ -57,8 +60,3 @@ int NetworkPackageManager::get_package_size(std::vector<unsigned char> command_d
     size |= command_data[2] << 8;
     return size;
 }
-
-void NetworkPackageManager::add_network_command(NetworkPackage* command) {
-    network_commands[command->get_package_nr()] = std::unique_ptr<NetworkPackage>(command);
-}
-

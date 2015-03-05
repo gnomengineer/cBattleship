@@ -1,8 +1,8 @@
 #ifndef _PLAYERNETWORKPACKAGE_H
 #define _PLAYERNETWORKPACKAGE_H
 
-#include "NetworkPackage.h"
-#include <common/Player.h>
+#include <common/communication/NetworkPackage.h>
+#include "Player.h"
 
 class PlayerNetworkPackage {
     private:
@@ -13,7 +13,7 @@ class PlayerNetworkPackage {
         PlayerNetworkPackage(NetworkPackage & command, Player & player);
 
         Player & get_player();
-        NetworkPackage & get_network_command();
+        NetworkPackage & get_package();
 };
 
 #endif // _PLAYERNETWORKPACKAGE_H

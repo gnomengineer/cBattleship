@@ -13,6 +13,7 @@ GameServer::~GameServer() {
 GameServer::StateMachineType::StateMap GameServer::get_state_map() {
     StateMachineType::StateMap map;
     map[CHECK_FOR_CONNECTIONS] =  &GameServer::check_for_connections;
+    map[SETUP_GAME] = &GameServer::setup_game;
     return map;
 }
 
@@ -71,17 +72,43 @@ bool GameServer::can_handle_new_connection() {
     return players.size() < 2;
 }
 
-void GameServer::register_new_connection(Connection & conn) {
-    players[conn.get_id()] = std::unique_ptr<Player>(new Player(conn.get_id()));
+void GameServer::register_new_connection(Connection & connection) {
+    players[connection.get_id()] = std::unique_ptr<Player>(new Player(connection));
 }
 
 void GameServer::run() {
     state_machine.run();
 }
 
-GameServerState GameServer::check_for_connections(PlayerNetworkPackage command) {
-    if(server.get_connections().size() >= 2) {
-        return STOP;
+GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_package) {
+    Player& player = player_package.get_player();
+    NetworkPackage& package = player_package.get_package();
+
+    if(is_package_of_type<PlayerJoinPackage>(package)) {
+        PlayerJoinPackage & p = cast_package<PlayerJoinPackage>(package);
+        player.set_name(p.get_player_name());
+        PlayerJoinAnswerPackage answer;
+
+        auto randchar = []() -> char {
+            const char charset[] = "abcdefghijklmnopqrstuvwxyz";
+            const size_t size = sizeof(charset) - 1;
+            return charset[rand() % size];
+        };
+        std::string identity(12, 0);
+        std::generate_n(identity.begin(), 12, randchar);
+        answer.set_identity(identity);
+        player.get_connection().write(answer);
+        players_playing.push_back(&player);
     }
-    return CHECK_FOR_CONNECTIONS;
+
+    return players_playing.size() == 2 ? SETUP_GAME : CHECK_FOR_CONNECTIONS;
+}
+
+GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
+    Player& player = player_package.get_player();
+    NetworkPackage& package = player_package.get_package();
+
+    if(is_package_of_type<GameReadyPackage>(package)) {
+    }
+    
 }

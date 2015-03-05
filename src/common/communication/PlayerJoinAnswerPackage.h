@@ -1,13 +1,12 @@
-#ifndef _PLAYERJOINANSWERCOMMAND_H
-#define _PLAYERJOINANSWERCOMMAND_H
+#ifndef _PLAYERJOINANSWERPACKAGE_H
+#define _PLAYERJOINANSWERPACKAGE_H
 
 #include <string>
 #include <vector>
 
 #include "NetworkPackage.h"
-class PlayerJoinAnswerCommand : public NetworkPackage {
+class PlayerJoinAnswerPackage : public NetworkPackage {
     private:
-        bool accepted;
         std::string identity;
 
     public:
@@ -17,7 +16,5 @@ class PlayerJoinAnswerCommand : public NetworkPackage {
 
         std::string get_identity();
         void set_identity(std::string identity);
-        void set_accepted(bool accepted);
-        bool get_accepted();
 };
 #endif 

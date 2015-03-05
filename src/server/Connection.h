@@ -3,6 +3,7 @@
 
 #include <boost/asio.hpp>
 #include <common/communication/NetworkPackage.h>
+#include <common/communication/NetworkPackageManager.h>
 
 namespace asio = boost::asio;
 
@@ -17,6 +18,7 @@ class Connection {
         std::vector<unsigned char> header;
         std::vector<unsigned char> payload;
         asio::ip::tcp::socket socket;
+        NetworkPackageManager network_package_manager;
 
     public:
         Connection(conn_id_t conn_id, asio::ip::tcp::socket socket);

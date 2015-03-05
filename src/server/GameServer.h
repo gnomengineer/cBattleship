@@ -4,13 +4,14 @@
 #include "BattleShipServer.h"
 #include <common/state-machine/StateMachine.h>
 #include <common/communication/NetworkPackageManager.h>
-#include <common/communication/PlayerNetworkPackage.h>
+#include "PlayerNetworkPackage.h"
 #include <map>
 #include <queue>
 #include <mutex>
 
 enum GameServerState {
     CHECK_FOR_CONNECTIONS,
+    SETUP_GAME,
     STOP = -1
 };
 
@@ -22,7 +23,9 @@ class GameServer {
         StateMachineType state_machine;
         BattleShipServer server;
 
-        std::map<conn_id_t, std::shared_ptr<Player>> players;
+
+        std::list<Player*> players_playing;
+        std::map<conn_id_t, std::unique_ptr<Player>> players;
         std::queue<PlayerNetworkPackage> input_queue;
         std::mutex queue_lock;
 
@@ -35,7 +38,8 @@ class GameServer {
 
         void run();
 
-        GameServerState check_for_connections(PlayerNetworkPackage command);
+        GameServerState check_for_connections(PlayerNetworkPackage player_package);
+        GameServerState setup_game(PlayerNetworkPackage player_package);
 
     private:
         void handle_connection(Connection & conn);

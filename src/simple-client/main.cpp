@@ -8,6 +8,7 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
+    std::cout << "resolving ... " << std::endl;
     boost::asio::io_service io_service;
     boost::asio::ip::tcp::resolver resolver(io_service);
     boost::asio::ip::tcp::resolver::query query(argv[1], "13477");
@@ -19,11 +20,17 @@ int main(int argc, char *argv[]){
     unsigned char packageLengthL = 0x0A;
     unsigned char buffer[] = { commandNr, packageLengthL, packageLengthH, 'C', 'l', 'i', 'e', 'n', 't', 0xCD};
 
+    std::cout << "connecting ... " << std::endl;
     boost::system::error_code ec;
     socket.write_some(boost::asio::buffer(buffer), ec);
+
+    std::vector<char> rb(1024, 0);
+    socket.read_some(boost::asio::buffer(rb), ec);
+    std::string rbs(rb.begin(), rb.end());
+    std::cout << "read: " << rbs << std::endl;
     socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
     socket.close();
 
-    //io_service.run();
+    io_service.run();
     return 0;
 }
