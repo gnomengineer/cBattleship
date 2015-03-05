@@ -6,7 +6,6 @@
 #include "NetworkPackage.h"
 class GameReadyPackage : public NetworkPackage {
     private:
-        int field;
 
 
     public:
@@ -14,8 +13,6 @@ class GameReadyPackage : public NetworkPackage {
         virtual std::vector<unsigned char> encode_payload();
         virtual void decode_payload(std::vector<unsigned char> command_data);
 
-        int get_field();
-        void set_field(int field);
 
 };
 #endif /* _GAMEREADYPACKAGE_H */

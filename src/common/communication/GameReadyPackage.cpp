@@ -8,24 +8,15 @@ package_nr_t GameReadyPackage::get_package_nr() {
 std::vector<unsigned char> GameReadyPackage::encode_payload() {
     std::vector<unsigned char> encoded;
     /* add the following members to the vector
-        * field
 
-    */
+     */
     return encoded;
 }
 
 void GameReadyPackage::decode_payload(std::vector<unsigned char> command_data) {
     /* retrieve the following members from the vector
-        * field
 
-    */
+     */
 }
 
-void GameReadyPackage::set_field(int field) {
-    this->field = field;
-}
-
-int GameReadyPackage::get_field() {
-    return field;
-}
 
