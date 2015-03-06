@@ -1,9 +1,15 @@
 #include "PlayerJoinPackage.h"
 
+
+PlayerJoinPackage::PlayerJoinPackage() {
+}
+
+PlayerJoinPackage::~PlayerJoinPackage() {
+}
+
 package_nr_t PlayerJoinPackage::get_package_nr() {
     return 1;
 }
-
 
 std::vector<unsigned char> PlayerJoinPackage::encode_payload() {
     return std::vector<unsigned char>(player_name.begin(), player_name.end());

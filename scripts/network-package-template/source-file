@@ -1,5 +1,11 @@
 #include "@NAME@Package.h"
 
+@NAME@Package::@NAME@Package() {
+}
+
+@NAME@Package::~@NAME@Package() {
+}
+
 package_nr_t @NAME@Package::get_package_nr() {
     return @COMMAND_NR@;
 }

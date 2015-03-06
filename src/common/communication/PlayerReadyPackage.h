@@ -1,21 +1,21 @@
-#ifndef _@UP_NAME@PACKAGE_H
-#define _@UP_NAME@PACKAGE_H
+#ifndef _PLAYERREADYPACKAGE_H
+#define _PLAYERREADYPACKAGE_H
 
 #include <vector>
 
 #include "NetworkPackage.h"
-class @NAME@Package : public NetworkPackage {
+class PlayerReadyPackage : public NetworkPackage {
     private:
-@MEMBERS@
+
 
     public:
-        @NAME@Package();
-        ~@NAME@Package();
+        PlayerReadyPackage();
+        ~PlayerReadyPackage();
 
         virtual package_nr_t get_package_nr();
         virtual std::vector<unsigned char> encode_payload();
         virtual void decode_payload(std::vector<unsigned char> command_data);
 
-@METHOD_DECLARATIONS@
+
 };
-#endif /* _@UP_NAME@PACKAGE_H */
+#endif /* _PLAYERREADYPACKAGE_H */

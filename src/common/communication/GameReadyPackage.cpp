@@ -1,7 +1,13 @@
 #include "GameReadyPackage.h"
 
+GameReadyPackage::GameReadyPackage() {
+}
+
+GameReadyPackage::~GameReadyPackage() {
+}
+
 package_nr_t GameReadyPackage::get_package_nr() {
-    return 3;
+    return 4;
 }
 
 

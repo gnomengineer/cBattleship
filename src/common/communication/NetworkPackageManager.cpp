@@ -8,7 +8,8 @@ NetworkPackageManager::NetworkPackageManager() {
     if(network_commands.size() == 0) {
         add_network_commands<PlayerJoinPackage,
                              PlayerJoinAnswerPackage,
-                             GameReadyPackage>();
+                             GameReadyPackage,
+                             PlayerReadyPackage>();
     }
 }
 

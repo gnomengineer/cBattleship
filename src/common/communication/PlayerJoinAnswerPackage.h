@@ -10,6 +10,9 @@ class PlayerJoinAnswerPackage : public NetworkPackage {
         std::string identity;
 
     public:
+        PlayerJoinAnswerPackage();
+        ~PlayerJoinAnswerPackage();
+
         virtual package_nr_t get_package_nr();
         virtual std::vector<unsigned char> encode_payload();
         virtual void decode_payload(std::vector<unsigned char> command_data);

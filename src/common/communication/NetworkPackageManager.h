@@ -8,6 +8,7 @@
 #include "PlayerJoinPackage.h"
 #include "PlayerJoinAnswerPackage.h"
 #include "GameReadyPackage.h"
+#include "PlayerReadyPackage.h"
 
 class NetworkPackageManager {
     private:
