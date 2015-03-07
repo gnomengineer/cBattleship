@@ -2,7 +2,9 @@
 #include <sstream>
 
 Player::Player(Connection & connection)
-    : name(std::string("unnamed player #")), connection(connection) {
+    : name(std::string("unnamed player #")),
+      connection(connection),
+      is_ready_to_start_(false) { 
     std::stringstream ss;
     ss << (long)connection.get_id();
     name += ss.str();
@@ -28,7 +30,14 @@ void Player::set_identity(std::string new_identity) {
     identity = new_identity;
 }
 
+bool Player::is_ready_to_start() {
+    return is_ready_to_start_;
+}
+
+void Player::set_ready_to_start(bool ready_to_start) {
+    is_ready_to_start_ = ready_to_start;
+}
+
 BattleField &Player::get_battle_field() {
     return battle_field;
 }
-

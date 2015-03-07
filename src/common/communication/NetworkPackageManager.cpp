@@ -9,7 +9,8 @@ NetworkPackageManager::NetworkPackageManager() {
         add_network_commands<PlayerJoinPackage,
                              PlayerJoinAnswerPackage,
                              GameReadyPackage,
-                             PlayerReadyPackage>();
+                             PlayerReadyPackage,
+                             TurnRequestPackage>();
     }
 }
 

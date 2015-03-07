@@ -1,6 +1,7 @@
 #include "GameServer.h"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp> 
+#include <algorithm>
 
 GameServer::GameServer()
     : state_machine(CHECK_FOR_CONNECTIONS, *this), server() {
@@ -14,6 +15,7 @@ GameServer::StateMachineType::StateMap GameServer::get_state_map() {
     StateMachineType::StateMap map;
     map[CHECK_FOR_CONNECTIONS] =  &GameServer::check_for_connections;
     map[SETUP_GAME] = &GameServer::setup_game;
+    map[TURN_WAIT] = &GameServer::turn_wait;
     return map;
 }
 
@@ -80,6 +82,22 @@ void GameServer::run() {
     state_machine.run();
 }
 
+void GameServer::next_player() {
+    if(current_player != players_playing.end()) {
+        current_player++;
+    }
+    if(current_player == players_playing.end()) {
+        current_player = players_playing.begin();
+    }
+}
+
+void GameServer::request_turn() {
+    next_player();
+    TurnRequestPackage turn_request_package;
+    (*current_player)->get_connection().write(turn_request_package);
+}
+
+
 GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_package) {
     Player& player = player_package.get_player();
     NetworkPackage& package = player_package.get_package();
@@ -108,7 +126,23 @@ GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
     Player& player = player_package.get_player();
     NetworkPackage& package = player_package.get_package();
 
-    if(is_package_of_type<GameReadyPackage>(package)) {
+    if(is_package_of_type<PlayerReadyPackage>(package)) {
+        player.set_ready_to_start(true);
     }
+
+    bool players_are_ready_to_start = std::all_of(players_playing.begin(), players_playing.end(), [](Player *player) {
+        return player->is_ready_to_start();
+    });
     
+    if(players_are_ready_to_start) {
+        request_turn();
+        return TURN_WAIT;
+    }
+    return SETUP_GAME;
+}
+
+GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
+    Player& player = player_package.get_player();
+    NetworkPackage& package = player_package.get_package();
+    return TURN_WAIT;
 }

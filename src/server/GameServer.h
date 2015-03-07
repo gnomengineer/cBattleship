@@ -12,6 +12,7 @@
 enum GameServerState {
     CHECK_FOR_CONNECTIONS,
     SETUP_GAME,
+    TURN_WAIT,
     STOP = -1
 };
 
@@ -25,6 +26,7 @@ class GameServer {
 
 
         std::list<Player*> players_playing;
+        std::list<Player*>::iterator current_player;
         std::map<conn_id_t, std::unique_ptr<Player>> players;
         std::queue<PlayerNetworkPackage> input_queue;
         std::mutex queue_lock;
@@ -40,6 +42,7 @@ class GameServer {
 
         GameServerState check_for_connections(PlayerNetworkPackage player_package);
         GameServerState setup_game(PlayerNetworkPackage player_package);
+        GameServerState turn_wait(PlayerNetworkPackage player_package);
 
     private:
         void handle_connection(Connection & conn);
@@ -47,6 +50,8 @@ class GameServer {
         bool is_new_connection(Connection & conn);
         bool can_handle_new_connection();
         void register_new_connection(Connection & conn);
+        void next_player();
+        void request_turn();
 
 };
 

@@ -9,6 +9,7 @@
 #include "PlayerJoinAnswerPackage.h"
 #include "GameReadyPackage.h"
 #include "PlayerReadyPackage.h"
+#include "TurnRequestPackage.h"
 
 class NetworkPackageManager {
     private:
