@@ -7,9 +7,15 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <vector>
 
 #define BATTLEFIELD_WIDTH 10
 #define BATTLEFIELD_HEIGHT 10
+
+#define FIELD_WATER '~'
+#define FIELD_SHIP 'S'
+#define FIELD_HIT 'X'
+#define FIELD_DESTROYED 'X'
 
 
 // This class provides the functionality of a battle
@@ -23,11 +29,14 @@ class BattleField {
 
     public:
         BattleField();
+        BattleField(const BattleField& other);
         void add_ship(unsigned int length, orientation_t orientation, position_t position);
         bool all_ships_destroyed() const;
         bool hit_field(position_t position);
 
         void remove_ship(unsigned int length, orientation_t orientation, position_t position);
+
+        std::vector<unsigned char> to_vector(bool hide_ships = false);
 
     private:
         bool check_ship_collision(Ship &new_ship) const;

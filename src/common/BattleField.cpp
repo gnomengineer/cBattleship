@@ -15,6 +15,13 @@ BattleField::BattleField() {
     ships_available[5] = 1;
 }
 
+BattleField::BattleField(const BattleField& other) {
+        
+    fields = std::array<std::array<std::shared_ptr<Field>, BATTLEFIELD_HEIGHT>, BATTLEFIELD_WIDTH>(other.fields);
+    ships = std::list<std::shared_ptr<Ship>>(other.ships);
+    ships_available = std::map<unsigned int, int>(other.ships_available);
+}
+
 void BattleField::add_ship(unsigned int length, orientation_t orientation, position_t start_position) {
     if(!is_valid_orientation(orientation)) throw std::invalid_argument("invalid orientation");
     if(!check_position(start_position, BATTLEFIELD_WIDTH, BATTLEFIELD_HEIGHT)) throw std::out_of_range("position out of range");
@@ -61,6 +68,31 @@ bool BattleField::hit_field(position_t position) {
     auto &hit_field = fields[position.y][position.x];
     hit_field->set_hit();
     return hit_field->is_ship_part();
+}
+
+std::vector<unsigned char> BattleField::to_vector(bool hide_ships) {
+    std::vector<unsigned char> result;
+    result.resize(BATTLEFIELD_HEIGHT * BATTLEFIELD_WIDTH);
+    for(int y = 0; y < BATTLEFIELD_HEIGHT; y++) {
+        for(int x = 0; x < BATTLEFIELD_WIDTH; x++) {
+            int i = BATTLEFIELD_HEIGHT * y + x;
+            auto& field = *fields[y][x];
+            if(field.is_hit()) {
+                if(field.is_ship_part()) {
+                    result[i] = FIELD_DESTROYED;
+                } else {
+                    result[i] = FIELD_HIT;
+                }
+            } else {
+                if(field.is_ship_part() && !hide_ships) {
+                    result[i] = FIELD_SHIP;
+                } else {
+                    result[i] = FIELD_WATER;
+                }
+            }
+        }
+    }
+    return result;
 }
 
 bool BattleField::check_ship_collision(Ship &new_ship) const {
