@@ -10,6 +10,7 @@
 #include "GameReadyPackage.h"
 #include "PlayerReadyPackage.h"
 #include "TurnRequestPackage.h"
+#include "TurnPackage.h"
 
 class NetworkPackageManager {
     private:

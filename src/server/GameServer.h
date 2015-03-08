@@ -51,6 +51,7 @@ class GameServer {
         bool can_handle_new_connection();
         void register_new_connection(Connection & conn);
         void next_player();
+        Player& get_enemy();
         void request_turn();
 
 };

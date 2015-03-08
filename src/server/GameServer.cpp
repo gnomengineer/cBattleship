@@ -91,6 +91,14 @@ void GameServer::next_player() {
     }
 }
 
+Player& GameServer::get_enemy() {
+    auto current = current_player;
+    next_player();
+    auto enemy = current_player;
+    current_player = current;
+    return **enemy;
+}
+
 void GameServer::request_turn() {
     next_player();
     TurnRequestPackage turn_request_package;
@@ -144,5 +152,13 @@ GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
 GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
     Player& player = player_package.get_player();
     NetworkPackage& package = player_package.get_package();
+
+    if(is_package_of_type<TurnPackage>(package)) {
+        if(&player == *current_player) {
+            TurnPackage & p = cast_package<TurnPackage>(package);
+            get_enemy().get_battle_field().hit_field(position(p.get_pos_x(), p.get_pos_y()));
+            request_turn();
+        }
+    }
     return TURN_WAIT;
 }

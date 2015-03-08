@@ -10,7 +10,8 @@ NetworkPackageManager::NetworkPackageManager() {
                              PlayerJoinAnswerPackage,
                              GameReadyPackage,
                              PlayerReadyPackage,
-                             TurnRequestPackage>();
+                             TurnRequestPackage,
+                             TurnPackage>();
     }
 }
 
