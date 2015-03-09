@@ -35,7 +35,7 @@ PlayerNetworkPackage GameServer::get_input() {
             auto& connection = **it;
             handle_connection(connection);
         }
-        boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+        boost::this_thread::sleep(boost::posix_time::milliseconds(500));
     }
 
     std::lock_guard<std::mutex> lock(queue_lock);
@@ -111,6 +111,7 @@ GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_pa
     NetworkPackage& package = player_package.get_package();
 
     if(is_package_of_type<PlayerJoinPackage>(package)) {
+        std::cout << "PlayerJoinPackage received" << std::endl;
         PlayerJoinPackage & p = cast_package<PlayerJoinPackage>(package);
         player.set_name(p.get_player_name());
         PlayerJoinAnswerPackage answer;

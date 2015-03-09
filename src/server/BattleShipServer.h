@@ -8,7 +8,7 @@
 #include <list>
 #include <memory>
 
-#include "Connection.h"
+#include <common/Connection.h>
 
 namespace asio = boost::asio;
 

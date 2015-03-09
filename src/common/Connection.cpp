@@ -18,6 +18,7 @@ void Connection::read(ReadCommandHandler handler) {
         payload.resize(package_size - 3);
         asio::async_read(socket, asio::buffer(payload), get_read_callback(handler, package_size));
     };
+    read_lock.lock();
     asio::async_read(socket, asio::buffer(header), get_read_header_callback(read_header_callback));
 }
 
@@ -32,6 +33,7 @@ ReadCallback Connection::get_read_callback(ReadCommandHandler handler, int packa
         } else {
             disconnect();
         }
+        read_lock.unlock();
     };
 }
 

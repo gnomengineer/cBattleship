@@ -2,7 +2,7 @@
 #define _PLAYER_H
 
 #include <common/BattleField.h>
-#include "Connection.h"
+#include <common/Connection.h>
 #include <string>
 
 class Player {
