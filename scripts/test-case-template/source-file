@@ -1,15 +1,21 @@
-#include "@NAME@Test.h"
+#include "{{name}}Test.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION(@NAME@Test);
+CPPUNIT_TEST_SUITE_REGISTRATION({{name}}Test);
 
 
-void @NAME@Test::setUp()
+void {{name}}Test::setUp()
 {
 }
 
 
-void @NAME@Test::tearDown()
+void {{name}}Test::tearDown()
 {
 }
 
-@METHOD_IMPLEMENTATIONS@
+{{#methods}}
+void {{name}}Test::{{.}}()
+{
+    CPPUNIT_FAIL("not implemented yet");
+}
+{{/methods}}
+

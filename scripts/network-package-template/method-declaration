@@ -1,2 +1,0 @@
-        @TYPE@ get_@PROPERTY@();
-        void set_@PROPERTY@(@TYPE@ @PROPERTY@);

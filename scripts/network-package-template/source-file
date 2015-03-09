@@ -1,28 +1,40 @@
-#include "@NAME@Package.h"
+#include "{{name}}Package.h"
 
-@NAME@Package::@NAME@Package() {
+{{name}}Package::{{name}}Package() {
 }
 
-@NAME@Package::~@NAME@Package() {
+{{name}}Package::~{{name}}Package() {
 }
 
-package_nr_t @NAME@Package::get_package_nr() {
-    return @COMMAND_NR@;
+package_nr_t {{name}}Package::get_package_nr() {
+    return {{command_nr}};
 }
 
 
-std::vector<unsigned char> @NAME@Package::encode_payload() {
+std::vector<unsigned char> {{name}}Package::encode_payload() {
     std::vector<unsigned char> encoded;
     /* add the following members to the vector
-@PROPERTY_LIST@
+{{#members}}
+     * - {{property}}
+{{/members}}
      */
     return encoded;
 }
 
-void @NAME@Package::decode_payload(std::vector<unsigned char> command_data) {
+void {{name}}Package::decode_payload(std::vector<unsigned char> command_data) {
     /* retrieve the following members from the vector
-@PROPERTY_LIST@
+{{#members}}
+     * - {{property}}
+{{/members}}
      */
 }
 
-@METHOD_IMPLEMENTATIONS@
+{{#members}}
+void {{name}}Package::set_{{property}}({{type}} {{property}}) {
+    this->{{property}} = {{property}};
+}
+
+{{type}} {{name}}Package::get_{{property}}() {
+    return {{property}};
+}
+{{/members}}

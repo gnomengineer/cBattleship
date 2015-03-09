@@ -1,20 +1,23 @@
-#ifndef _@UP_NAME@TEST_H
-#define _@UP_NAME@TEST_H
+#ifndef _{{uppercase_name}}TEST_H
+#define _{{uppercase_name}}TEST_H
 
 #include <cppunit/extensions/HelperMacros.h>
 
-class @NAME@Test : public CppUnit::TestFixture
+class {{name}}Test : public CppUnit::TestFixture
 {
-    CPPUNIT_TEST_SUITE(@NAME@Test);
-
-@METHODS_ADD_SUITE@
+    CPPUNIT_TEST_SUITE({{name}}Test);
+{{#methods}}
+    CPPUNIT_TEST({{.}});
+{{/methods}}
     CPPUNIT_TEST_SUITE_END();
       
     public:
         void setUp();
         void tearDown();
           
-@METHOD_DECLARATIONS@
+{{#methods}}
+        void {{.}}();
+{{/methods}}
 };
 
-#endif  // @UP_NAME@TEST_H
+#endif  // {{uppercase_name}}TEST_H
