@@ -12,7 +12,12 @@ package_nr_t {{name}}Package::get_package_nr() {
 
 
 std::vector<unsigned char> {{name}}Package::encode_payload() {
+{{#authenticated}}
+    std::vector<unsigned char> encoded = AuthenticatedNetworkPackage::encode_payload();
+{{/authenticated}}
+{{^authenticated}}
     std::vector<unsigned char> encoded;
+{{/authenticated}}
     /* add the following members to the vector
 {{#members}}
      * - {{property}}
@@ -22,6 +27,9 @@ std::vector<unsigned char> {{name}}Package::encode_payload() {
 }
 
 void {{name}}Package::decode_payload(std::vector<unsigned char> command_data) {
+{{#authenticated}}
+    AuthenticatedNetworkPackage::decode_payload(command_data);
+{{/authenticated}}
     /* retrieve the following members from the vector
 {{#members}}
      * - {{property}}
