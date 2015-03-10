@@ -18,7 +18,7 @@ std::vector<unsigned char> PlayerJoinAnswerPackage::encode_payload() {
 }
 
 void PlayerJoinAnswerPackage::decode_payload(std::vector<unsigned char> command_data) {
-    identity = std::string(command_data.begin() + 1, command_data.end());
+    identity = std::string(command_data.begin(), command_data.end());
 }
 
 void PlayerJoinAnswerPackage::set_identity(std::string identity) {

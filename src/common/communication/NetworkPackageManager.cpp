@@ -32,10 +32,10 @@ std::vector<unsigned char> NetworkPackageManager::encode_command(NetworkPackage&
 
 NetworkPackage& NetworkPackageManager::decode_command(std::vector<unsigned char> command_data) {
     if(!NetworkPackageManager::check_packaging(command_data)) throw std::runtime_error("frame is packaged incorrectly");
-    unsigned char package_nr = command_data[0];
+    package_nr_t package_nr = command_data[0];
     int size = this->get_package_size(command_data);
 
-    if(network_commands.find((int)command_data[0]) == network_commands.end()) throw std::runtime_error("invalid command nr");
+    if(network_commands.find(package_nr) == network_commands.end()) throw std::runtime_error("invalid command nr");
 
     // remove terminator & header
     command_data.erase(command_data.begin() + (size - 1));

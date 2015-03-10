@@ -11,7 +11,7 @@ class PlayerJoinAnswerPackage : public NetworkPackage {
 
     public:
         PlayerJoinAnswerPackage();
-        ~PlayerJoinAnswerPackage();
+        virtual ~PlayerJoinAnswerPackage();
 
         virtual package_nr_t get_package_nr();
         virtual std::vector<unsigned char> encode_payload();

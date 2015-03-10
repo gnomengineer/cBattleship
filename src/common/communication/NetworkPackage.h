@@ -28,7 +28,7 @@ template<typename T> bool is_package_of_type(NetworkPackage & package) {
 }
 
 template<typename T> T & cast_package(NetworkPackage & package) {
-    return *dynamic_cast<T*>(&package);
+    return dynamic_cast<T&>(package);
 }
 
 #endif
