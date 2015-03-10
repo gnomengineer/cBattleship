@@ -4,6 +4,8 @@ import argparse
 from template import *
 
 parser = argparse.ArgumentParser(prog='generate-network-package', description='Generate a NetworkPackage class')
+parser.add_argument('--authenticated', action="store_true",
+                    help='create a package inheriting AuthenticatedNetworkPackage (instead of inheriting NetworkPackage)')
 parser.add_argument('name', metavar='package_name',
                     help='Name of the new NetworkPackage without the "Package"-postfix')
 parser.add_argument('command_nr', metavar='command_nr', type=int,

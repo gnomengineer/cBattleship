@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "NetworkPackage.h"
-class {{name}}Package : public NetworkPackage {
+#include "{{#authenticated}}Authenticated{{/authenticated}}NetworkPackage.h"
+class {{name}}Package : public {{#authenticated}}Authenticated{{/authenticated}}NetworkPackage {
     private:
 {{#members}}
         {{type}} {{property}};
@@ -12,7 +12,7 @@ class {{name}}Package : public NetworkPackage {
 
     public:
         {{name}}Package();
-        ~{{name}}Package();
+        virtual ~{{name}}Package();
 
         virtual package_nr_t get_package_nr();
         virtual std::vector<unsigned char> encode_payload();
