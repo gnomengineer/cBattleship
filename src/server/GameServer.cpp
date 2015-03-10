@@ -59,11 +59,21 @@ void GameServer::handle_connection(Connection & connection) {
 void GameServer::handle_player_connection(Connection & connection) {
     auto & player = *players[connection.get_id()].get();
     connection.read([this, &player](NetworkPackage& command) {
-        std::lock_guard<std::mutex> lock(queue_lock);
         std::cout << "received command #" << (int)command.get_package_nr() << " from client" << std::endl;
-        PlayerNetworkPackage pcmd(command, player);
-        input_queue.push(pcmd);
+        if(is_authenticated(command, player)) {
+            std::lock_guard<std::mutex> lock(queue_lock);
+            PlayerNetworkPackage pcmd(command, player);
+            input_queue.push(pcmd);
+        } else {
+            std::cout << "command not properly authenticated" << std::endl;
+        }
     });
+}
+
+bool GameServer::is_authenticated(NetworkPackage & command, Player & player) {
+    AuthenticatedNetworkPackage* authenticated_package = dynamic_cast<AuthenticatedNetworkPackage*>(&command);
+    if(authenticated_package == nullptr) return true;
+    return authenticated_package->get_identity() == player.get_identity();
 }
 
 bool GameServer::is_new_connection(Connection & connection) {
@@ -124,6 +134,7 @@ GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_pa
         std::string identity(12, 0);
         std::generate_n(identity.begin(), 12, randchar);
         answer.set_identity(identity);
+        player.set_identity(identity);
         player.get_connection().write(answer);
         players_playing.push_back(&player);
     }

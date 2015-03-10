@@ -47,6 +47,7 @@ class GameServer {
     private:
         void handle_connection(Connection & conn);
         void handle_player_connection(Connection & conn);
+        bool is_authenticated(NetworkPackage & command, Player & player);
         bool is_new_connection(Connection & conn);
         bool can_handle_new_connection();
         void register_new_connection(Connection & conn);

@@ -33,11 +33,14 @@ int main(int argc, char *argv[]){
     player_join_package.set_player_name(name);
     connection.write(player_join_package);
 
-    connection.read([](NetworkPackage & package) {
+    connection.read([&](NetworkPackage & package) {
         std::cout << "answer" << std::endl;
         if(is_package_of_type<PlayerJoinAnswerPackage>(package)) {
              PlayerJoinAnswerPackage & answer = cast_package<PlayerJoinAnswerPackage>(package);
              std::cout << "identity: " << answer.get_identity() << std::endl;
+             PlayerReadyPackage ready_package;
+             ready_package.set_identity(answer.get_identity());
+             connection.write(ready_package);
         }
     });
     io_service.run();
