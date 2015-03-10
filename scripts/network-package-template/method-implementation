@@ -1,7 +1,0 @@
-void @NAME@Package::set_@PROPERTY@(@TYPE@ @PROPERTY@) {
-    this->@PROPERTY@ = @PROPERTY@;
-}
-
-@TYPE@ @NAME@Package::get_@PROPERTY@() {
-    return @PROPERTY@;
-}

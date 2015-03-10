@@ -1,44 +1,28 @@
 #!/usr/bin/env python
 
-import sys
-from read_template import read_template
+import argparse
+from template import *
 
+parser = argparse.ArgumentParser(prog='generate-network-package', description='Generate a NetworkPackage class')
+parser.add_argument('name', metavar='package_name',
+                    help='Name of the new NetworkPackage without the "Package"-postfix')
+parser.add_argument('command_nr', metavar='command_nr', type=int,
+                    help='Command number of the new NetworkPackage, should be unique')
+parser.add_argument('members', nargs='*',
+                    help='Members the NetworkPackage should have. Pass in the format of "member_name|type_t". If no type is given "int" is used. Getters and setters are generated.')
 
-method_implementations = ""
-method_declarations = ""
-methods_add_suite = ""
+args = parser.parse_args()
+args.uppercase_name = args.name.upper()
+for i, member in enumerate(args.members):
+    data = member.split('|')
+    if len(data) <= 1:
+        data.append("int")
+    args.members[i] = {"property": data[0], "type": data[1]}
 
-name = sys.argv[1]
-command_nr = sys.argv[2]
-template_vars = {"NAME": name,
-                 "UP_NAME": name.upper(), 
-                 "COMMAND_NR": command_nr,
-                 "METHOD_IMPLEMENTATIONS": "",
-                 "METHOD_DECLARATIONS": "",
-                 "PROPERTY_LIST": "",
-                 "MEMBERS": ""}
-
-
-properties = sys.argv[3:]
-for property in properties:
-    split = property.split('|')
-    property_name, property_type = split[0], split[1]
-    template_vars["PROPERTY"] = property_name
-    template_vars["TYPE"] = property_type
-    template_vars["METHOD_IMPLEMENTATIONS"] += read_template("scripts/network-package-template/method-implementation", template_vars)
-    template_vars["METHOD_DECLARATIONS"] += read_template("scripts/network-package-template/method-declaration", template_vars)
-    template_vars["PROPERTY_LIST"] += read_template("scripts/network-package-template/property-list", template_vars)
-    template_vars["MEMBERS"] += read_template("scripts/network-package-template/member", template_vars)
-
-
-source_file = read_template("scripts/network-package-template/source-file", template_vars)
-header_file = read_template("scripts/network-package-template/header-file", template_vars)
-
-
-f = open("src/common/communication/" + name + "Package.cpp", "w")
-f.write(source_file)
-f.close()
-f = open("src/common/communication/" + name + "Package.h", "w")
-f.write(header_file)
-f.close()
+eval_template("scripts/network-package-template/source-file",
+                       "src/common/communication/" + args.name + "Package.cpp",
+                       args)
+eval_template("scripts/network-package-template/header-file",
+                       "src/common/communication/" + args.name + "Package.h",
+                       args)
 

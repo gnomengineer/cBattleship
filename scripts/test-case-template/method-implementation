@@ -1,5 +1,0 @@
-void @NAME@Test::@METHOD_NAME@()
-{
-    CPPUNIT_FAIL("not implemented yet");
-}
-
