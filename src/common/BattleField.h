@@ -13,9 +13,9 @@
 #define BATTLEFIELD_HEIGHT 10
 
 #define FIELD_WATER '~'
-#define FIELD_SHIP 'S'
+#define FIELD_SHIP 'O'
 #define FIELD_HIT 'X'
-#define FIELD_DESTROYED 'X'
+#define FIELD_DESTROYED '#'
 
 
 // This class provides the functionality of a battle
@@ -36,7 +36,7 @@ class BattleField {
 
         void remove_ship(unsigned int length, orientation_t orientation, position_t position);
 
-        std::vector<unsigned char> to_vector(bool hide_ships = false);
+        std::vector<std::vector<unsigned char>> to_vector(bool hide_ships = false);
 
     private:
         bool check_ship_collision(Ship &new_ship) const;
