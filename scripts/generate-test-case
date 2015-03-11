@@ -3,6 +3,8 @@
 import argparse
 from template import *
 
+change_to_source_dir()
+
 parser = argparse.ArgumentParser(prog='generate-test-case', description='Generate a CppUnit test class')
 parser.add_argument('name', metavar='test_class_name',
                     help='Name of the new test class without the "Test"-postfix')

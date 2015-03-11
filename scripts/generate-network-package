@@ -3,6 +3,8 @@
 import argparse
 from template import *
 
+change_to_source_dir()
+
 parser = argparse.ArgumentParser(prog='generate-network-package', description='Generate a NetworkPackage class')
 parser.add_argument('--authenticated', action="store_true",
                     help='create a package inheriting AuthenticatedNetworkPackage (instead of inheriting NetworkPackage)')
