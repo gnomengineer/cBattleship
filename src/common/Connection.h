@@ -4,6 +4,7 @@
 #include <boost/asio.hpp>
 #include <common/communication/NetworkPackage.h>
 #include <common/communication/NetworkPackageManager.h>
+#include <iostream>
 #include <mutex>
 
 namespace asio = boost::asio;
