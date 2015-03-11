@@ -64,3 +64,13 @@ endif()
 enable_testing()
 set(BUILD_TESTING ON)
 add_test(NAME unit_test COMMAND ${PROJECT_BINARY_DIR}/cBattleshipTest)
+
+# compile documentation graphs
+find_program(DOT NAMES dot)
+
+add_custom_command(OUTPUT network-sequence.png
+                   COMMAND ${DOT} -Tpng ${PROJECT_SOURCE_DIR}/doc/network-sequence.dot > ${PROJECT_BINARY_DIR}/network-sequence.png
+                   DEPENDS ${PROJECT_SOURCE_DIR}/doc/network-sequence.dot)
+
+add_custom_target(doc
+                  DEPENDS network-sequence.png)

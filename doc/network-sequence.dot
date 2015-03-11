@@ -1,0 +1,65 @@
+digraph NetworkSequence {
+    nodesep=2
+    node[shape=box]
+    subgraph cluster_server {
+        label="Server"
+        connections [label="Wait for connections"]
+        wait_ready [label="Wait for player ready"]
+        gen_id [label="Generate identities"]
+        setup_game [label="Setup Game"]
+        wait_ships [label="Wait for ship placement"]
+        start_turnp1 [label="Start Player 1 turn"]
+        start_turnp2 [label="Start Player 2 turn"]
+        wait_turnp1  [label="Wait for Player 2 turn"]
+        wait_turnp2  [label="Wait for Player 2 turn"]
+
+        connections ->
+        wait_ready ->
+        gen_id ->
+        setup_game ->
+        wait_ships ->
+        start_turnp1 ->
+        wait_turnp1 ->
+        start_turnp2 ->
+        wait_turnp2 [weight=3]
+
+        wait_turnp2 -> start_turnp1 [weight=0]
+    }
+
+    subgraph cluster_players {
+        label="Players"
+        start_connection [label = "start connection"]
+        name [label="set name"]
+        save_id [label = "Save identity"]
+        wait_ship_req [label = "Wait for game start"]
+        select_ships [label = "select ships"]
+        turnp1_wait [label="Player 1 waits for turn"]
+        turnp2_wait [label="Player 2 waits for turn"]
+        turnp1 [label="Player 1 turn"]
+        turnp2 [label="Player 2 turn"]
+
+        start_connection ->
+        name ->
+        save_id ->
+        wait_ship_req ->
+        select_ships ->
+        turnp1_wait ->
+        turnp1 ->
+        turnp2_wait ->
+        turnp2
+
+        turnp2 -> turnp1_wait [weight=0]
+
+    }
+
+    edge[constraint=false]
+    start_connection -> connections [label = "connect"]
+    name -> wait_ready [ label = "[PlayerJoin] send name"]
+    gen_id -> save_id [ label = "[PlayerJoinAnswer] send identity" ]
+    setup_game -> wait_ship_req [label = "[ShipRequest] send request for ships"]
+    select_ships -> wait_ships [label = "[ShipPlacement] send ship placement"]
+    start_turnp1 -> turnp1_wait [label = "[TurnRequest] Request turn from Player 1"]
+    turnp1 -> wait_turnp1 [label = "[Turn] send turn"]
+    start_turnp2 -> turnp2_wait [label = "[TurnRequest] Request turn from Player 1"]
+    turnp2 -> wait_turnp2 [label = "[Turn] send turn"]
+}
