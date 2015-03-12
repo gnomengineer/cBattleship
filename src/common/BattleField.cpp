@@ -70,27 +70,29 @@ bool BattleField::hit_field(position_t position) {
     return hit_field->is_ship_part();
 }
 
-std::vector<unsigned char> BattleField::to_vector(bool hide_ships) {
-    std::vector<unsigned char> result;
-    result.resize(BATTLEFIELD_HEIGHT * BATTLEFIELD_WIDTH);
+std::vector<std::vector<unsigned char>> BattleField::to_vector(bool hide_ships) {
+    std::vector<std::vector<unsigned char>> result;
+    result.resize(BATTLEFIELD_HEIGHT);
     for(int y = 0; y < BATTLEFIELD_HEIGHT; y++) {
+        std::vector<unsigned char> row;
+        row.resize(BATTLEFIELD_WIDTH);
         for(int x = 0; x < BATTLEFIELD_WIDTH; x++) {
-            int i = BATTLEFIELD_HEIGHT * y + x;
             auto& field = *fields[y][x];
             if(field.is_hit()) {
                 if(field.is_ship_part()) {
-                    result[i] = FIELD_DESTROYED;
+                    row[x] = FIELD_DESTROYED;
                 } else {
-                    result[i] = FIELD_HIT;
+                    row[x] = FIELD_HIT;
                 }
             } else {
                 if(field.is_ship_part() && !hide_ships) {
-                    result[i] = FIELD_SHIP;
+                    row[x] = FIELD_SHIP;
                 } else {
-                    result[i] = FIELD_WATER;
+                    row[x] = FIELD_WATER;
                 }
             }
         }
+        result.push_back(row);
     }
     return result;
 }

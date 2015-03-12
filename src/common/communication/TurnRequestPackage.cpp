@@ -14,11 +14,6 @@ package_nr_t TurnRequestPackage::get_package_nr() {
 std::vector<unsigned char> TurnRequestPackage::encode_payload() {
     std::vector<unsigned char> encoded;
 
-    auto your_vector = your_battlefield.to_vector();
-    encoded.insert(encoded.end(), your_vector.begin(), your_vector.end());
-
-    auto enemy_vector = enemy_battlefield.to_vector();
-    encoded.insert(encoded.end(), enemy_vector.begin(), enemy_vector.end());
     return encoded;
 }
 
