@@ -15,11 +15,12 @@ void BattleFieldUI::hide_field(WINDOW *win){
 }
 
 void BattleFieldUI::draw_field(){
-    
-}
-
-void BattleFieldUI::draw_ship(int length, int orientation, position_t position){
-
+    std::vector<unsigned char> home_char = home_content.to_vector(false);
+    int y = 0;
+    for(int i = 0; i < home_char.length(); i++){
+        if(i % BATTLEFIELD_WIDTH == 0)
+            y++;
+    }   
 }
 
 void BattleFieldUI::draw_hit_mark(WINDOW *win, position_t position, bool is_ship){

@@ -320,11 +320,10 @@
 --
 WINDOW *home_field
 WINDOW *enemy_field
-char[][] enemy_content
-char[][] home_content
+BattleField enemy_content
+BattleField home_content
 --
 +hide_field(WINDOW *win)
-+draw_ship(int length, int orientation, pos_t position)
 +draw_hit_mark(WINDOW *win, pos_t position, bool is_hit)
 +draw_field()
 +show_field(WINDOW *win)</panel_attributes>
