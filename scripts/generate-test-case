@@ -1,21 +1,32 @@
 #!/usr/bin/env python
+# this is a script, not a module
+# pylint: disable=C0103
+
+"""a script to generate CppUnit test classes for this project in a breeze"""
 
 import argparse
-from template import *
+from template import eval_template, change_to_source_dir
+
+def parse_args():
+    """parse command line arguments"""
+    parser = argparse.ArgumentParser(prog='generate-test-case',
+                                     description='Generate a CppUnit test class')
+    parser.add_argument('name', metavar='test_class_name',
+                        help='Name of the new test class without the "Test"-postfix')
+    parser.add_argument('methods', nargs='*',
+                        help='Test methods the test class should have')
+
+    args = parser.parse_args()
+    return args
+
+def generate(args):
+    """generate the template files with the given arguments"""
+    args.uppercase_name = args.name.upper()
+
+    eval_template("scripts/test-case-template/source-file",
+                  "src/test/" + args.name + "Test.cpp", args)
+    eval_template("scripts/test-case-template/header-file",
+                  "src/test/" + args.name + "Test.h", args)
 
 change_to_source_dir()
-
-parser = argparse.ArgumentParser(prog='generate-test-case', description='Generate a CppUnit test class')
-parser.add_argument('name', metavar='test_class_name',
-                    help='Name of the new test class without the "Test"-postfix')
-parser.add_argument('methods', nargs='*',
-                    help='Test methods the test class should have')
-
-args = parser.parse_args()
-args.uppercase_name = args.name.upper()
-
-eval_template("scripts/test-case-template/source-file",
-              "src/test/" + args.name + "Test.cpp", args)
-eval_template("scripts/test-case-template/header-file",
-              "src/test/" + args.name + "Test.h", args)
-
+generate(parse_args())
