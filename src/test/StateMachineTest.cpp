@@ -64,22 +64,11 @@ void StateMachineTest::tearDown()
     delete leet_state_machine1;
 }
 
-void StateMachineTest::run()
-{
-    CPPUNIT_ASSERT_EQUAL(static_cast<LeetState>(-1), state_machine->run());
-}
-
 void StateMachineTest::run_state()
 {
     int i = 1;
     state_machine->run_state(i);
 }
 
-void StateMachineTest::is_end_state()
-{
-    CPPUNIT_ASSERT_EQUAL(false, state_machine->has_terminated());
-    state_machine->run();
-    CPPUNIT_ASSERT_EQUAL(true, state_machine->has_terminated());
-}
 
 

@@ -35,7 +35,7 @@ PlayerNetworkPackage GameServer::get_input() {
             auto& connection = **it;
             handle_connection(connection);
         }
-        boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+        boost::this_thread::sleep(boost::posix_time::milliseconds(50));
     }
 
     std::lock_guard<std::mutex> lock(queue_lock);
@@ -89,7 +89,10 @@ void GameServer::register_new_connection(Connection & connection) {
 }
 
 void GameServer::run() {
-    state_machine.run();
+    while(!state_machine.has_terminated()) {
+        auto input = get_input();
+        state_machine.run_state(input);
+    }
 }
 
 void GameServer::next_player() {
@@ -136,6 +139,7 @@ GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_pa
         answer.set_identity(identity);
         player.set_identity(identity);
         player.get_connection().write(answer);
+        std::cout << "writtn answR" << std::endl;
         players_playing.push_back(&player);
     }
 

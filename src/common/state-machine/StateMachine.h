@@ -3,13 +3,14 @@
 
 #include <map>
 
+
 template<typename E, class M, class I> 
 class StateMachine {
     public:
         typedef E (M::*StateFuncPtr)(I input);
         typedef std::map<E, StateFuncPtr> StateMap;
 
-    private:
+    protected:
         std::map<E, StateFuncPtr> state_map;
         M & instance;
         E current_state;
@@ -20,14 +21,6 @@ class StateMachine {
         }
 
         virtual ~StateMachine() {}
-
-        E run() {
-            while(!has_terminated()) {
-                I input = instance.get_input();
-                run_state(input);
-            }
-            return current_state;
-        }
 
         E run_state(I input) {
             return current_state = run_single_state(input);
@@ -41,7 +34,7 @@ class StateMachine {
             return is_end_state(current_state);
         }
 
-    private:
+    protected:
         E run_single_state(I input) {
             auto fptr_found = state_map.find(current_state);
             if(fptr_found == state_map.end()) return static_cast<E>(-1);
@@ -53,4 +46,5 @@ class StateMachine {
             return (int)state < 0;
         }
 };
+
 #endif /* _STATE_MACHINE */
