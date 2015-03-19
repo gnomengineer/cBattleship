@@ -134,12 +134,11 @@ GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_pa
             const size_t size = sizeof(charset) - 1;
             return charset[rand() % size];
         };
-        std::string identity(12, 0);
-        std::generate_n(identity.begin(), 12, randchar);
+        std::string identity(IDENTITY_LENGTH, 0);
+        std::generate_n(identity.begin(), IDENTITY_LENGTH, randchar);
         answer.set_identity(identity);
         player.set_identity(identity);
         player.get_connection().write(answer);
-        std::cout << "writtn answR" << std::endl;
         players_playing.push_back(&player);
     }
 
@@ -150,7 +149,7 @@ GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
     Player& player = player_package.get_player();
     NetworkPackage& package = player_package.get_package();
 
-    if(is_package_of_type<PlayerReadyPackage>(package)) {
+    if(is_package_of_type<ShipPlacementPackage>(package)) {
         player.set_ready_to_start(true);
     }
 

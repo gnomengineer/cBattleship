@@ -32,8 +32,8 @@ void SimpleClient::run() {
     connection.write(player_join_package);
 
     static std::function<void(void)> get_input;
-    get_input = [this, &get_input]() -> void {
-        connection.read([this, &get_input](NetworkPackage& command) {
+    get_input = [this]() -> void {
+        connection.read([this](NetworkPackage& command) {
             ServerNetworkPackage package(command);
             state_machine.run_state(package);
             get_input();
@@ -50,9 +50,9 @@ SimpleClientState SimpleClient::get_identity(ServerNetworkPackage server_package
          PlayerJoinAnswerPackage & answer = cast_package<PlayerJoinAnswerPackage>(package);
          you.set_identity(answer.get_identity());
          std::cout << "identity: " << you.get_identity() << std::endl;
-         PlayerReadyPackage ready_package;
-         ready_package.set_identity(answer.get_identity());
-         connection.write(ready_package);
+         ShipPlacementPackage ship_placement_package;
+         ship_placement_package.set_identity(answer.get_identity());
+         connection.write(ship_placement_package);
         return WAIT_FOR_GAME_START;
     }
     return GET_IDENTITY;

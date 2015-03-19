@@ -1,18 +1,18 @@
-#ifndef _SENDSHIPSPACKAGE_H
-#define _SENDSHIPSPACKAGE_H
+#ifndef _SHIPPLACEMENTPACKAGE_H
+#define _SHIPPLACEMENTPACKAGE_H
 
 #include <vector>
 #include <common/position.h>
 
-#include "NetworkPackage.h"
-class SendShipsPackage : public NetworkPackage {
+#include "AuthenticatedNetworkPackage.h"
+class ShipPlacementPackage : public AuthenticatedNetworkPackage {
     private:
         std::vector<std::pair<unsigned int, orientation_t>> ships;
 
 
     public:
-        SendShipsPackage();
-        ~SendShipsPackage();
+        ShipPlacementPackage();
+        ~ShipPlacementPackage();
 
         virtual package_nr_t get_package_nr();
         virtual std::vector<unsigned char> encode_payload();
@@ -22,4 +22,4 @@ class SendShipsPackage : public NetworkPackage {
         void set_ships(std::vector<std::pair<unsigned int, orientation_t>> ships);
 
 };
-#endif /* _SENDSHIPSPACKAGE_H */
+#endif /* _SHIPPLACEMENTPACKAGE_H */

@@ -5,6 +5,7 @@
 #include <string>
 
 #include "NetworkPackage.h"
+#define IDENTITY_LENGTH 12
 class AuthenticatedNetworkPackage : public NetworkPackage {
     private:
         std::string identity;

@@ -30,7 +30,7 @@ digraph NetworkSequence {
     connection_data [label="connect"]
     player_join_data [label="{PlayerJoin|name:string*}"]
     player_join_answer_data [label="{PlayerJoinAnswer|identity:string[8]}"]
-    ship_request_data [label="{ShipRequest|-}"]
+    game_ready_data [label="{GameReady|-}"]
     ship_placement_data [label="{ShipPlacement|
                                 {Ship2[3]|{pos_x:uint|pos_y:uint|orientation:bool}}|
                                 {Ship3[2]|{pos_x:uint|pos_y:uint|orientation:bool}}|
@@ -40,7 +40,7 @@ digraph NetworkSequence {
     enemy_hit_data [label="{EnemyHitData|hit_ship_length:uint}"]
     turn_request_data [label="{TurnRequest|-}"]
     turn_data [label="{TurnData|pos_x:uint|pos_y:uint}"]
-    connection_data -> player_join_data -> player_join_answer_data -> ship_request_data -> ship_placement_data -> turn_request_data -> turn_data -> enemy_hit_data [style=invis]
+    connection_data -> player_join_data -> player_join_answer_data -> game_ready_data -> ship_placement_data -> turn_request_data -> turn_data -> enemy_hit_data [style=invis]
     subgraph cluster_players {
         label="Players"
         start_connection [label = "start connection"]
@@ -69,7 +69,7 @@ digraph NetworkSequence {
     start_connection -> connection_data -> connections
     name -> player_join_data -> wait_ready
     gen_id -> player_join_answer_data -> save_id
-    setup_game -> ship_request_data -> wait_ship_req
+    setup_game -> game_ready_data -> wait_ship_req
     select_ships -> ship_placement_data -> wait_ships
     start_turnp1 -> turn_request_data -> turnp1_wait
     turnp1 -> turn_data -> wait_turnp1

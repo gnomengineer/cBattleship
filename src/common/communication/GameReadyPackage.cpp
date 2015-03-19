@@ -7,7 +7,7 @@ GameReadyPackage::~GameReadyPackage() {
 }
 
 package_nr_t GameReadyPackage::get_package_nr() {
-    return 4;
+    return 3;
 }
 
 
