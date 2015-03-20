@@ -1,13 +1,13 @@
-#ifndef _{{uppercase_name}}TEST_H
-#define _{{uppercase_name}}TEST_H
+#ifndef _{{{uppercase_name}}}TEST_H
+#define _{{{uppercase_name}}}TEST_H
 
 #include <cppunit/extensions/HelperMacros.h>
 
-class {{name}}Test : public CppUnit::TestFixture
+class {{{name}}}Test : public CppUnit::TestFixture
 {
-    CPPUNIT_TEST_SUITE({{name}}Test);
+    CPPUNIT_TEST_SUITE({{{name}}}Test);
 {{#methods}}
-    CPPUNIT_TEST({{.}});
+    CPPUNIT_TEST({{{.}}});
 {{/methods}}
     CPPUNIT_TEST_SUITE_END();
       
@@ -16,8 +16,8 @@ class {{name}}Test : public CppUnit::TestFixture
         void tearDown();
           
 {{#methods}}
-        void {{.}}();
+        void {{{.}}}();
 {{/methods}}
 };
 
-#endif  // {{uppercase_name}}TEST_H
+#endif  // {{{uppercase_name}}}TEST_H

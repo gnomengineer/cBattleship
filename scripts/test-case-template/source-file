@@ -1,19 +1,19 @@
-#include "{{name}}Test.h"
+#include "{{{name}}}Test.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION({{name}}Test);
+CPPUNIT_TEST_SUITE_REGISTRATION({{{name}}}Test);
 
 
-void {{name}}Test::setUp()
+void {{{name}}}Test::setUp()
 {
 }
 
 
-void {{name}}Test::tearDown()
+void {{{name}}}Test::tearDown()
 {
 }
 
 {{#methods}}
-void {{name}}Test::{{.}}()
+void {{{name}}}Test::{{{.}}}()
 {
     CPPUNIT_FAIL("not implemented yet");
 }

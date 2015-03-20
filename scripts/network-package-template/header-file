@@ -1,26 +1,26 @@
-#ifndef _{{uppercase_name}}PACKAGE_H
-#define _{{uppercase_name}}PACKAGE_H
+#ifndef _{{{uppercase_name}}}PACKAGE_H
+#define _{{{uppercase_name}}}PACKAGE_H
 
 #include <vector>
 
 #include "{{#authenticated}}Authenticated{{/authenticated}}NetworkPackage.h"
-class {{name}}Package : public {{#authenticated}}Authenticated{{/authenticated}}NetworkPackage {
+class {{{name}}}Package : public {{#authenticated}}Authenticated{{/authenticated}}NetworkPackage {
     private:
 {{#members}}
-        {{type}} {{property}};
+        {{{type}}} {{{property}}};
 {{/members}}
 
     public:
-        {{name}}Package();
-        virtual ~{{name}}Package();
+        {{{name}}}Package();
+        virtual ~{{{name}}}Package();
 
         virtual package_nr_t get_package_nr();
         virtual std::vector<unsigned char> encode_payload();
         virtual void decode_payload(std::vector<unsigned char> command_data);
 
 {{#members}}
-        {{type}} get_{{property}}();
-        void set_{{property}}({{type}} {{property}});
+        {{{type}}} get_{{{property}}}();
+        void set_{{{property}}}({{{type}}} {{{property}}});
 {{/members}}
 };
-#endif /* _{{uppercase_name}}PACKAGE_H */
+#endif /* _{{{uppercase_name}}}PACKAGE_H */
