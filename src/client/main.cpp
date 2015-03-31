@@ -1,3 +1,5 @@
+#include "BattleFieldUI.cpp"
+
 int main() {
-    return 0;
+    BattleFieldUI test;
 }
