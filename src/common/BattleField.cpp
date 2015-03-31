@@ -1,4 +1,7 @@
 #include "BattleField.h"
+#include "Ship.h"
+
+#include <algorithm>
 
 BattleField::BattleField() {
     // fill battlefield with Field instances
@@ -23,7 +26,6 @@ BattleField::BattleField(const BattleField& other) {
 }
 
 void BattleField::add_ship(unsigned int length, orientation_t orientation, position_t start_position) {
-    if(!is_valid_orientation(orientation)) throw std::invalid_argument("invalid orientation");
     if(!check_position(start_position, BATTLEFIELD_WIDTH, BATTLEFIELD_HEIGHT)) throw std::out_of_range("position out of range");
     if(ships_available[length] < 1) throw std::invalid_argument("no more ships of this length available");
 
@@ -32,14 +34,9 @@ void BattleField::add_ship(unsigned int length, orientation_t orientation, posit
     end_position[orientation] += length - 1;
     if(!check_position(end_position, BATTLEFIELD_WIDTH, BATTLEFIELD_HEIGHT)) throw std::out_of_range("length out of range");
     
-    // make a list of the fields the ship uses
-    // and check for collision of ships
-    std::list<std::shared_ptr<Field>> ship_parts;
-    for(; start_position[orientation] <= end_position[orientation]; start_position[orientation]++) {
-        ship_parts.push_back(fields[start_position.y][start_position.x]);
-    }
-
-    auto new_ship = std::shared_ptr<Ship>(new Ship(ship_parts));
+    
+    // check for collision of ships
+    auto new_ship = std::shared_ptr<Ship>(new Ship(length, orientation, start_position, *this));
     if(!check_ship_collision(*new_ship)) throw std::invalid_argument("a field the ship uses is already taken by an other ship");
 
     // everythings ok with the ship, so use it
@@ -106,4 +103,26 @@ bool BattleField::check_ship_collision(Ship &new_ship) const {
         }
     }
     return true;
+}
+
+std::shared_ptr<Field> BattleField::get_field(position_t position) {
+    return fields[position.x][position.y];
+}
+std::vector<ShipData> BattleField::get_ship_data() const {
+    std::vector<ShipData> ship_data;
+    for(auto it = ships.begin(); it != ships.end(); it++) {
+        ship_data.push_back((*it)->get_data());
+    }
+    return ship_data;
+}
+
+std::map<unsigned int, int> BattleField::get_ships_available() {
+    return ships_available;
+}
+
+bool BattleField::all_ships_placed() {
+    return std::all_of(ships_available.begin(), ships_available.end(), [](std::pair<unsigned int, int> pair) {
+        const int number_available = pair.second;
+        return number_available <= 0;
+    });
 }
