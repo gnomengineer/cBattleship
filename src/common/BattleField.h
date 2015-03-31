@@ -2,12 +2,16 @@
 #define _BATTLEFIELD_H
 
 #include "Field.h"
-#include "Ship.h"
 #include <array>
 #include <list>
 #include <map>
 #include <memory>
 #include <vector>
+
+#ifndef _SHIP_H
+struct ShipData;
+class Ship;
+#endif
 
 #define BATTLEFIELD_WIDTH 10
 #define BATTLEFIELD_HEIGHT 10
@@ -37,6 +41,12 @@ class BattleField {
         void remove_ship(unsigned int length, orientation_t orientation, position_t position);
 
         std::vector<std::vector<unsigned char>> to_vector(bool hide_ships = false);
+
+        std::shared_ptr<Field> get_field(position_t position);
+        std::vector<ShipData> get_ship_data() const;
+
+        std::map<unsigned int, int> get_ships_available();
+        bool all_ships_placed();
 
     private:
         bool check_ship_collision(Ship &new_ship) const;

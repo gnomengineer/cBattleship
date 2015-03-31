@@ -20,7 +20,7 @@ The C++ `boost` libraries are used extensively in this project, you also need to
 To be able to compile the cBattleshipClient you also need to have `ncurses` installed. If you don't want the `ncurses` client you can also omit it during compilation:
 
 ```bash
-make cBattleshipSimpleClient cBattleshipServer
+make cbattleship-text-client cbattleship-server
 ```
  
 ## Run It
@@ -28,11 +28,11 @@ make cBattleshipSimpleClient cBattleshipServer
 ```bash
 # execute these commands inside the your build directory
 # run the server
-$ ./cBattleshipServer 
+$ ./cbattleship-server 
 # run the ncurses-client
-$ ./cBattleshipClient <server-ip-or-hostname>
+$ ./cbattleship-curses-client <server-ip-or-hostname>
 # run the text based client
-$ ./cBattleshipSimpleClient <server-ip-or-hostname>
+$ ./cbattleship-text-client <server-ip-or-hostname>
 ```
 
 ## Running The Tests
@@ -42,7 +42,7 @@ CppUnit is being used for Unit Testing.
 To run the Tests type the following command inside your build directory:
 
 ```bash
-$ ./cBattleshipTest
+$ ./cbattleship-unit-tests
 ```
 
 Alternatively you can also use the make target `test` to run the tests.

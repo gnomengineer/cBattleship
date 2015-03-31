@@ -35,7 +35,6 @@ PlayerNetworkPackage GameServer::get_input() {
             auto& connection = **it;
             handle_connection(connection);
         }
-        boost::this_thread::sleep(boost::posix_time::milliseconds(50));
     }
 
     std::lock_guard<std::mutex> lock(queue_lock);
@@ -45,14 +44,12 @@ PlayerNetworkPackage GameServer::get_input() {
 }
 
 void GameServer::handle_connection(Connection & connection) {
-    if(is_new_connection(connection)) {
-        if(can_handle_new_connection()) {
-            register_new_connection(connection);
-        } else {
-            connection.disconnect();
-        }
+    if(!is_new_connection(connection)) return;
+
+    if(can_handle_new_connection()) {
+        register_new_connection(connection);
     } else {
-        handle_player_connection(connection);
+        connection.disconnect();
     }
 }
 
@@ -86,6 +83,7 @@ bool GameServer::can_handle_new_connection() {
 
 void GameServer::register_new_connection(Connection & connection) {
     players[connection.get_id()] = std::unique_ptr<Player>(new Player(connection));
+    handle_player_connection(connection);
 }
 
 void GameServer::run() {
@@ -120,6 +118,7 @@ void GameServer::request_turn() {
 
 
 GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_package) {
+    std::cout << __FUNCTION__ << std::endl;
     Player& player = player_package.get_player();
     NetworkPackage& package = player_package.get_package();
 
@@ -140,9 +139,19 @@ GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_pa
         player.set_identity(identity);
         player.get_connection().write(answer);
         players_playing.push_back(&player);
+    } else {
+        std::cout << "got some shitty package? " << (int)package.get_package_nr() << std::endl;
     }
 
-    return players_playing.size() == 2 ? SETUP_GAME : CHECK_FOR_CONNECTIONS;
+    if(players_playing.size() == 2) {
+        std::for_each(players_playing.begin(), players_playing.end(), [](Player* player) {
+            GameReadyPackage package;
+            player->get_connection().write(package);
+        });
+        return SETUP_GAME;
+    } else {
+        return CHECK_FOR_CONNECTIONS;
+    }
 }
 
 GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {

@@ -13,6 +13,8 @@ typedef enum {
 
 // represents a 2 dimensional position
 typedef struct position {
+    position()
+        : x(0), y(0) { }
     position(position_coordinate_t y, position_coordinate_t x)
         : x(x), y(y) { }
     position_coordinate_t y;
