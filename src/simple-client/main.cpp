@@ -22,10 +22,13 @@ int main(int argc, char *argv[]){
     Connection connection(1, std::move(socket));
     PlayerJoinPackage player_join_package;
 
-    SimpleClient client(connection);
-    client.run();
-
-    io_service.run();
+    try {
+        SimpleClient client(connection);
+        client.run();
+        io_service.run();
+    } catch(std::runtime_error & ex) {
+        std::cout << "error: " << ex.what() << std::endl;
+    }
 
     return 0;
 }

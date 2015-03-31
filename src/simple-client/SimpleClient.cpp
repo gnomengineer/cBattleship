@@ -19,6 +19,7 @@ SimpleClient::StateMachineType::StateMap SimpleClient::get_state_map() {
 }
 
 std::string SimpleClient::ask_user(std::string prompt, std::string default_value) {
+    if(std::cin.eof()) throw std::runtime_error("user input requested, but stdin is already closed.");
     std::string value;
     std::cout << prompt << std::flush;
     std::cin >> value;
@@ -33,7 +34,11 @@ void SimpleClient::ask_ship_placement() {
         auto length = ask_ship_length();
         auto orientation = ask_ship_orientation();
         auto position = ask_ship_position(length, orientation);
-        you.get_battle_field().add_ship(length, orientation, position);
+        try {
+            you.get_battle_field().add_ship(length, orientation, position);
+        } catch(std::invalid_argument & ex) {
+            std::cout << "error: " << ex.what() << std::endl;
+        }
     }
 }
 
@@ -52,10 +57,10 @@ unsigned int SimpleClient::ask_ship_length() {
                     std::cout << "no more " << get_ship_name_by_length(chosen_length) << "s available" << std::endl;
                 }
             } else {
-                std::cout << "there are no ships of length " << chosen_length << std::endl;
+                std::cout << "error: there are no ships of length " << chosen_length << std::endl;
             }
         } catch(boost::bad_lexical_cast&) {
-            std::cout << "invalid input" << std::endl;
+            std::cout << "error: invalid input. enter a whole positive number" << std::endl;
         }
     }
     return chosen_length;
@@ -70,7 +75,7 @@ orientation_t SimpleClient::ask_ship_orientation() {
             orientation = input == "v" ? ORIENTATION_VERTICAL : ORIENTATION_HORIZONTAL;
             ok = true;
         } else {
-            std::cout << "invalid orienation. type either 'v' or 'h'." << std::endl;
+            std::cout << "error: invalid orienation. type either 'v' or 'h'." << std::endl;
         }
     }
     return orientation;
@@ -87,7 +92,7 @@ position_t SimpleClient::ask_ship_position(unsigned int length, orientation_t or
         if(position.y <= BATTLEFIELD_HEIGHT && position.x <= BATTLEFIELD_WIDTH) {
             ok = true;
         } else {
-            std::cout << "cant place ship there. out of bounds." << std::endl;
+            std::cout << "error: cant place ship there. out of bounds." << std::endl;
         }
     }
     return position;
@@ -102,7 +107,7 @@ position_coordinate_t SimpleClient::ask_ship_coord(std::string coord_name) {
             coord = boost::lexical_cast<position_coordinate_t>(input);
             ok = true;
         } catch(boost::bad_lexical_cast&) {
-            std::cout << "invalid input" << std::endl;
+            std::cout << "error: invalid input. enter a whole postive number" << std::endl;
         }
     }
     return coord;
