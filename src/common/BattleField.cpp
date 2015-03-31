@@ -89,7 +89,7 @@ std::vector<std::vector<unsigned char>> BattleField::to_vector(bool hide_ships) 
                 }
             }
         }
-        result.push_back(row);
+        result[y] = row;
     }
     return result;
 }
