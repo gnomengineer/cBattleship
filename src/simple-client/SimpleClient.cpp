@@ -28,6 +28,7 @@ std::string SimpleClient::ask_user(std::string prompt, std::string default_value
 
 void SimpleClient::ask_ship_placement() {
     while(!you.get_battle_field().all_ships_placed()) {
+        print_your_battlefield();
         print_ships_available();
         auto length = ask_ship_length();
         auto orientation = ask_ship_orientation();
@@ -128,6 +129,17 @@ std::string SimpleClient::get_ship_name_by_length(unsigned int length) {
         return ship_names[length - 2];
     }
     return std::string("(invalid ship)");
+}
+
+void SimpleClient::print_your_battlefield() {
+    std::cout << " " << std::string(BATTLEFIELD_WIDTH - 2, '_') << " " << std::endl;
+    std::cout << "/ YOU" << std::string(BATTLEFIELD_WIDTH - 6, ' ') << "\\" << std::endl;
+    auto fields = you.get_battle_field().to_vector();
+    for(int y = 0; y < BATTLEFIELD_HEIGHT; y++) {
+        std::string line(fields[y].begin(), fields[y].end());
+        std::cout << line << std::endl;
+    }
+    std::cout << "\\" << std::string(BATTLEFIELD_WIDTH - 2, '_') << "/" << std::endl;
 }
 
 void SimpleClient::run() {
