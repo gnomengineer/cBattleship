@@ -13,6 +13,7 @@
 enum SimpleClientState {
     GET_IDENTITY,
     WAIT_FOR_GAME_START,
+    YOUR_TURN,
     STOP = -1
 };
 
@@ -42,6 +43,7 @@ class SimpleClient {
 
         SimpleClientState get_identity(ServerNetworkPackage server_package);
         SimpleClientState wait_for_game_start(ServerNetworkPackage server_package);
+        SimpleClientState your_turn(ServerNetworkPackage server_package);
 
     private:
         std::string ask_user(std::string prompt, std::string default_value);
@@ -49,12 +51,12 @@ class SimpleClient {
         void ask_ship_placement();
         unsigned int ask_ship_length();
         orientation_t ask_ship_orientation();
-        position_t ask_ship_position(unsigned int length, orientation_t orientation);
+        position_t ask_position();
         position_coordinate_t ask_ship_coord(std::string coord_name);
         void print_ships_available();
 
         std::string get_ship_name_by_length(unsigned int length);
-        void print_your_battlefield();
+        void print_battle_field(BattleField &battle_field);
 };
 
 

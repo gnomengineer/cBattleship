@@ -3,16 +3,15 @@
 
 #include <vector>
 
-#include "NetworkPackage.h"
-class TurnPackage : public NetworkPackage {
+#include "AuthenticatedNetworkPackage.h"
+class TurnPackage : public AuthenticatedNetworkPackage {
     private:
         int pos_x;
         int pos_y;
 
-
     public:
         TurnPackage();
-        ~TurnPackage();
+        virtual ~TurnPackage();
 
         virtual package_nr_t get_package_nr();
         virtual std::vector<unsigned char> encode_payload();
@@ -22,6 +21,5 @@ class TurnPackage : public NetworkPackage {
         void set_pos_x(int pos_x);
         int get_pos_y();
         void set_pos_y(int pos_y);
-
 };
 #endif /* _TURNPACKAGE_H */

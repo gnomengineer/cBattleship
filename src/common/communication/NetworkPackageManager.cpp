@@ -11,7 +11,8 @@ NetworkPackageManager::NetworkPackageManager() {
                              GameReadyPackage,
                              ShipPlacementPackage,
                              TurnRequestPackage,
-                             TurnPackage>();
+                             TurnPackage,
+                             EnemyDisconnectedPackage>();
     }
 }
 

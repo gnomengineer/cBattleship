@@ -15,6 +15,7 @@ SimpleClient::StateMachineType::StateMap SimpleClient::get_state_map() {
     StateMachineType::StateMap map;
     map[GET_IDENTITY] = &SimpleClient::get_identity;
     map[WAIT_FOR_GAME_START] = &SimpleClient::wait_for_game_start;
+    map[YOUR_TURN] = &SimpleClient::your_turn;
     return map;
 }
 
@@ -29,14 +30,16 @@ std::string SimpleClient::ask_user(std::string prompt, std::string default_value
 
 void SimpleClient::ask_ship_placement() {
     while(!you.get_battle_field().all_ships_placed()) {
-        print_your_battlefield();
+        print_battle_field(you.get_battle_field());
         print_ships_available();
         auto length = ask_ship_length();
         auto orientation = ask_ship_orientation();
-        auto position = ask_ship_position(length, orientation);
+        auto position = ask_position();
         try {
             you.get_battle_field().add_ship(length, orientation, position);
-        } catch(std::invalid_argument & ex) {
+        } catch(std::out_of_range &ex) {
+            std::cout << "error: " << ex.what() << std::endl;
+        } catch(std::invalid_argument &ex) {
             std::cout << "error: " << ex.what() << std::endl;
         }
     }
@@ -81,18 +84,16 @@ orientation_t SimpleClient::ask_ship_orientation() {
     return orientation;
 }
 
-position_t SimpleClient::ask_ship_position(unsigned int length, orientation_t orientation) {
+position_t SimpleClient::ask_position() {
     position_t position;
     bool ok = false;
     while(!ok) {
         position.y = ask_ship_coord("y");
         position.x = ask_ship_coord("x");
-        position_t end_position = position;
-        end_position[orientation] += length;
         if(position.y <= BATTLEFIELD_HEIGHT && position.x <= BATTLEFIELD_WIDTH) {
             ok = true;
         } else {
-            std::cout << "error: cant place ship there. out of bounds." << std::endl;
+            std::cout << "error: out of bounds." << std::endl;
         }
     }
     return position;
@@ -136,10 +137,10 @@ std::string SimpleClient::get_ship_name_by_length(unsigned int length) {
     return std::string("(invalid ship)");
 }
 
-void SimpleClient::print_your_battlefield() {
+void SimpleClient::print_battle_field(BattleField & battle_field) {
     std::cout << " " << std::string(BATTLEFIELD_WIDTH - 2, '_') << " " << std::endl;
     std::cout << "/ YOU" << std::string(BATTLEFIELD_WIDTH - 6, ' ') << "\\" << std::endl;
-    auto fields = you.get_battle_field().to_vector();
+    auto fields = battle_field.to_vector();
     for(int y = 0; y < BATTLEFIELD_HEIGHT; y++) {
         std::string line(fields[y].begin(), fields[y].end());
         std::cout << line << std::endl;
@@ -185,6 +186,24 @@ SimpleClientState SimpleClient::wait_for_game_start(ServerNetworkPackage server_
         ShipPlacementPackage ship_placement_package;
         ship_placement_package.set_identity(you.get_identity());
         connection.write(ship_placement_package);
+        std::cout << "waiting for enemy ... " << std::endl;
     }
-    return STOP;
+    return YOUR_TURN;
+}
+
+SimpleClientState SimpleClient::your_turn(ServerNetworkPackage server_package) {
+    NetworkPackage &package = server_package.get_package();
+    if(is_package_of_type<TurnRequestPackage>(package)) {
+        print_battle_field(enemy.get_battle_field());
+        print_battle_field(you.get_battle_field());
+        TurnPackage turn;
+        turn.set_identity(you.get_identity());
+        std::cout << "Enter enemy field you want to hit." << std::endl;
+        position_t position = ask_position();
+        connection.write(turn);
+        std::cout << "waiting for enemy ... " << std::endl;
+    } else if(is_package_of_type<EnemyDisconnectedPackage>(package)) {
+        std::cout << "the enemy disconnected ... well i guess you won?" << std::endl;
+    }
+    return YOUR_TURN;
 }
