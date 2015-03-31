@@ -15,7 +15,6 @@ Ship::Ship(unsigned int length, orientation_t orientation, position_t start_posi
     // make a list of the fields the ship uses
     position_t end_position = start_position;
     end_position[orientation] += length - 1;
-    std::list<std::shared_ptr<Field>> ship_parts;
     for(; start_position[orientation] <= end_position[orientation]; start_position[orientation]++) {
         ship_parts.push_back(battle_field.get_field(start_position));
     }
