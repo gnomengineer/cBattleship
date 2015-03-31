@@ -8,9 +8,7 @@ class StateMachineTest : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE(StateMachineTest);
 
-    CPPUNIT_TEST(run);
     CPPUNIT_TEST(run_state);
-    CPPUNIT_TEST(is_end_state);
 
     CPPUNIT_TEST_SUITE_END();
 
@@ -48,9 +46,7 @@ class StateMachineTest : public CppUnit::TestFixture
         void tearDown();
           
         void initialization();
-        void run();
         void run_state();
-        void is_end_state();
 
 };
 

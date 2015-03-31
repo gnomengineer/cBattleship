@@ -8,7 +8,7 @@
 #include "PlayerJoinPackage.h"
 #include "PlayerJoinAnswerPackage.h"
 #include "GameReadyPackage.h"
-#include "PlayerReadyPackage.h"
+#include "ShipPlacementPackage.h"
 #include "TurnRequestPackage.h"
 #include "TurnPackage.h"
 

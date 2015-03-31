@@ -2,14 +2,7 @@
 #include <boost/asio.hpp>
 #include <common/communication/NetworkPackageManager.h>
 #include <common/Connection.h>
-
-std::string ask_user(std::string prompt, std::string default_value) {
-    std::string value;
-    std::cout << prompt << std::flush;
-    std::cin >> value;
-    if(!std::cin.good()) value = default_value;
-    return value;
-}
+#include "SimpleClient.h"
 
 int main(int argc, char *argv[]){
 
@@ -27,22 +20,11 @@ int main(int argc, char *argv[]){
     std::cout << "connecting ... " << std::endl;
 
     Connection connection(1, std::move(socket));
-
-    std::string name = ask_user("your nickname: ", "unnamed");
     PlayerJoinPackage player_join_package;
-    player_join_package.set_player_name(name);
-    connection.write(player_join_package);
 
-    connection.read([&](NetworkPackage & package) {
-        std::cout << "answer" << std::endl;
-        if(is_package_of_type<PlayerJoinAnswerPackage>(package)) {
-             PlayerJoinAnswerPackage & answer = cast_package<PlayerJoinAnswerPackage>(package);
-             std::cout << "identity: " << answer.get_identity() << std::endl;
-             PlayerReadyPackage ready_package;
-             ready_package.set_identity(answer.get_identity());
-             connection.write(ready_package);
-        }
-    });
+    SimpleClient client(connection);
+    client.run();
+
     io_service.run();
 
     return 0;

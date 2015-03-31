@@ -13,7 +13,7 @@ std::vector<unsigned char> AuthenticatedNetworkPackage::encode_payload() {
 }
 
 void AuthenticatedNetworkPackage::decode_payload(std::vector<unsigned char> command_data) {
-    identity = std::string(command_data.begin(), command_data.end());
+    identity = std::string(command_data.begin(), command_data.begin() + IDENTITY_LENGTH);
 }
 
 void AuthenticatedNetworkPackage::set_identity(std::string identity) {

@@ -35,7 +35,7 @@ PlayerNetworkPackage GameServer::get_input() {
             auto& connection = **it;
             handle_connection(connection);
         }
-        boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+        boost::this_thread::sleep(boost::posix_time::milliseconds(50));
     }
 
     std::lock_guard<std::mutex> lock(queue_lock);
@@ -89,7 +89,10 @@ void GameServer::register_new_connection(Connection & connection) {
 }
 
 void GameServer::run() {
-    state_machine.run();
+    while(!state_machine.has_terminated()) {
+        auto input = get_input();
+        state_machine.run_state(input);
+    }
 }
 
 void GameServer::next_player() {
@@ -131,8 +134,8 @@ GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_pa
             const size_t size = sizeof(charset) - 1;
             return charset[rand() % size];
         };
-        std::string identity(12, 0);
-        std::generate_n(identity.begin(), 12, randchar);
+        std::string identity(IDENTITY_LENGTH, 0);
+        std::generate_n(identity.begin(), IDENTITY_LENGTH, randchar);
         answer.set_identity(identity);
         player.set_identity(identity);
         player.get_connection().write(answer);
@@ -146,7 +149,7 @@ GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
     Player& player = player_package.get_player();
     NetworkPackage& package = player_package.get_package();
 
-    if(is_package_of_type<PlayerReadyPackage>(package)) {
+    if(is_package_of_type<ShipPlacementPackage>(package)) {
         player.set_ready_to_start(true);
     }
 
