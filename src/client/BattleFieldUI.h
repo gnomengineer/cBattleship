@@ -16,11 +16,11 @@ bool is_enemy_shown = false;
     public:
 BattleFieldUI();
 void hide_field();
-void draw_field(WINDOW *win);
+void draw_field(WINDOW *win,BattleField field);
 void draw_hit_mark(WINDOW *win, position_t position, bool is_ship);
 void show_field(WINDOW *win);
 //getter method
-WINDOW get_home_win();
-WINDOW get_enemy_win();
+WINDOW *get_home_win();
+WINDOW *get_enemy_win();
 };
 #endif
