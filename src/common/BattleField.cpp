@@ -26,13 +26,13 @@ BattleField::BattleField(const BattleField& other) {
 }
 
 void BattleField::add_ship(unsigned int length, orientation_t orientation, position_t start_position) {
-    if(!check_position(start_position, BATTLEFIELD_WIDTH, BATTLEFIELD_HEIGHT)) throw std::out_of_range("position out of range");
+    if(!check_position(start_position, BATTLEFIELD_HEIGHT, BATTLEFIELD_WIDTH)) throw std::out_of_range("position out of range");
     if(ships_available[length] < 1) throw std::invalid_argument("no more ships of this length available");
 
     // check if length laps over the border of the battlefield
     position_t end_position = start_position;
     end_position[orientation] += length - 1;
-    if(!check_position(end_position, BATTLEFIELD_WIDTH, BATTLEFIELD_HEIGHT)) throw std::out_of_range("length out of range");
+    if(!check_position(end_position, BATTLEFIELD_HEIGHT, BATTLEFIELD_WIDTH)) throw std::out_of_range("length out of range");
     
     
     // check for collision of ships
