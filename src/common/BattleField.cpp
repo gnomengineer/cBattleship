@@ -5,8 +5,8 @@
 
 BattleField::BattleField() {
     // fill battlefield with Field instances
-    for(int y = 0; y < BATTLEFIELD_WIDTH; y++) {
-        for(int x = 0; x < BATTLEFIELD_HEIGHT; x++) {
+    for(int y = 0; y < BATTLEFIELD_HEIGHT; y++) {
+        for(int x = 0; x < BATTLEFIELD_WIDTH; x++) {
             fields[y][x] = std::shared_ptr<Field>(new Field(position(y, x)));
         }
     }
@@ -20,7 +20,7 @@ BattleField::BattleField() {
 
 BattleField::BattleField(const BattleField& other) {
         
-    fields = std::array<std::array<std::shared_ptr<Field>, BATTLEFIELD_HEIGHT>, BATTLEFIELD_WIDTH>(other.fields);
+    fields = std::array<std::array<std::shared_ptr<Field>, BATTLEFIELD_WIDTH>, BATTLEFIELD_HEIGHT>(other.fields);
     ships = std::list<std::shared_ptr<Ship>>(other.ships);
     ships_available = std::map<unsigned int, int>(other.ships_available);
 }
@@ -106,7 +106,7 @@ bool BattleField::check_ship_collision(Ship &new_ship) const {
 }
 
 std::shared_ptr<Field> BattleField::get_field(position_t position) {
-    return fields[position.x][position.y];
+    return fields[position.y][position.x];
 }
 std::vector<ShipData> BattleField::get_ship_data() const {
     std::vector<ShipData> ship_data;

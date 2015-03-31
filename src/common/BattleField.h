@@ -13,7 +13,7 @@ struct ShipData;
 class Ship;
 #endif
 
-#define BATTLEFIELD_WIDTH 10
+#define BATTLEFIELD_WIDTH 15
 #define BATTLEFIELD_HEIGHT 10
 
 #define FIELD_WATER '~'
@@ -26,7 +26,7 @@ class Ship;
 // field. It gives methods for reading position of ships
 class BattleField {
     private:
-        std::array<std::array<std::shared_ptr<Field>, BATTLEFIELD_HEIGHT>, BATTLEFIELD_WIDTH> fields;
+        std::array<std::array<std::shared_ptr<Field>, BATTLEFIELD_WIDTH>, BATTLEFIELD_HEIGHT> fields;
         std::list<std::shared_ptr<Ship>> ships;
         //key: ship length, value: max ship quantity
         std::map<unsigned int, int> ships_available;
