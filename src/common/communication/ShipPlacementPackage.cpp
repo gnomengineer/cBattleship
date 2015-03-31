@@ -1,5 +1,4 @@
 #include "ShipPlacementPackage.h"
-#include <algorithm>
 
 ShipPlacementPackage::ShipPlacementPackage() {
 }
@@ -14,31 +13,38 @@ package_nr_t ShipPlacementPackage::get_package_nr() {
 
 std::vector<unsigned char> ShipPlacementPackage::encode_payload() {
     std::vector<unsigned char> encoded = AuthenticatedNetworkPackage::encode_payload();
-    std::for_each(ships.begin(), ships.end(), [&](std::pair<int, orientation_t> p) {
-        encoded.push_back(p.first & 0xFF);
-        encoded.push_back(p.second & 0x1);
-    });
+    for(auto it = ship_data.begin(); it != ship_data.end(); it++) {
+        auto &ship = *it;
+        encoded.push_back(ship.length & 0xFF);
+        encoded.push_back(ship.orientation & 0x1);
+        encoded.push_back(ship.start_position.y & 0xFF);
+        encoded.push_back(ship.start_position.x & 0xFF);
+    }
     return encoded;
 }
 
 void ShipPlacementPackage::decode_payload(std::vector<unsigned char> command_data) {
     AuthenticatedNetworkPackage::decode_payload(command_data);
-
-    int num_ships = command_data.size() / 2;
-    std::vector<std::pair<int, orientation_t>> ships_received;
+    const int ship_length = 4;
+    const int ships_length = command_data.size() - IDENTITY_LENGTH;
+    const int num_ships = ship_length / ship_length;
+    ship_data.clear();
     for(int i = 0; i < num_ships; i++) {
-        int ship_length = command_data[i * 2];
-        orientation_t orientation = static_cast<orientation_t>(command_data[i * 2 + 1]);
-        std::pair<int, orientation_t> ship = std::make_pair(ship_length, orientation);
-        ships_received.push_back(ship);
+        const int ship_offset = IDENTITY_LENGTH + i * ship_length;
+        ShipData data = { command_data[ship_offset],
+                          static_cast<orientation_t>(command_data[ship_offset + 1] & 1),
+                          { command_data[ship_offset + 2],
+                            command_data[ship_offset + 3],
+                          },
+                        };
+        ship_data.push_back(data);
     }
 }
 
-void ShipPlacementPackage::set_ships(std::vector<std::pair<unsigned int, orientation_t>> ships) {
-    this->ships = ships;
+void ShipPlacementPackage::set_ship_data(std::vector<ShipData> ship_data) {
+    this->ship_data = ship_data;
 }
 
-std::vector<std::pair<unsigned int, orientation_t>> ShipPlacementPackage::get_ships() {
-    return ships;
+std::vector<ShipData> ShipPlacementPackage::get_ship_data() {
+    return ship_data;
 }
-

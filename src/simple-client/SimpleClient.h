@@ -45,6 +45,15 @@ class SimpleClient {
 
     private:
         std::string ask_user(std::string prompt, std::string default_value);
+
+        void ask_ship_placement();
+        unsigned int ask_ship_length();
+        orientation_t ask_ship_orientation();
+        position_t ask_ship_position(unsigned int length, orientation_t orientation);
+        position_coordinate_t ask_ship_coord(std::string coord_name);
+        void print_ships_available();
+
+        std::string get_ship_name_by_length(unsigned int length);
 };
 
 
