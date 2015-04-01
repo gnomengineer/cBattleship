@@ -53,7 +53,7 @@ class GameServer {
         void register_new_connection(Connection & conn);
         void next_player();
         Player& get_enemy();
-        void request_turn();
+        void request_turn(bool enemy_hit, position_t position);
 
 };
 

@@ -111,10 +111,12 @@ Player& GameServer::get_enemy() {
     return **enemy;
 }
 
-void GameServer::request_turn() {
+void GameServer::request_turn(bool enemy_hit, position_t position) {
     next_player();
     std::cout << "requesting turn from" << (*current_player)->get_name() << std::endl;
     TurnRequestPackage turn_request_package;
+    turn_request_package.set_enemy_hit(enemy_hit);
+    turn_request_package.set_position(position);
     (*current_player)->get_connection().write(turn_request_package);
 }
 
@@ -171,7 +173,7 @@ GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
         auto last_player = players_playing.end();
         last_player--;
         current_player = last_player;
-        request_turn();
+        request_turn(false, position());
         return TURN_WAIT;
     }
     return SETUP_GAME;
@@ -187,7 +189,7 @@ GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
             TurnPackage & p = cast_package<TurnPackage>(package);
             position_t position = p.get_position();
             get_enemy().get_battle_field().hit_field(position);
-            request_turn();
+            request_turn(true, position);
         }
     }
     return TURN_WAIT;

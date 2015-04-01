@@ -195,12 +195,20 @@ SimpleClientState SimpleClient::wait_for_game_start(ServerNetworkPackage server_
 SimpleClientState SimpleClient::your_turn(ServerNetworkPackage server_package) {
     NetworkPackage &package = server_package.get_package();
     if(is_package_of_type<TurnRequestPackage>(package)) {
+        auto& turn_request = cast_package<TurnRequestPackage>(package);
+        if(turn_request.get_enemy_hit()) {
+            you.get_battle_field().hit_field(turn_request.get_position());
+        }
+
         print_battle_field(enemy);
         print_battle_field(you);
-        TurnPackage turn;
-        turn.set_identity(you.get_identity());
+
         std::cout << "Enter enemy field you want to hit." << std::endl;
         position_t position = ask_position();
+        enemy.get_battle_field().hit_field(position);
+
+        TurnPackage turn;
+        turn.set_identity(you.get_identity());
         turn.set_position(position);
         connection.write(turn);
         std::cout << "waiting for enemy ... " << std::endl;
