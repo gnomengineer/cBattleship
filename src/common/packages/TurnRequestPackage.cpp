@@ -17,9 +17,9 @@ std::vector<unsigned char> TurnRequestPackage::encode_payload() {
     return encoded;
 }
 
-void TurnRequestPackage::decode_payload(std::vector<unsigned char> command_data) {
+void TurnRequestPackage::decode_payload(std::vector<unsigned char> package_data) {
     std::vector<unsigned char> encoded;
-    NetworkPackage::get_from_bytes(command_data, 0, enemy_hit, position.y, position.x);
+    NetworkPackage::get_from_bytes(package_data, 0, enemy_hit, position.y, position.x);
 }
 
 void TurnRequestPackage::set_enemy_hit(bool enemy_hit) {

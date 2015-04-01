@@ -14,11 +14,11 @@ std::vector<unsigned char> NetworkPackageManagerTest::TestNetworkPackage::encode
     payload[3] = (some_payload >>  0) & 0xFF;
     return payload;
 }
-void NetworkPackageManagerTest::TestNetworkPackage::decode_payload(std::vector<unsigned char> command_data) {
-    some_payload = command_data[0] << 24
-                 | command_data[1] << 16
-                 | command_data[2] << 8
-                 | command_data[3] << 0;
+void NetworkPackageManagerTest::TestNetworkPackage::decode_payload(std::vector<unsigned char> package_data) {
+    some_payload = package_data[0] << 24
+                 | package_data[1] << 16
+                 | package_data[2] << 8
+                 | package_data[3] << 0;
 }
 
 void NetworkPackageManagerTest::setUp()
@@ -34,11 +34,11 @@ void NetworkPackageManagerTest::tearDown()
     delete network_package_manager;
 }
 
-void NetworkPackageManagerTest::encode_command_test()
+void NetworkPackageManagerTest::encode_package_test()
 {
     TestNetworkPackage test_command;
     test_command.some_payload = 0x12345678;
-    auto vector = network_package_manager->encode_command(test_command);
+    auto vector = network_package_manager->encode_package(test_command);
     CPPUNIT_ASSERT_EQUAL((int)0xEF, (int)vector[0]);
     CPPUNIT_ASSERT_EQUAL((int)0x08, (int)vector[1]);
     CPPUNIT_ASSERT_EQUAL((int)0x00, (int)vector[2]);
@@ -49,12 +49,12 @@ void NetworkPackageManagerTest::encode_command_test()
     CPPUNIT_ASSERT_EQUAL((int)0xCD, (int)vector[7]);
 }
 
-void NetworkPackageManagerTest::decode_command_test()
+void NetworkPackageManagerTest::decode_package_test()
 {
     const int payload = 0x12345678;
     TestNetworkPackage test_command;
     test_command.some_payload = payload;
-    NetworkPackage& network_command = network_package_manager->decode_command(network_package_manager->encode_command(test_command));
+    NetworkPackage& network_command = network_package_manager->decode_package(network_package_manager->encode_package(test_command));
     int decoded_payload = dynamic_cast<TestNetworkPackage*>(&network_command)->some_payload;
     CPPUNIT_ASSERT_EQUAL(payload, decoded_payload);
 }

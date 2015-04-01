@@ -11,7 +11,7 @@ class NetworkPackage {
         virtual ~NetworkPackage() = default;
         virtual package_nr_t get_package_nr() = 0;
         virtual std::vector<unsigned char> encode_payload() = 0;
-        virtual void decode_payload(std::vector<unsigned char> command_data) = 0;
+        virtual void decode_payload(std::vector<unsigned char> package_data) = 0;
 
         // utility methods
         template<typename T>

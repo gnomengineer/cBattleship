@@ -88,8 +88,8 @@ position_t SimpleClient::ask_position() {
     position_t position;
     bool ok = false;
     while(!ok) {
-        position.y = ask_ship_coord("y");
-        position.x = ask_ship_coord("x");
+        position.y = ask_coord("y");
+        position.x = ask_coord("x");
         if(position.y <= BATTLEFIELD_HEIGHT && position.x <= BATTLEFIELD_WIDTH) {
             ok = true;
         } else {
@@ -99,7 +99,7 @@ position_t SimpleClient::ask_position() {
     return position;
 }
 
-position_coordinate_t SimpleClient::ask_ship_coord(std::string coord_name) {
+position_coordinate_t SimpleClient::ask_coord(std::string coord_name) {
     position_coordinate_t coord = 0;
     bool ok = false;
     while(!ok) {

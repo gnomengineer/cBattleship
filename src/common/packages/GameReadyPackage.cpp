@@ -19,7 +19,7 @@ std::vector<unsigned char> GameReadyPackage::encode_payload() {
     return encoded;
 }
 
-void GameReadyPackage::decode_payload(std::vector<unsigned char> command_data) {
+void GameReadyPackage::decode_payload(std::vector<unsigned char> package_data) {
     /* retrieve the following members from the vector
 
      */

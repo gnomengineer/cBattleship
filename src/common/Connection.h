@@ -2,8 +2,8 @@
 #define _CONNECTION_H
 
 #include <boost/asio.hpp>
-#include <common/communication/NetworkPackage.h>
-#include <common/communication/NetworkPackageManager.h>
+#include <common/packages/NetworkPackage.h>
+#include <common/packages/NetworkPackageManager.h>
 #include <iostream>
 #include <iomanip>
 #include <mutex>

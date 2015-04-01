@@ -12,7 +12,7 @@
 
 namespace asio = boost::asio;
 
-class BattleShipServer {
+class ConnectionServer {
     private:
         asio::io_service io_service;
         asio::ip::tcp::socket socket;
@@ -24,7 +24,7 @@ class BattleShipServer {
         conn_id_t conn_id_gen;
 
     public:
-        BattleShipServer();
+        ConnectionServer();
 
         void handle_io();
 

@@ -1,7 +1,7 @@
 #ifndef _PLAYERNETWORKPACKAGE_H
 #define _PLAYERNETWORKPACKAGE_H
 
-#include <common/communication/NetworkPackage.h>
+#include <common/packages/NetworkPackage.h>
 #include "Player.h"
 
 class PlayerNetworkPackage {

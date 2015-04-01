@@ -2,7 +2,7 @@
 #define _SIMPLECLIENT_H
 
 #include <common/state-machine/StateMachine.h>
-#include <common/communication/NetworkPackageManager.h>
+#include <common/packages/NetworkPackageManager.h>
 #include <map>
 #include <queue>
 #include <mutex>
@@ -52,7 +52,7 @@ class SimpleClient {
         unsigned int ask_ship_length();
         orientation_t ask_ship_orientation();
         position_t ask_position();
-        position_coordinate_t ask_ship_coord(std::string coord_name);
+        position_coordinate_t ask_coord(std::string coord_name);
         void print_ships_available();
 
         std::string get_ship_name_by_length(unsigned int length);

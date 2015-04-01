@@ -20,11 +20,11 @@ class NetworkPackageManager {
     public:
         NetworkPackageManager();
 
-        std::vector<unsigned char> encode_command(NetworkPackage& command);
-        NetworkPackage& decode_command(std::vector<unsigned char> command_data);
+        std::vector<unsigned char> encode_package(NetworkPackage& command);
+        NetworkPackage& decode_package(std::vector<unsigned char> package_data);
 
-        bool check_packaging(std::vector<unsigned char> command_data);
-        int get_package_size(std::vector<unsigned char> command_data);
+        bool check_packaging(std::vector<unsigned char> package_data);
+        int get_package_size(std::vector<unsigned char> package_data);
 
 
         template<typename... Targs> void add_network_commands() {

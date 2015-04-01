@@ -1,9 +1,9 @@
 #ifndef _GAMESERVER_H
 #define _GAMESERVER_H
 
-#include "BattleShipServer.h"
+#include "ConnectionServer.h"
 #include <common/state-machine/StateMachine.h>
-#include <common/communication/NetworkPackageManager.h>
+#include <common/packages/NetworkPackageManager.h>
 #include "PlayerNetworkPackage.h"
 #include <map>
 #include <queue>
@@ -22,7 +22,7 @@ class GameServer {
         typedef StateMachine<GameServerState, GameServer, PlayerNetworkPackage> StateMachineType;
 
         StateMachineType state_machine;
-        BattleShipServer server;
+        ConnectionServer server;
 
 
         std::list<Player*> players_playing;

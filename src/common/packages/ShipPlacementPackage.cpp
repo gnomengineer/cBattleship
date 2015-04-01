@@ -22,15 +22,15 @@ std::vector<unsigned char> ShipPlacementPackage::encode_payload() {
     return encoded;
 }
 
-void ShipPlacementPackage::decode_payload(std::vector<unsigned char> command_data) {
-    AuthenticatedNetworkPackage::decode_payload(command_data);
+void ShipPlacementPackage::decode_payload(std::vector<unsigned char> package_data) {
+    AuthenticatedNetworkPackage::decode_payload(package_data);
     const int ship_length = 4;
-    const int ships_length = command_data.size() - IDENTITY_LENGTH;
+    const int ships_length = package_data.size() - IDENTITY_LENGTH;
     const int num_ships = ship_length / ship_length;
     ship_data.clear();
     for(int i = 0; i < num_ships; i++) {
         ShipData ship;
-        NetworkPackage::get_from_bytes(command_data, IDENTITY_LENGTH + i * 4,
+        NetworkPackage::get_from_bytes(package_data, IDENTITY_LENGTH + i * 4,
             ship.length, (unsigned char &)ship.orientation,
             ship.start_position.y, ship.start_position.x);
         ship_data.push_back(ship);

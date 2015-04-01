@@ -16,7 +16,7 @@ class AuthenticatedNetworkPackage : public NetworkPackage {
 
         virtual package_nr_t get_package_nr() = 0;
         virtual std::vector<unsigned char> encode_payload();
-        virtual void decode_payload(std::vector<unsigned char> command_data);
+        virtual void decode_payload(std::vector<unsigned char> package_data);
 
         std::string get_identity();
         void set_identity(std::string identity);

@@ -1,6 +1,5 @@
 #include <iostream>
 #include <boost/asio.hpp>
-#include <common/communication/NetworkPackageManager.h>
 #include <common/Connection.h>
 #include "SimpleClient.h"
 

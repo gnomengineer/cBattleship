@@ -17,9 +17,9 @@ std::vector<unsigned char> TurnPackage::encode_payload() {
     return encoded;
 }
 
-void TurnPackage::decode_payload(std::vector<unsigned char> command_data) {
-    AuthenticatedNetworkPackage::decode_payload(command_data);
-    NetworkPackage::get_from_bytes(command_data, IDENTITY_LENGTH, position.y, position.x);
+void TurnPackage::decode_payload(std::vector<unsigned char> package_data) {
+    AuthenticatedNetworkPackage::decode_payload(package_data);
+    NetworkPackage::get_from_bytes(package_data, IDENTITY_LENGTH, position.y, position.x);
 }
 
 void TurnPackage::set_position(position_t position) {

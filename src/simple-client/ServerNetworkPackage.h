@@ -1,7 +1,7 @@
 #ifndef _SERVERNETWORKPACKAGE_H
 #define _SERVERNETWORKPACKAGE_H
 
-#include <common/communication/NetworkPackage.h>
+#include <common/packages/NetworkPackage.h>
 class ServerNetworkPackage {
     private:
         NetworkPackage &package;
