@@ -30,7 +30,7 @@ std::string SimpleClient::ask_user(std::string prompt, std::string default_value
 
 void SimpleClient::ask_ship_placement() {
     while(!you.get_battle_field().all_ships_placed()) {
-        print_battle_field(you.get_battle_field());
+        print_battle_field(you);
         print_ships_available();
         auto length = ask_ship_length();
         auto orientation = ask_ship_orientation();
@@ -137,10 +137,10 @@ std::string SimpleClient::get_ship_name_by_length(unsigned int length) {
     return std::string("(invalid ship)");
 }
 
-void SimpleClient::print_battle_field(BattleField & battle_field) {
+void SimpleClient::print_battle_field(Player & player) {
     std::cout << " " << std::string(BATTLEFIELD_WIDTH - 2, '_') << " " << std::endl;
-    std::cout << "/ YOU" << std::string(BATTLEFIELD_WIDTH - 6, ' ') << "\\" << std::endl;
-    auto fields = battle_field.to_vector();
+    std::cout << "/ " << std::setw(BATTLEFIELD_WIDTH - 4) << player.get_name() << " \\" << std::endl;
+    auto fields = player.get_battle_field().to_vector();
     for(int y = 0; y < BATTLEFIELD_HEIGHT; y++) {
         std::string line(fields[y].begin(), fields[y].end());
         std::cout << line << std::endl;
@@ -185,6 +185,7 @@ SimpleClientState SimpleClient::wait_for_game_start(ServerNetworkPackage server_
         ask_ship_placement();
         ShipPlacementPackage ship_placement_package;
         ship_placement_package.set_identity(you.get_identity());
+        ship_placement_package.set_ship_data(you.get_battle_field().get_ship_data());
         connection.write(ship_placement_package);
         std::cout << "waiting for enemy ... " << std::endl;
     }
@@ -194,8 +195,8 @@ SimpleClientState SimpleClient::wait_for_game_start(ServerNetworkPackage server_
 SimpleClientState SimpleClient::your_turn(ServerNetworkPackage server_package) {
     NetworkPackage &package = server_package.get_package();
     if(is_package_of_type<TurnRequestPackage>(package)) {
-        print_battle_field(enemy.get_battle_field());
-        print_battle_field(you.get_battle_field());
+        print_battle_field(enemy);
+        print_battle_field(you);
         TurnPackage turn;
         turn.set_identity(you.get_identity());
         std::cout << "Enter enemy field you want to hit." << std::endl;

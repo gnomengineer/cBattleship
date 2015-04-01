@@ -55,7 +55,7 @@ void GameServer::handle_connection(Connection & connection) {
 
 void GameServer::handle_player_connection(Connection & connection) {
     auto & player = *players[connection.get_id()].get();
-    connection.read([this, &player](NetworkPackage& command) {
+    connection.read([this, &player, &connection](NetworkPackage& command) {
         std::cout << "received command #" << (int)command.get_package_nr() << " from client" << std::endl;
         if(is_authenticated(command, player)) {
             std::lock_guard<std::mutex> lock(queue_lock);
@@ -64,6 +64,7 @@ void GameServer::handle_player_connection(Connection & connection) {
         } else {
             std::cout << "command not properly authenticated" << std::endl;
         }
+        handle_player_connection(connection);
     });
 }
 
@@ -112,6 +113,7 @@ Player& GameServer::get_enemy() {
 
 void GameServer::request_turn() {
     next_player();
+    std::cout << "requesting turn from" << (*current_player)->get_name() << std::endl;
     TurnRequestPackage turn_request_package;
     (*current_player)->get_connection().write(turn_request_package);
 }
@@ -139,8 +141,6 @@ GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_pa
         player.set_identity(identity);
         player.get_connection().write(answer);
         players_playing.push_back(&player);
-    } else {
-        std::cout << "got some shitty package? " << (int)package.get_package_nr() << std::endl;
     }
 
     if(players_playing.size() == 2) {
@@ -155,6 +155,7 @@ GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_pa
 }
 
 GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
+    std::cout << __FUNCTION__ << std::endl;
     Player& player = player_package.get_player();
     NetworkPackage& package = player_package.get_package();
 
@@ -167,6 +168,9 @@ GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
     });
     
     if(players_are_ready_to_start) {
+        auto last_player = players_playing.end();
+        last_player--;
+        current_player = last_player;
         request_turn();
         return TURN_WAIT;
     }
@@ -174,6 +178,7 @@ GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
 }
 
 GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
+    std::cout << __FUNCTION__ << std::endl;
     Player& player = player_package.get_player();
     NetworkPackage& package = player_package.get_package();
 

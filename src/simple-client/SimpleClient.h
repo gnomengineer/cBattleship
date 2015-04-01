@@ -56,7 +56,7 @@ class SimpleClient {
         void print_ships_available();
 
         std::string get_ship_name_by_length(unsigned int length);
-        void print_battle_field(BattleField &battle_field);
+        void print_battle_field(Player &player);
 };
 
 
