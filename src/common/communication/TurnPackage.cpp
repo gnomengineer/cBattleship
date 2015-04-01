@@ -13,43 +13,19 @@ package_nr_t TurnPackage::get_package_nr() {
 
 std::vector<unsigned char> TurnPackage::encode_payload() {
     std::vector<unsigned char> encoded = AuthenticatedNetworkPackage::encode_payload();
-
-    encoded.push_back(pos_x >>  0 & 0xFF);
-    encoded.push_back(pos_x >>  8 & 0xFF);
-    encoded.push_back(pos_x >> 16 & 0xFF);
-    encoded.push_back(pos_x >> 24 & 0xFF);
-
-    encoded.push_back(pos_x >>  0 & 0xFF);
-    encoded.push_back(pos_y >>  8 & 0xFF);
-    encoded.push_back(pos_y >> 16 & 0xFF);
-    encoded.push_back(pos_y >> 24 & 0xFF);
-
+    NetworkPackage::add_to_bytes(encoded, position.y, position.x);
     return encoded;
 }
 
 void TurnPackage::decode_payload(std::vector<unsigned char> command_data) {
     AuthenticatedNetworkPackage::decode_payload(command_data);
-    pos_x = command_data.at(IDENTITY_LENGTH + 0) <<  0 
-          | command_data.at(IDENTITY_LENGTH + 1) <<  8
-          | command_data.at(IDENTITY_LENGTH + 2) << 16 
-          | command_data.at(IDENTITY_LENGTH + 3) << 24;
-    pos_y = command_data.at(IDENTITY_LENGTH + 4) <<  0
-          | command_data.at(IDENTITY_LENGTH + 5) <<  8
-          | command_data.at(IDENTITY_LENGTH + 6) << 16
-          | command_data.at(IDENTITY_LENGTH + 7) << 24;
+    NetworkPackage::get_from_bytes(command_data, IDENTITY_LENGTH, position.y, position.x);
 }
 
-void TurnPackage::set_pos_x(int pos_x) {
-    this->pos_x = pos_x;
+void TurnPackage::set_position(position_t position) {
+    this->position = position;
 }
 
-int TurnPackage::get_pos_x() {
-    return pos_x;
-}
-void TurnPackage::set_pos_y(int pos_y) {
-    this->pos_y = pos_y;
-}
-
-int TurnPackage::get_pos_y() {
-    return pos_y;
+position_t TurnPackage::get_position() {
+    return position;
 }

@@ -201,6 +201,7 @@ SimpleClientState SimpleClient::your_turn(ServerNetworkPackage server_package) {
         turn.set_identity(you.get_identity());
         std::cout << "Enter enemy field you want to hit." << std::endl;
         position_t position = ask_position();
+        turn.set_position(position);
         connection.write(turn);
         std::cout << "waiting for enemy ... " << std::endl;
     } else if(is_package_of_type<EnemyDisconnectedPackage>(package)) {

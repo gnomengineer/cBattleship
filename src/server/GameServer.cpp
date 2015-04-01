@@ -185,7 +185,8 @@ GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
     if(is_package_of_type<TurnPackage>(package)) {
         if(&player == *current_player) {
             TurnPackage & p = cast_package<TurnPackage>(package);
-            get_enemy().get_battle_field().hit_field(position(p.get_pos_x(), p.get_pos_y()));
+            position_t position = p.get_position();
+            get_enemy().get_battle_field().hit_field(position);
             request_turn();
         }
     }
