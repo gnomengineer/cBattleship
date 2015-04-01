@@ -5,6 +5,7 @@
 #include <common/communication/NetworkPackage.h>
 #include <common/communication/NetworkPackageManager.h>
 #include <iostream>
+#include <iomanip>
 #include <mutex>
 
 namespace asio = boost::asio;
@@ -19,10 +20,12 @@ class Connection {
         conn_id_t conn_id;
         std::vector<unsigned char> header;
         std::vector<unsigned char> payload;
+        std::vector<unsigned char> writebuffer;
         asio::ip::tcp::socket socket;
         NetworkPackageManager network_package_manager;
 
         std::mutex read_lock;
+        std::mutex write_lock;
 
     public:
         Connection(conn_id_t conn_id, asio::ip::tcp::socket socket);
@@ -38,5 +41,13 @@ class Connection {
     private:
         ReadCallback get_read_callback(ReadCommandHandler handler, int package_size);
         ReadCallback get_read_header_callback(ReadHeaderCommandHandler handler);
+
+        template<typename T> void debug_print(T data, int num = -1) {
+            std::for_each(data.begin(), num == -1 ? data.end() : data.begin() + num, [](unsigned char byte) {
+                    std::cout << "$" << std::hex << std::setw(2) << std::setfill('0') << (int)byte << " ";
+            });
+            std::cout << std::dec;
+            std::cout << std::setfill(' ');
+        }
 };
 #endif
