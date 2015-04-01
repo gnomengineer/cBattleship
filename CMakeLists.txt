@@ -21,32 +21,32 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 # common library
 set(CBATTLESHIP_COMMON_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/common)
 file(GLOB_RECURSE CBATTLESHIP_COMMON_SOURCE_FILES ${CBATTLESHIP_COMMON_SOURCE_PATH}/*.cpp)
-add_library(libcbattleship ${CBATTLESHIP_COMMON_SOURCE_FILES})
+add_library(cbattleship-common ${CBATTLESHIP_COMMON_SOURCE_FILES})
 
 # server 
 set(CBATTLESHIP_SERVER_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/server)
 file(GLOB_RECURSE CBATTLESHIP_SERVER_SOURCE_FILES ${CBATTLESHIP_SERVER_SOURCE_PATH}/*.cpp)
 add_executable(cbattleship-server ${CBATTLESHIP_SERVER_SOURCE_FILES})
-target_link_libraries(cbattleship-server libcbattleship ${BOOST_USED_LIBS})
+target_link_libraries(cbattleship-server cbattleship-common ${BOOST_USED_LIBS})
 
 # client
 set(CBATTLESHIP_CLIENT_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/client)
 file(GLOB_RECURSE CBATTLESHIP_CLIENT_SOURCE_FILES ${CBATTLESHIP_CLIENT_SOURCE_PATH}/*.cpp)
 add_executable(cbattleship-curses-client ${CBATTLESHIP_CLIENT_SOURCE_FILES})
-target_link_libraries(cbattleship-curses-client libcbattleship ${BOOST_USED_LIBS})
+target_link_libraries(cbattleship-curses-client cbattleship-common ${BOOST_USED_LIBS})
 
 # simple client
-set(CBATTLESHIP_SIMPLE_CLIENT_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/simple-client)
+set(CBATTLESHIP_SIMPLE_CLIENT_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/text-client)
 file(GLOB_RECURSE CBATTLESHIP_SIMPLE_CLIENT_SOURCE_FILES ${CBATTLESHIP_SIMPLE_CLIENT_SOURCE_PATH}/*.cpp)
 add_executable(cbattleship-text-client ${CBATTLESHIP_SIMPLE_CLIENT_SOURCE_FILES})
-target_link_libraries(cbattleship-text-client libcbattleship ${BOOST_USED_LIBS})
+target_link_libraries(cbattleship-text-client cbattleship-common ${BOOST_USED_LIBS})
 
 
 # test cases
 set(CBATTLESHIP_TEST_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/test)
 file(GLOB_RECURSE CBATTLESHIP_TEST_SOURCE_FILES ${CBATTLESHIP_TEST_SOURCE_PATH}/*.cpp)
 add_executable(cbattleship-unit-tests ${CBATTLESHIP_TEST_SOURCE_FILES})
-target_link_libraries(cbattleship-unit-tests libcbattleship cppunit)
+target_link_libraries(cbattleship-unit-tests cbattleship-common cppunit)
 
 # use ncurses library
 set(CURSES_NEED_NCURSES TRUE)
