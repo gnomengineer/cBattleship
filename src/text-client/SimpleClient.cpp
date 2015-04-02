@@ -139,7 +139,7 @@ std::string SimpleClient::get_ship_name_by_length(unsigned int length) {
 
 void SimpleClient::print_battle_field(Player & player) {
     std::cout << " " << std::string(BATTLEFIELD_WIDTH - 2, '_') << " " << std::endl;
-    std::cout << "/ " << std::setw(BATTLEFIELD_WIDTH - 4) << player.get_name() << " \\" << std::endl;
+    std::cout << "/ " << std::setw(BATTLEFIELD_WIDTH  - 4) << player.get_name() << " \\" << std::endl;
     auto fields = player.get_battle_field().to_vector();
     for(int y = 0; y < BATTLEFIELD_HEIGHT; y++) {
         std::string line(fields[y].begin(), fields[y].end());
@@ -182,6 +182,7 @@ SimpleClientState SimpleClient::wait_for_game_start(ServerNetworkPackage server_
     NetworkPackage &package = server_package.get_package();
     if(is_package_of_type<GameReadyPackage>(package)) {
         GameReadyPackage & game_ready_package = cast_package<GameReadyPackage>(package);
+        enemy.set_name(game_ready_package.get_enemy_name());
         ask_ship_placement();
         ShipPlacementPackage ship_placement_package;
         ship_placement_package.set_identity(you.get_identity());

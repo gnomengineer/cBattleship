@@ -21,6 +21,8 @@ class Ship;
 #define FIELD_HIT 'X'
 #define FIELD_DESTROYED '#'
 
+#define PLAYER_NAME_MAX_LENGTH (BATTLEFIELD_WIDTH - 4)
+
 
 // This class provides the functionality of a battle
 // field. It gives methods for reading position of ships

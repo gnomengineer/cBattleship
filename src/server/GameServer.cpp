@@ -146,10 +146,17 @@ GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_pa
     }
 
     if(players_playing.size() == 2) {
-        std::for_each(players_playing.begin(), players_playing.end(), [](Player* player) {
+        auto last_player = players_playing.end();
+        last_player--;
+        current_player = last_player;
+        auto player_before = last_player;
+        do {
+            player_before = current_player;
+            next_player();
             GameReadyPackage package;
-            player->get_connection().write(package);
-        });
+            package.set_enemy_name((*player_before)->get_name());
+            (*current_player)->get_connection().write(package);
+        } while((*current_player)->get_identity() != (*last_player)->get_identity());
         return SETUP_GAME;
     } else {
         return CHECK_FOR_CONNECTIONS;
@@ -170,9 +177,6 @@ GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
     });
     
     if(players_are_ready_to_start) {
-        auto last_player = players_playing.end();
-        last_player--;
-        current_player = last_player;
         request_turn(false, position());
         return TURN_WAIT;
     }
