@@ -204,9 +204,39 @@ SimpleClientState SimpleClient::wait_for_game_start(ServerNetworkPackage server_
         ship_placement_package.set_identity(you.get_identity());
         ship_placement_package.set_ship_data(you.get_battle_field().get_ship_data());
         connection.write(ship_placement_package);
-        std::cout << "waiting for your first turn to start ... " << std::endl;
+        std::cout << "waiting for confirmation ... " << std::endl;
+    } else if(is_package_of_type<ShipPlacementResponsePackage>(package)) {
+        auto &response = cast_package<ShipPlacementResponsePackage>(package);
+        if(response.get_valid()) {
+            std::cout << "your ship placement has been confirmed." << std::endl;
+            std::cout << "waiting for your first turn to start ... " << std::endl;
+            return YOUR_TURN;
+        } else {
+
+            std::cout << "error: server rejected ship placement, because";
+            if(response.get_out_of_bounds()) {
+                std::cout << "some ships where out of bounds";
+            } else if(response.get_ships_overlap()) {
+                std::cout << "some ships overlap";
+            } else if(response.get_remaining_ships() > 0) {
+                std::cout << "you didn't place all the ships";
+            } else if(response.get_remaining_ships() < 0) {
+                std::cout << "you placed too many ships";
+            } else {
+                std::cout << "of an unknown reason";
+            }
+            std::cout << std::endl;
+            std::cout << "so, let's place the ships again! yay!" << std::endl;
+            you.get_battle_field().clear();
+            ask_ship_placement();
+            ShipPlacementPackage ship_placement_package;
+            ship_placement_package.set_identity(you.get_identity());
+            ship_placement_package.set_ship_data(you.get_battle_field().get_ship_data());
+            connection.write(ship_placement_package);
+            std::cout << "waiting for confirmation ... " << std::endl;
+        }
     }
-    return YOUR_TURN;
+    return WAIT_FOR_GAME_START;
 }
 
 SimpleClientState SimpleClient::your_turn(ServerNetworkPackage server_package) {

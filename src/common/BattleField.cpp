@@ -4,25 +4,31 @@
 #include <algorithm>
 
 BattleField::BattleField() {
-    // fill battlefield with Field instances
+    clear();
+}
+
+BattleField::BattleField(const BattleField& other) {
+    fields = std::array<std::array<std::shared_ptr<Field>, BATTLEFIELD_WIDTH>, BATTLEFIELD_HEIGHT>(other.fields);
+    ships = std::list<std::shared_ptr<Ship>>(other.ships);
+    ships_available = std::map<unsigned int, int>(other.ships_available);
+}
+
+void BattleField::clear() {
+    // fill battlefield with empty Field instances
     for(int y = 0; y < BATTLEFIELD_HEIGHT; y++) {
         for(int x = 0; x < BATTLEFIELD_WIDTH; x++) {
             fields[y][x] = std::shared_ptr<Field>(new Field(position(y, x)));
         }
     }
 
+    ships.clear();
+
     //define possible ship lengths    
+    ships_available.clear();
     ships_available[2] = 3;
     ships_available[3] = 2;
     ships_available[4] = 2;
     ships_available[5] = 1;
-}
-
-BattleField::BattleField(const BattleField& other) {
-        
-    fields = std::array<std::array<std::shared_ptr<Field>, BATTLEFIELD_WIDTH>, BATTLEFIELD_HEIGHT>(other.fields);
-    ships = std::list<std::shared_ptr<Ship>>(other.ships);
-    ships_available = std::map<unsigned int, int>(other.ships_available);
 }
 
 void BattleField::add_ship(unsigned int length, orientation_t orientation, position_t start_position) {

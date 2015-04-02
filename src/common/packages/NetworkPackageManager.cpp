@@ -10,6 +10,7 @@ NetworkPackageManager::NetworkPackageManager() {
                              PlayerJoinAnswerPackage,
                              GameReadyPackage,
                              ShipPlacementPackage,
+                             ShipPlacementResponsePackage,
                              TurnRequestPackage,
                              TurnPackage,
                              TurnResponsePackage,

@@ -9,6 +9,7 @@
 #include "PlayerJoinAnswerPackage.h"
 #include "GameReadyPackage.h"
 #include "ShipPlacementPackage.h"
+#include "ShipPlacementResponsePackage.h"
 #include "TurnRequestPackage.h"
 #include "TurnPackage.h"
 #include "TurnResponsePackage.h"

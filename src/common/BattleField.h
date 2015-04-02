@@ -36,6 +36,9 @@ class BattleField {
     public:
         BattleField();
         BattleField(const BattleField& other);
+
+        void clear();
+
         void add_ship(unsigned int length, orientation_t orientation, position_t position);
         bool all_ships_destroyed() const;
         bool hit_field(position_t position);

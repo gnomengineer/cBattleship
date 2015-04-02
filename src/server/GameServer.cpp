@@ -169,7 +169,43 @@ GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
     NetworkPackage& package = player_package.get_package();
 
     if(is_package_of_type<ShipPlacementPackage>(package)) {
-        player.set_ready_to_start(true);
+        auto &ship_placement_package = cast_package<ShipPlacementPackage>(package);
+        auto ship_data = ship_placement_package.get_ship_data();
+        ShipPlacementResponsePackage response;
+        try {
+            player.get_battle_field().clear();
+            std::for_each(ship_data.begin(), ship_data.end(), [&player](ShipData &ship) {
+                std::cout << "place ship(" << ship.length << ") or: " << ship.orientation << ", y: " << ship.start_position.y << ", x: " << ship.start_position.x << std::endl;
+                player.get_battle_field().add_ship(ship.length, ship.orientation, ship.start_position);
+            });
+            response.set_out_of_bounds(false);
+            response.set_ships_overlap(false);
+            if(player.get_battle_field().all_ships_placed()) {
+                response.set_valid(true);
+                response.set_remaining_ships(0);
+                player.set_ready_to_start(true);
+            } else {
+                std::cout << "error: not all ships placed" << std::endl;
+                response.set_valid(false);
+                response.set_remaining_ships(1);
+            }
+        } catch(std::out_of_range &ex) {
+            std::cout << "error: " << ex.what() << std::endl;
+            response.set_valid(false);
+            response.set_out_of_bounds(true);
+            response.set_ships_overlap(false);
+            response.set_remaining_ships(0);
+        } catch(std::invalid_argument &ex) {
+            std::cout << "error: " << ex.what() << std::endl;
+            response.set_valid(false);
+            response.set_out_of_bounds(false);
+            if(player.get_battle_field().all_ships_placed()) {
+                response.set_ships_overlap(true);
+            } else {
+                response.set_remaining_ships(-1);
+            }
+        }
+        player.get_connection().write(response);
     }
 
     bool players_are_ready_to_start = std::all_of(players_playing.begin(), players_playing.end(), [](Player *player) {
