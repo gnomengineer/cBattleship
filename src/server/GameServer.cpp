@@ -113,7 +113,7 @@ Player& GameServer::get_enemy() {
 
 void GameServer::request_turn(bool enemy_hit, position_t position) {
     next_player();
-    std::cout << "requesting turn from" << (*current_player)->get_name() << std::endl;
+    std::cout << "requesting turn from " << (*current_player)->get_name() << std::endl;
     TurnRequestPackage turn_request_package;
     turn_request_package.set_enemy_hit(enemy_hit);
     turn_request_package.set_position(position);
@@ -192,8 +192,25 @@ GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
         if(&player == *current_player) {
             TurnPackage & p = cast_package<TurnPackage>(package);
             position_t position = p.get_position();
-            get_enemy().get_battle_field().hit_field(position);
-            request_turn(true, position);
+            try {
+                auto field = get_enemy().get_battle_field().get_field(position);
+                field->set_hit();
+
+                // everything ok with this turn, send feedback
+                TurnResponsePackage turn_response;
+                turn_response.set_valid(true);
+                turn_response.set_ship_hit(field->is_ship_part());
+                (*current_player)->get_connection().write(turn_response);
+
+                // request next turn from other player
+                request_turn(true, position);
+            } catch(std::out_of_range &ex) {
+                std::cout << "error: player sent out of range position, asking again..." << std::endl;
+                TurnResponsePackage turn_response;
+                turn_response.set_valid(false);
+                turn_response.set_ship_hit(false);
+                (*current_player)->get_connection().write(turn_response);
+            }
         }
     }
     return TURN_WAIT;

@@ -29,6 +29,8 @@ class SimpleClient {
         Player enemy;
         std::list<Player*> players_playing;
 
+        position_t last_turn_position;
+
         std::queue<ServerNetworkPackage> input_queue;
         std::mutex queue_lock;
 
@@ -53,6 +55,7 @@ class SimpleClient {
         orientation_t ask_ship_orientation();
         position_t ask_position();
         position_coordinate_t ask_coord(std::string coord_name);
+        void ask_turn();
         void print_ships_available();
 
         std::string get_ship_name_by_length(unsigned int length);

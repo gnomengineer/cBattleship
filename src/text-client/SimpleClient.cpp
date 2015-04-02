@@ -5,7 +5,9 @@
 #include <algorithm>
 
 SimpleClient::SimpleClient(Connection &connection)
-    : state_machine(GET_IDENTITY, *this),  connection(connection) {
+    : state_machine(GET_IDENTITY, *this), 
+      connection(connection),
+      last_turn_position() {
 }
 
 SimpleClient::~SimpleClient() {
@@ -90,13 +92,26 @@ position_t SimpleClient::ask_position() {
     while(!ok) {
         position.y = ask_coord("y");
         position.x = ask_coord("x");
-        if(position.y <= BATTLEFIELD_HEIGHT && position.x <= BATTLEFIELD_WIDTH) {
+        if(check_position(position, BATTLEFIELD_HEIGHT, BATTLEFIELD_WIDTH)) {
             ok = true;
         } else {
             std::cout << "error: out of bounds." << std::endl;
         }
     }
     return position;
+}
+
+void SimpleClient::ask_turn() {
+        print_battle_field(enemy);
+        print_battle_field(you);
+
+        std::cout << "Enter enemy field you want to hit." << std::endl;
+        last_turn_position = ask_position();
+
+        TurnPackage turn;
+        turn.set_identity(you.get_identity());
+        turn.set_position(last_turn_position);
+        connection.write(turn);
 }
 
 position_coordinate_t SimpleClient::ask_coord(std::string coord_name) {
@@ -149,7 +164,8 @@ void SimpleClient::print_battle_field(Player & player) {
 }
 
 void SimpleClient::run() {
-    std::string name = ask_user("your nickname: ", "unnamed");
+    std::string name = ask_user("Your Nickname: ", "unnamed");
+    you.set_name(name);
     PlayerJoinPackage player_join_package;
     player_join_package.set_player_name(name);
     connection.write(player_join_package);
@@ -188,7 +204,7 @@ SimpleClientState SimpleClient::wait_for_game_start(ServerNetworkPackage server_
         ship_placement_package.set_identity(you.get_identity());
         ship_placement_package.set_ship_data(you.get_battle_field().get_ship_data());
         connection.write(ship_placement_package);
-        std::cout << "waiting for enemy ... " << std::endl;
+        std::cout << "waiting for your first turn to start ... " << std::endl;
     }
     return YOUR_TURN;
 }
@@ -200,19 +216,23 @@ SimpleClientState SimpleClient::your_turn(ServerNetworkPackage server_package) {
         if(turn_request.get_enemy_hit()) {
             you.get_battle_field().hit_field(turn_request.get_position());
         }
-
-        print_battle_field(enemy);
-        print_battle_field(you);
-
-        std::cout << "Enter enemy field you want to hit." << std::endl;
-        position_t position = ask_position();
-        enemy.get_battle_field().hit_field(position);
-
-        TurnPackage turn;
-        turn.set_identity(you.get_identity());
-        turn.set_position(position);
-        connection.write(turn);
-        std::cout << "waiting for enemy ... " << std::endl;
+        ask_turn();
+        std::cout << "wait for confirmation ... " << std::endl;
+    } else if(is_package_of_type<TurnResponsePackage>(package)) {
+        auto& turn_response = cast_package<TurnResponsePackage>(package);
+        if(!turn_response.get_valid()) {
+            std::cout << "error: invalid turn, try again" << std::endl;
+            ask_turn();
+            std::cout << "wait for confirmation ... " << std::endl;
+        } else {
+            auto field = enemy.get_battle_field().get_field(last_turn_position);
+            field->set_ship_part(turn_response.get_ship_hit());
+            field->set_hit();
+            std::cout << (turn_response.get_ship_hit()
+                         ? "you hit an enemy ship!"
+                         : "you missed!") << std::endl;
+            std::cout << "wait for enemy player to make his turn ... " << std::endl;
+        }
     } else if(is_package_of_type<EnemyDisconnectedPackage>(package)) {
         std::cout << "the enemy disconnected ... well i guess you won?" << std::endl;
     }

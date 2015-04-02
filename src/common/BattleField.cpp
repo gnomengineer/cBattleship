@@ -62,7 +62,7 @@ bool BattleField::all_ships_destroyed() const {
 }
 
 bool BattleField::hit_field(position_t position) {
-    auto &hit_field = fields[position.y][position.x];
+    auto hit_field = get_field(position);
     hit_field->set_hit();
     return hit_field->is_ship_part();
 }
@@ -106,6 +106,7 @@ bool BattleField::check_ship_collision(Ship &new_ship) const {
 }
 
 std::shared_ptr<Field> BattleField::get_field(position_t position) {
+    if(!check_position(position, BATTLEFIELD_HEIGHT, BATTLEFIELD_WIDTH)) throw std::out_of_range("position out of range");
     return fields[position.y][position.x];
 }
 std::vector<ShipData> BattleField::get_ship_data() const {

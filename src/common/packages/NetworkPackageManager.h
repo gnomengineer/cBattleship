@@ -11,6 +11,7 @@
 #include "ShipPlacementPackage.h"
 #include "TurnRequestPackage.h"
 #include "TurnPackage.h"
+#include "TurnResponsePackage.h"
 #include "EnemyDisconnectedPackage.h"
 
 class NetworkPackageManager {
