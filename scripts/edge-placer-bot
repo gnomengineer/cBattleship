@@ -1,43 +1,19 @@
 #!/bin/bash
-echo "edge-placer-bot"
-# ship
-echo "5"
-echo "v"
-echo "0"
-echo "0"
-# ship
-echo "4"
-echo "v"
-echo "0"
-echo "1"
-# ship
-echo "4"
-echo "v"
-echo "0"
-echo "2"
-# ship
-echo "3"
-echo "v"
-echo "0"
-echo "3"
-# ship
-echo "3"
-echo "v"
-echo "0"
-echo "4"
-# ship
-echo "2"
-echo "v"
-echo "0"
-echo "5"
-# ship
-echo "2"
-echo "v"
-echo "0"
-echo "6"
-# ship
-echo "2"
-echo "v"
-echo "0"
-echo "7"
+if [ -z "$1" ]; then
+    echo "edge-bot"
+else
+    echo "$1"
+fi
+
+# place ships in the top left edge
+echo "5 v 0 0"
+echo "4 v 0 1"
+echo "4 v 0 2"
+echo "3 v 0 3"
+echo "3 v 0 4"
+echo "2 v 0 5"
+echo "2 v 0 6"
+echo "2 v 0 7"
+
+# let the user input the rest
 cat
