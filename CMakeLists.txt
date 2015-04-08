@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 2.8.4)
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
+include(cotire)
+
 project(cBattleship)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
@@ -28,18 +31,21 @@ set(CBATTLESHIP_SERVER_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/server)
 file(GLOB_RECURSE CBATTLESHIP_SERVER_SOURCE_FILES ${CBATTLESHIP_SERVER_SOURCE_PATH}/*.cpp)
 add_executable(cbattleship-server ${CBATTLESHIP_SERVER_SOURCE_FILES})
 target_link_libraries(cbattleship-server cbattleship-common ${BOOST_USED_LIBS})
+cotire(cbattleship-server)
 
 # client
 set(CBATTLESHIP_CLIENT_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/client)
 file(GLOB_RECURSE CBATTLESHIP_CLIENT_SOURCE_FILES ${CBATTLESHIP_CLIENT_SOURCE_PATH}/*.cpp)
 add_executable(cbattleship-curses-client ${CBATTLESHIP_CLIENT_SOURCE_FILES})
 target_link_libraries(cbattleship-curses-client cbattleship-common ${BOOST_USED_LIBS})
+cotire(cbattleship-curses-client)
 
 # simple client
 set(CBATTLESHIP_SIMPLE_CLIENT_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/text-client)
 file(GLOB_RECURSE CBATTLESHIP_SIMPLE_CLIENT_SOURCE_FILES ${CBATTLESHIP_SIMPLE_CLIENT_SOURCE_PATH}/*.cpp)
 add_executable(cbattleship-text-client ${CBATTLESHIP_SIMPLE_CLIENT_SOURCE_FILES})
 target_link_libraries(cbattleship-text-client cbattleship-common ${BOOST_USED_LIBS})
+cotire(cbattleship-text-client)
 
 
 # test cases
@@ -47,6 +53,7 @@ set(CBATTLESHIP_TEST_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/test)
 file(GLOB_RECURSE CBATTLESHIP_TEST_SOURCE_FILES ${CBATTLESHIP_TEST_SOURCE_PATH}/*.cpp)
 add_executable(cbattleship-unit-tests ${CBATTLESHIP_TEST_SOURCE_FILES})
 target_link_libraries(cbattleship-unit-tests cbattleship-common cppunit)
+cotire(cbattleship-unit-tests)
 
 # use ncurses library
 set(CURSES_NEED_NCURSES TRUE)
