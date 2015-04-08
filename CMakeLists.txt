@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.4)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
-include(cotire)
+include(cotire OPTIONAL)
 
 project(cBattleship)
 
@@ -9,13 +9,13 @@ set(CMAKE_CXX_FLAGS "-std=c++11")
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREAD ON)
-find_package(Boost 1.54.0 REQUIRED COMPONENTS system thread regex)
+find_package(Boost 1.55.0 REQUIRED COMPONENTS thread system)
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     link_directories(${Boost_LIBRARY_DIRS})
 endif(Boost_FOUND)
 
-set(BOOST_USED_LIBS ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY} ${Boost_REGEX_LIBRARY} pthread)
+set(BOOST_USED_LIBS ${Boost_SYSTEM_LIBRARIES} ${Boost_THREAD_LIBRARIES} pthread)
 
 # add src to include directories so, every module can include headers
 # from common
@@ -25,27 +25,37 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 set(CBATTLESHIP_COMMON_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/common)
 file(GLOB_RECURSE CBATTLESHIP_COMMON_SOURCE_FILES ${CBATTLESHIP_COMMON_SOURCE_PATH}/*.cpp)
 add_library(cbattleship-common ${CBATTLESHIP_COMMON_SOURCE_FILES})
+target_link_libraries(cbattleship-common ${BOOST_USED_LIBS})
+if(COMMAND cotire)
+    cotire(cbattleship-common)
+endif()
 
 # server 
 set(CBATTLESHIP_SERVER_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/server)
 file(GLOB_RECURSE CBATTLESHIP_SERVER_SOURCE_FILES ${CBATTLESHIP_SERVER_SOURCE_PATH}/*.cpp)
 add_executable(cbattleship-server ${CBATTLESHIP_SERVER_SOURCE_FILES})
 target_link_libraries(cbattleship-server cbattleship-common ${BOOST_USED_LIBS})
-cotire(cbattleship-server)
+if(COMMAND cotire)
+    cotire(cbattleship-server)
+endif()
 
-# client
+# curses client
 set(CBATTLESHIP_CLIENT_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/client)
 file(GLOB_RECURSE CBATTLESHIP_CLIENT_SOURCE_FILES ${CBATTLESHIP_CLIENT_SOURCE_PATH}/*.cpp)
 add_executable(cbattleship-curses-client ${CBATTLESHIP_CLIENT_SOURCE_FILES})
 target_link_libraries(cbattleship-curses-client cbattleship-common ${BOOST_USED_LIBS})
-cotire(cbattleship-curses-client)
+if(COMMAND cotire)
+    cotire(cbattleship-curses-client)
+endif()
 
-# simple client
+# text client
 set(CBATTLESHIP_SIMPLE_CLIENT_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/text-client)
 file(GLOB_RECURSE CBATTLESHIP_SIMPLE_CLIENT_SOURCE_FILES ${CBATTLESHIP_SIMPLE_CLIENT_SOURCE_PATH}/*.cpp)
 add_executable(cbattleship-text-client ${CBATTLESHIP_SIMPLE_CLIENT_SOURCE_FILES})
 target_link_libraries(cbattleship-text-client cbattleship-common ${BOOST_USED_LIBS})
-cotire(cbattleship-text-client)
+if(COMMAND cotire)
+    cotire(cbattleship-text-client)
+endif()
 
 
 # test cases
@@ -53,7 +63,9 @@ set(CBATTLESHIP_TEST_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/test)
 file(GLOB_RECURSE CBATTLESHIP_TEST_SOURCE_FILES ${CBATTLESHIP_TEST_SOURCE_PATH}/*.cpp)
 add_executable(cbattleship-unit-tests ${CBATTLESHIP_TEST_SOURCE_FILES})
 target_link_libraries(cbattleship-unit-tests cbattleship-common cppunit)
-cotire(cbattleship-unit-tests)
+if(COMMAND cotire)
+    cotire(cbattleship-unit-tests)
+endif()
 
 # use ncurses library
 set(CURSES_NEED_NCURSES TRUE)
