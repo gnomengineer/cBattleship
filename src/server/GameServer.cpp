@@ -2,10 +2,11 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp> 
 #include <algorithm>
+#include <boost/log/trivial.hpp>
 
 GameServer::GameServer()
     : state_machine(CHECK_FOR_CONNECTIONS, *this), server() {
-    std::cout << "BattleShipServer listening on 0.0.0.0:13477 ..." << std::endl;
+    BOOST_LOG_TRIVIAL(info) << "cbattleship-server listening on 0.0.0.0:13477 ...";
 }
 
 GameServer::~GameServer() {
@@ -56,13 +57,13 @@ void GameServer::handle_connection(Connection & connection) {
 void GameServer::handle_player_connection(Connection & connection) {
     auto & player = *players[connection.get_id()].get();
     connection.read([this, &player, &connection](NetworkPackage& command) {
-        std::cout << "received command #" << (int)command.get_package_nr() << " from client" << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << "add command #" << (int)command.get_package_nr() << " from '" << player.get_name() << "' to input queue";
         if(is_authenticated(command, player)) {
             std::lock_guard<std::mutex> lock(queue_lock);
             PlayerNetworkPackage pcmd(command, player);
             input_queue.push(pcmd);
         } else {
-            std::cout << "command not properly authenticated" << std::endl;
+            BOOST_LOG_TRIVIAL(warning) << "dropping, command not properly authenticated";
         }
         handle_player_connection(connection);
     });
@@ -113,7 +114,7 @@ Player& GameServer::get_enemy() {
 
 void GameServer::request_turn(bool enemy_hit, position_t position) {
     next_player();
-    std::cout << "requesting turn from " << (*current_player)->get_name() << std::endl;
+    BOOST_LOG_TRIVIAL(info) << "requesting turn from " << (*current_player)->get_name();
     TurnRequestPackage turn_request_package;
     turn_request_package.set_enemy_hit(enemy_hit);
     turn_request_package.set_position(position);
@@ -122,14 +123,14 @@ void GameServer::request_turn(bool enemy_hit, position_t position) {
 
 
 GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_package) {
-    std::cout << __FUNCTION__ << std::endl;
+    BOOST_LOG_TRIVIAL(debug) << "entering state " << __FUNCTION__;
     Player& player = player_package.get_player();
     NetworkPackage& package = player_package.get_package();
 
     if(is_package_of_type<PlayerJoinPackage>(package)) {
-        std::cout << "PlayerJoinPackage received" << std::endl;
         PlayerJoinPackage & p = cast_package<PlayerJoinPackage>(package);
         player.set_name(p.get_player_name());
+        BOOST_LOG_TRIVIAL(info) << "Player '" << p.get_player_name() << "' joined the game";
         PlayerJoinAnswerPackage answer;
 
         auto randchar = []() -> char {
@@ -164,7 +165,7 @@ GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_pa
 }
 
 GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
-    std::cout << __FUNCTION__ << std::endl;
+    BOOST_LOG_TRIVIAL(debug) << "entering state " << __FUNCTION__;
     Player& player = player_package.get_player();
     NetworkPackage& package = player_package.get_package();
 
@@ -175,7 +176,7 @@ GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
         try {
             player.get_battle_field().clear();
             std::for_each(ship_data.begin(), ship_data.end(), [&player](ShipData &ship) {
-                std::cout << "place ship(" << ship.length << ") or: " << ship.orientation << ", y: " << ship.start_position.y << ", x: " << ship.start_position.x << std::endl;
+                BOOST_LOG_TRIVIAL(debug) << player.get_name() << ": place ship(" << ship.length << ") or: " << ship.orientation << ", y: " << ship.start_position.y << ", x: " << ship.start_position.x;
                 player.get_battle_field().add_ship(ship.length, ship.orientation, ship.start_position);
             });
             response.set_out_of_bounds(false);
@@ -185,18 +186,18 @@ GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
                 response.set_remaining_ships(0);
                 player.set_ready_to_start(true);
             } else {
-                std::cout << "error: not all ships placed" << std::endl;
+                BOOST_LOG_TRIVIAL(warning) << player.get_name() << ": not all ships placed, retrying ... ";
                 response.set_valid(false);
                 response.set_remaining_ships(1);
             }
         } catch(std::out_of_range &ex) {
-            std::cout << "error: " << ex.what() << std::endl;
+            BOOST_LOG_TRIVIAL(warning) << player.get_name() << ": " << ex.what() << ", retrying ... ";
             response.set_valid(false);
             response.set_out_of_bounds(true);
             response.set_ships_overlap(false);
             response.set_remaining_ships(0);
         } catch(std::invalid_argument &ex) {
-            std::cout << "error: " << ex.what() << std::endl;
+            BOOST_LOG_TRIVIAL(warning) << player.get_name() << ": " << ex.what() << ", retrying ... ";
             response.set_valid(false);
             response.set_out_of_bounds(false);
             if(player.get_battle_field().all_ships_placed()) {
@@ -220,7 +221,7 @@ GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
 }
 
 GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
-    std::cout << __FUNCTION__ << std::endl;
+    BOOST_LOG_TRIVIAL(debug) << "entering state " << __FUNCTION__;
     Player& player = player_package.get_player();
     NetworkPackage& package = player_package.get_package();
 
@@ -241,7 +242,7 @@ GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
                 // request next turn from other player
                 request_turn(true, position);
             } catch(std::out_of_range &ex) {
-                std::cout << "error: player sent out of range position, asking again..." << std::endl;
+                BOOST_LOG_TRIVIAL(info) << "player sent out of range position, asking again...";
                 TurnResponsePackage turn_response;
                 turn_response.set_valid(false);
                 turn_response.set_ship_hit(false);
