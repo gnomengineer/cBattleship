@@ -5,18 +5,13 @@ CPPUNIT_TEST_SUITE_REGISTRATION(ShipTest);
 
 void ShipTest::setUp()
 {
-    std::list<std::shared_ptr<Field>> fields1;
-    fields1.push_back(std::shared_ptr<Field>(new Field(position(0, 1))));
-    fields1.push_back(std::shared_ptr<Field>(new Field(position(0, 2))));
-    ship1 = new Ship(fields1);
+    ShipData ship_data;
+    ship_data.length = 2;
+    ship_data.orientation = ORIENTATION_HORIZONTAL;
+    ship_data.start_position = position(0, 0);
+    ship1 = new Ship(ship_data, battle_field);
 
-    std::list<std::shared_ptr<Field>> fields2;
-    fields2.push_back(std::shared_ptr<Field>(new Field(position(1, 1))));
-    fields2.push_back(std::shared_ptr<Field>(new Field(position(2, 1))));
-    fields2.push_back(std::shared_ptr<Field>(new Field(position(3, 1))));
-    fields2.push_back(std::shared_ptr<Field>(new Field(position(4, 1))));
-    fields2.push_back(std::shared_ptr<Field>(new Field(position(5, 1))));
-    ship2 = new Ship(fields2);
+    ship2 = new Ship(5, ORIENTATION_VERTICAL, position(1, 1), battle_field);
 }
 
 

@@ -2,6 +2,7 @@
 #define _SHIPTEST_H
 
 #include <cppunit/extensions/HelperMacros.h>
+#include <common/BattleField.h>
 #include <common/Ship.h>
 
 class ShipTest : public CppUnit::TestFixture
@@ -15,6 +16,7 @@ class ShipTest : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
     private:
+        BattleField battle_field;
         Ship *ship1;
         Ship *ship2;
       
