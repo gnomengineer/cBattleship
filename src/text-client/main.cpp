@@ -1,6 +1,7 @@
 #include <iostream>
 #include <boost/asio.hpp>
 #include <common/Connection.h>
+#include <common/LogConfig.h>
 #include "SimpleClient.h"
 
 int main(int argc, char *argv[]){
@@ -9,6 +10,8 @@ int main(int argc, char *argv[]){
         std::cout << "Usage: " << argv[0] << " <server>" << std::endl;
         return 1;
     }
+
+    LogConfig logClient(std::string(argv[0]) + ".log");
 
     std::cout << "resolving ... " << std::endl;
     boost::asio::io_service io_service;

@@ -1,5 +1,5 @@
 #include "GameServer.h"
-#include "LogConfig.h"
+#include <common/LogConfig.h>
 
 int main(int argc, char *argv[]) {
     std::cout
@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
     << "and you are welcome to redistribute it under certain conditions."
     << std::endl;
 
-    LogConfig logConfig(std::string(argv[0]) + ".log");
+    LogConfig logConfig(std::string(argv[0]) + ".log", true);
     GameServer server;
     server.run();
     return 0;

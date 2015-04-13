@@ -7,6 +7,7 @@
 #include <iostream>
 #include <iomanip>
 #include <mutex>
+#include <sstream>
 
 namespace asio = boost::asio;
 
@@ -42,12 +43,14 @@ class Connection {
         ReadCallback get_read_callback(ReadCommandHandler handler, int package_size);
         ReadCallback get_read_header_callback(ReadHeaderCommandHandler handler);
 
-        template<typename T> void debug_print(T data, int num = -1) {
-            std::for_each(data.begin(), num == -1 ? data.end() : data.begin() + num, [](unsigned char byte) {
-                    std::cout << "$" << std::hex << std::setw(2) << std::setfill('0') << (int)byte << " ";
+        template<typename T> std::string debug_package(T data, int num = -1) {
+            std::stringstream ss;
+            std::for_each(data.begin(), num == -1 ? data.end() : data.begin() + num, [&ss](unsigned char byte) {
+                    ss << "$" << std::hex << std::setw(2) << std::setfill('0') << (int)byte << " ";
             });
-            std::cout << std::dec;
-            std::cout << std::setfill(' ');
+            ss << std::dec;
+            ss << std::setfill(' ');
+            return ss.str();
         }
 };
 #endif

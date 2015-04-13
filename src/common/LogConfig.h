@@ -15,11 +15,11 @@ namespace logging = boost::log;
 
 class LogConfig {
     public:
-        LogConfig(std::string filename) {
+        LogConfig(std::string filename, bool to_console = false) {
             logging::add_common_attributes();
             logging::register_simple_formatter_factory<logging::trivial::severity_level, char>("Severity");
             logging::add_file_log(filename, logging::keywords::format  = "[%TimeStamp%] %Severity%: %Message%", logging::keywords::auto_flush = true);
-            logging::add_console_log(std::cout, logging::keywords::format  = "[%TimeStamp%] %Severity%: %Message%");
+            if(to_console) logging::add_console_log(std::cout, logging::keywords::format  = "[%TimeStamp%] %Severity%: %Message%");
 
             logging::core::get()->set_filter
             (
