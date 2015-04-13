@@ -239,6 +239,21 @@ GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
                 turn_response.set_ship_hit(field->is_ship_part());
                 (*current_player)->get_connection().write(turn_response);
 
+                // does a player not have any ships anymore?
+                if(std::any_of(players_playing.begin(), players_playing.end(),
+                    [](Player *player) { return player->get_battle_field().all_ships_destroyed(); })) {
+                    // well then, finish up the game
+                    auto current = current_player;
+                    do {
+                        next_player();
+                        GameEndedPackage game_ended_package;
+                        game_ended_package.set_won(!(*current_player)->get_battle_field().all_ships_destroyed());
+                        game_ended_package.set_enemy_ships(get_enemy().get_battle_field().get_ship_data());
+                        (*current_player)->get_connection().write(game_ended_package);
+                    } while(current != current_player);
+                    return STOP;
+                }
+
                 // request next turn from other player
                 request_turn(true, position);
             } catch(std::out_of_range &ex) {

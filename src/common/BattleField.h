@@ -50,6 +50,8 @@ class BattleField {
         std::shared_ptr<Field> get_field(position_t position);
         std::vector<ShipData> get_ship_data() const;
 
+        void add_ship_data(std::vector<ShipData> ship_data);
+
         std::map<unsigned int, int> get_ships_available();
         bool all_ships_placed();
 

@@ -213,7 +213,7 @@ SimpleClientState SimpleClient::wait_for_game_start(ServerNetworkPackage server_
             return YOUR_TURN;
         } else {
 
-            std::cout << "error: server rejected ship placement, because";
+            std::cout << "error: server rejected ship placement, because ";
             if(response.get_out_of_bounds()) {
                 std::cout << "some ships where out of bounds";
             } else if(response.get_ships_overlap()) {
@@ -265,6 +265,21 @@ SimpleClientState SimpleClient::your_turn(ServerNetworkPackage server_package) {
         }
     } else if(is_package_of_type<EnemyDisconnectedPackage>(package)) {
         std::cout << "the enemy disconnected ... well i guess you won?" << std::endl;
+    } else if(is_package_of_type<GameEndedPackage>(package)) {
+        auto& end_package= cast_package<GameEndedPackage>(package);
+        if(end_package.get_won()) {
+            std::cout << "Congratz! You Won! \\o/" << std::endl;
+        } else {
+            std::cout << "You lost :-(" << std::endl;
+        }
+
+        std::cout << "Here's the enemy's field with his ships: " << std::endl;
+        auto ship_data = end_package.get_enemy_ships();
+        enemy.get_battle_field().add_ship_data(ship_data);
+        print_battle_field(enemy);
+
+        std::cout << "Until next time!" << std::endl;
+
     }
     return YOUR_TURN;
 }

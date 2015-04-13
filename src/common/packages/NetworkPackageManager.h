@@ -14,6 +14,7 @@
 #include "TurnPackage.h"
 #include "TurnResponsePackage.h"
 #include "EnemyDisconnectedPackage.h"
+#include "GameEndedPackage.h"
 
 class NetworkPackageManager {
     private:

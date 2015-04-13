@@ -115,12 +115,24 @@ std::shared_ptr<Field> BattleField::get_field(position_t position) {
     if(!check_position(position, BATTLEFIELD_HEIGHT, BATTLEFIELD_WIDTH)) throw std::out_of_range("position out of range");
     return fields[position.y][position.x];
 }
+
 std::vector<ShipData> BattleField::get_ship_data() const {
     std::vector<ShipData> ship_data;
     for(auto it = ships.begin(); it != ships.end(); it++) {
         ship_data.push_back((*it)->get_data());
     }
     return ship_data;
+}
+
+void BattleField::add_ship_data(std::vector<ShipData> ship_data) {
+    for(int y = 0; y < BATTLEFIELD_HEIGHT; y++) {
+        for(int x = 0; x < BATTLEFIELD_WIDTH; x++) {
+            fields[y][x]->set_ship_part(false);
+        }
+    }
+    std::for_each(ship_data.begin(), ship_data.end(), [this](ShipData ship) {
+        add_ship(ship.length, ship.orientation, ship.start_position);
+    });
 }
 
 std::map<unsigned int, int> BattleField::get_ships_available() {

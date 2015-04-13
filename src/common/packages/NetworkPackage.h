@@ -34,7 +34,7 @@ class NetworkPackage {
 
         
         template<typename... Targs>
-        void add_to_bytes(std::vector<unsigned char> &bytes, Targs... values) {
+        static void add_to_bytes(std::vector<unsigned char> &bytes, Targs... values) {
             std::vector<unsigned char> results[] = {std::vector<unsigned char>(), (to_bytes<Targs>(values))...};
             for(int i = 0; i < sizeof...(Targs); i++) {
                 bytes.insert(bytes.end(), results[i + 1].begin(), results[i + 1].end());
@@ -42,7 +42,7 @@ class NetworkPackage {
         }
 
         template<typename... Targs>
-        void get_from_bytes(std::vector<unsigned char> &bytes, unsigned int index, Targs&... values) {
+        static void get_from_bytes(std::vector<unsigned char> &bytes, unsigned int index, Targs&... values) {
             int _[] = {0, (values = from_bytes<Targs>(bytes, (index += sizeof(Targs)) - sizeof(Targs)), 0)...};
             (void)_;
         }
