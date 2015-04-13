@@ -13,7 +13,7 @@ struct ShipData;
 class Ship;
 #endif
 
-#define BATTLEFIELD_WIDTH 15
+#define BATTLEFIELD_WIDTH 10
 #define BATTLEFIELD_HEIGHT 10
 
 #define FIELD_WATER '~'
