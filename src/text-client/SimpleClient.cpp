@@ -153,14 +153,31 @@ std::string SimpleClient::get_ship_name_by_length(unsigned int length) {
 }
 
 void SimpleClient::print_battle_field(Player & player) {
-    std::cout << " " << std::string(BATTLEFIELD_WIDTH - 2, '_') << " " << std::endl;
-    std::cout << "/ " << std::setw(BATTLEFIELD_WIDTH  - 4) << player.get_name() << " \\" << std::endl;
+    int x = 0, y = 0;
+    std::vector<int> x_numbers(BATTLEFIELD_WIDTH), y_numbers(BATTLEFIELD_HEIGHT);
+    std::generate_n(x_numbers.begin(), BATTLEFIELD_WIDTH, [&x]() { return x++; });
+    std::generate_n(y_numbers.begin(), BATTLEFIELD_HEIGHT, [&y]() { return y++; });
+
+    std::string under_line = std::string(BATTLEFIELD_WIDTH * 2 + 1, '_');
+    std::stringstream ss;
+    std::for_each(x_numbers.begin(), x_numbers.end(), [&](int x) { ss << std::setw(2) << x; });
+    std::string number_line = ss.str();
+
+    std::cout << " " << under_line << std::endl;
+    std::cout << "/ " << std::setw(PLAYER_NAME_MAX_LENGTH) << player.get_name() << " \\" << std::endl;
+    std::cout << "|" << number_line << " X" << std::endl;
+    
     auto fields = player.get_battle_field().to_vector();
     for(int y = 0; y < BATTLEFIELD_HEIGHT; y++) {
-        std::string line(fields[y].begin(), fields[y].end());
-        std::cout << line << std::endl;
+        std::cout << std::setw(1) << y_numbers[y];
+        for(int x = 0; x < BATTLEFIELD_WIDTH; x++) {
+            std::cout << std::setw(2) << fields[y][x];
+        }
+        std::cout << std::setw(2) << y_numbers[y];
+        std::cout << std::endl;
     }
-    std::cout << "\\" << std::string(BATTLEFIELD_WIDTH - 2, '_') << "/" << std::endl;
+    std::cout << "Y" << number_line << " |" << std::endl;
+    std::cout << "\\" << under_line  << "/" << std::endl;
 }
 
 void SimpleClient::run() {
