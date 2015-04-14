@@ -4,7 +4,6 @@ include(cotire OPTIONAL)
 
 project(cBattleship)
 
-# set(CMAKE_CXX_FLAGS "-std=c++11")
 set(CMAKE_CXX_FLAGS "-std=c++11 -DBOOST_LOG_DYN_LINK")
 
 
@@ -81,7 +80,8 @@ endif()
 # automatically run tests after build
 enable_testing()
 set(BUILD_TESTING ON)
-add_test(NAME unit_test COMMAND ${PROJECT_BINARY_DIR}/cbattleship-unit-tests)
+add_test(NAME unit-tests COMMAND ${PROJECT_BINARY_DIR}/cbattleship-unit-tests)
+add_test(NAME edge-bot-test COMMAND ${PROJECT_SOURCE_DIR}/scripts/tests/edge-bot-test ${PROJECT_BINARY_DIR})
 
 # compile documentation graphs
 find_program(DOT NAMES dot)
