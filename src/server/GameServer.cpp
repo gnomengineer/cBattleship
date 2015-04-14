@@ -205,11 +205,7 @@ GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
         player.get_connection().write(response);
     }
 
-    bool players_are_ready_to_start = std::all_of(players_playing.begin(), players_playing.end(), [](Player *player) {
-        return player->is_ready_to_start();
-    });
-    
-    if(players_are_ready_to_start) {
+    if(GameServerUtil::players_ready_to_start(players_playing)) {
         request_turn(false, position());
         return TURN_WAIT;
     }
