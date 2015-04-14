@@ -3,6 +3,7 @@
 #include <boost/thread/thread.hpp> 
 #include <algorithm>
 #include <boost/log/trivial.hpp>
+#include "GameServerUtil.h"
 
 GameServer::GameServer()
     : state_machine(CHECK_FOR_CONNECTIONS, *this), server() {
@@ -129,21 +130,16 @@ GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_pa
 
     if(is_package_of_type<PlayerJoinPackage>(package)) {
         PlayerJoinPackage & p = cast_package<PlayerJoinPackage>(package);
-        player.set_name(p.get_player_name());
         BOOST_LOG_TRIVIAL(info) << "Player '" << p.get_player_name() << "' joined the game";
-        PlayerJoinAnswerPackage answer;
+        player.set_name(p.get_player_name());
 
-        auto randchar = []() -> char {
-            const char charset[] = "abcdefghijklmnopqrstuvwxyz";
-            const size_t size = sizeof(charset) - 1;
-            return charset[rand() % size];
-        };
-        std::string identity(IDENTITY_LENGTH, 0);
-        std::generate_n(identity.begin(), IDENTITY_LENGTH, randchar);
-        answer.set_identity(identity);
+        std::string identity = GameServerUtil::generate_identity();
         player.set_identity(identity);
-        player.get_connection().write(answer);
         players_playing.push_back(&player);
+
+        PlayerJoinAnswerPackage answer;
+        answer.set_identity(identity);
+        player.get_connection().write(answer);
     }
 
     if(players_playing.size() == 2) {
