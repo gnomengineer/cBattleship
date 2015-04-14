@@ -24,8 +24,12 @@ GameServer::StateMachineType::StateMap GameServer::get_state_map() {
 
 PlayerNetworkPackage GameServer::get_input() {
     while(true) {
-        std::lock_guard<std::mutex> lock(queue_lock);
-        if(!input_queue.empty()) {
+        auto read_something = [this]() -> bool {
+            std::lock_guard<std::mutex> lock(queue_lock);
+            return !input_queue.empty();
+        };
+        if(read_something()) {
+            std::lock_guard<std::mutex> lock(queue_lock);
             PlayerNetworkPackage player_command = input_queue.front();
             input_queue.pop();
             return player_command;
