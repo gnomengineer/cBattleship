@@ -12,8 +12,12 @@ int main(int argc, char *argv[]) {
     << "and you are welcome to redistribute it under certain conditions.\n"
     << std::endl;
 
-    LogConfig logConfig(std::string(argv[0]) + ".log", true);
-    GameServer server;
-    server.run();
+    try {
+        LogConfig logConfig(std::string(argv[0]) + ".log", true);
+        GameServer server;
+        server.run();
+    } catch(...) {
+        std::cout << "an unexpected error occured ... " << std::endl;
+    }
     return 0;
 }

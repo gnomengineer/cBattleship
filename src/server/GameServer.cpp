@@ -1,12 +1,13 @@
 #include "GameServer.h"
+#include <boost/log/trivial.hpp>
+#include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp> 
 #include <algorithm>
-#include <boost/log/trivial.hpp>
 #include "GameServerUtil.h"
 
 GameServer::GameServer()
-    : state_machine(CHECK_FOR_CONNECTIONS, *this), server() {
+    : state_machine(CHECK_FOR_CONNECTIONS, *this), server(boost::bind(&GameServer::handle_connection, this, _1)) {
     BOOST_LOG_TRIVIAL(info) << "cbattleship-server listening on 0.0.0.0:13477 ...";
 }
 
@@ -22,41 +23,34 @@ GameServer::StateMachineType::StateMap GameServer::get_state_map() {
 }
 
 PlayerNetworkPackage GameServer::get_input() {
-    while(input_queue.empty()) {
-        auto & connections = server.get_connections();
-        for(auto it = players.begin(); it != players.end(); it++) {
-            conn_id_t id = it->first;
-            bool still_connected = std::any_of(connections.begin(), connections.end(), [id](std::unique_ptr<Connection> & connection) {
-                return connection->get_id() == id;
-            });
-            if(!still_connected) {
-                players.erase(id);
-            }
-        }
-        for(auto it = connections.begin(); it != connections.end(); it++) {
-            auto& connection = **it;
-            handle_connection(connection);
+    while(true) {
+        std::lock_guard<std::mutex> lock(queue_lock);
+        if(!input_queue.empty()) {
+            PlayerNetworkPackage player_command = input_queue.front();
+            input_queue.pop();
+            return player_command;
+        } else {
+            boost::this_thread::sleep(boost::posix_time::milliseconds(5));
         }
     }
-
-    std::lock_guard<std::mutex> lock(queue_lock);
-    PlayerNetworkPackage player_command = input_queue.front();
-    input_queue.pop();
-    return player_command;
 }
 
-void GameServer::handle_connection(Connection & connection) {
-    if(!is_new_connection(connection)) return;
-
+void GameServer::handle_connection(Connection *connection) {
     if(can_handle_new_connection()) {
         register_new_connection(connection);
     } else {
-        connection.disconnect();
+        connection->disconnect();
     }
 }
 
-void GameServer::handle_player_connection(Connection & connection) {
-    auto & player = *players[connection.get_id()].get();
+void GameServer::register_new_connection(Connection *connection) {
+    Player *player = new Player(connection);
+    players[connection->get_id()] = std::unique_ptr<Player>(new Player(connection));
+    handle_player_connection(*player);
+}
+
+void GameServer::handle_player_connection(Player &player) {
+    auto & connection = player.get_connection();
     connection.read([this, &player, &connection](NetworkPackage& command) {
         BOOST_LOG_TRIVIAL(debug) << "add command #" << (int)command.get_package_nr() << " from '" << player.get_name() << "' to input queue";
         if(is_authenticated(command, player)) {
@@ -66,7 +60,7 @@ void GameServer::handle_player_connection(Connection & connection) {
         } else {
             BOOST_LOG_TRIVIAL(warning) << "dropping, command not properly authenticated";
         }
-        handle_player_connection(connection);
+        handle_player_connection(player);
     });
 }
 
@@ -76,17 +70,8 @@ bool GameServer::is_authenticated(NetworkPackage & command, Player & player) {
     return authenticated_package->get_identity() == player.get_identity();
 }
 
-bool GameServer::is_new_connection(Connection & connection) {
-    return players.find(connection.get_id()) == players.end();
-}
-
 bool GameServer::can_handle_new_connection() {
     return players.size() < 2;
-}
-
-void GameServer::register_new_connection(Connection & connection) {
-    players[connection.get_id()] = std::unique_ptr<Player>(new Player(connection));
-    handle_player_connection(connection);
 }
 
 void GameServer::run() {
@@ -242,7 +227,6 @@ GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
                         game_ended_package.set_won(!(*current_player)->get_battle_field().all_ships_destroyed());
                         game_ended_package.set_enemy_ships(get_enemy().get_battle_field().get_ship_data());
                         (*current_player)->get_connection().write(game_ended_package);
-                        (*current_player)->get_connection().disconnect();
                     } while(current != current_player);
                     players_playing.clear();
                     players.clear();

@@ -7,14 +7,14 @@
 
 class Player {
     private:
-        Connection & connection;
+        std::unique_ptr<Connection> connection;
         std::string name;
         std::string identity;
         bool is_ready_to_start_;
         BattleField battle_field;
 
     public:
-        Player(Connection & connection);
+        Player(Connection *connection);
 
         Connection & get_connection();
         std::string get_name() const;

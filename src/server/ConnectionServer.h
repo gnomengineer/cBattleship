@@ -11,6 +11,7 @@
 #include <common/Connection.h>
 
 namespace asio = boost::asio;
+typedef std::function<void(Connection*)> NewConnectionHandler;
 
 class ConnectionServer {
     private:
@@ -19,16 +20,14 @@ class ConnectionServer {
         asio::ip::tcp::endpoint endpoint;
         asio::ip::tcp::acceptor acceptor;
 
-        std::list<std::unique_ptr<Connection>> connections;
-
         conn_id_t conn_id_gen;
 
+        NewConnectionHandler handler;
+
     public:
-        ConnectionServer();
-
-        void handle_io();
-
-        std::list<std::unique_ptr<Connection>>& get_connections();
+        ConnectionServer(NewConnectionHandler handler);
+        ~ConnectionServer();
+        void run();
 
     private:
         void accept_connections();

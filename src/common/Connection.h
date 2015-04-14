@@ -30,6 +30,7 @@ class Connection {
 
     public:
         Connection(conn_id_t conn_id, asio::ip::tcp::socket socket);
+        ~Connection();
 
         conn_id_t get_id();
 
