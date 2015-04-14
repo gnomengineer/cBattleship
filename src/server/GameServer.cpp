@@ -250,8 +250,11 @@ GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
                         game_ended_package.set_won(!(*current_player)->get_battle_field().all_ships_destroyed());
                         game_ended_package.set_enemy_ships(get_enemy().get_battle_field().get_ship_data());
                         (*current_player)->get_connection().write(game_ended_package);
+                        (*current_player)->get_connection().disconnect();
                     } while(current != current_player);
-                    return STOP;
+                    players_playing.clear();
+                    players.clear();
+                    return CHECK_FOR_CONNECTIONS;
                 }
 
                 // request next turn from other player
