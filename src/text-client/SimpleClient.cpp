@@ -165,7 +165,7 @@ void SimpleClient::print_battle_field(Player & player) {
 
     std::cout << " " << under_line << std::endl;
     std::cout << "/ " << std::setw(PLAYER_NAME_MAX_LENGTH) << player.get_name() << " \\" << std::endl;
-    std::cout << "|" << number_line << " X" << std::endl;
+    std::cout << "|" << number_line << " x" << std::endl;
     
     auto fields = player.get_battle_field().to_vector();
     for(int y = 0; y < BATTLEFIELD_HEIGHT; y++) {
@@ -176,7 +176,7 @@ void SimpleClient::print_battle_field(Player & player) {
         std::cout << std::setw(2) << y_numbers[y];
         std::cout << std::endl;
     }
-    std::cout << "Y" << number_line << " |" << std::endl;
+    std::cout << "y" << number_line << " |" << std::endl;
     std::cout << "\\" << under_line  << "/" << std::endl;
 }
 
