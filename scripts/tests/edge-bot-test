@@ -6,8 +6,8 @@ if [ -z "$1" ]; then
     exit 127
 fi
 
-BINDIR="$(realpath "$1")"
-SCRIPTDIR="$(dirname "$(dirname "$(realpath "$0")")")"
+BINDIR="$(readlink -e "$1")"
+SCRIPTDIR="$(dirname "$(dirname "$(readlink -e "$0")")")"
 SERVER="$BINDIR/cbattleship-server"
 TEXTCLIENT="$BINDIR/cbattleship-text-client"
 EDGEBOT="$SCRIPTDIR/bots/edge-bot"
