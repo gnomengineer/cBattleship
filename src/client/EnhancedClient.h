@@ -10,6 +10,7 @@ class EnhancedClient{
 private:
     Player you;
     Player enemy;
+    BattleField battle_field;
 
     BattleFieldUI battle_field_ui;
     bool visible_home;
