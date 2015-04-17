@@ -7,8 +7,8 @@
 #include <queue>
 #include <mutex>
 #include <common/Connection.h>
-#include "Player.h"
-#include "ServerNetworkPackage.h"
+#include <clientlib/Player.h>
+#include <clientlib/ServerNetworkPackage.h>
 
 enum SimpleClientState {
     GET_IDENTITY,
