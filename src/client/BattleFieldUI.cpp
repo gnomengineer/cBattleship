@@ -26,9 +26,10 @@ BattleFieldUI::~BattleFieldUI(){
 }
 
 void BattleFieldUI::hide_field(BattleField home_content){
-    wcolor_set(home_win, COLOR_PAIR(2),NULL);
+    wattron(home_win,COLOR_PAIR(2));
     draw_field(home_win,home_content);
-    wcolor_set(home_win, COLOR_PAIR(1),NULL);
+    wrefresh(home_win);
+    refresh();
 }
 
 void BattleFieldUI::draw_field(WINDOW *win, BattleField field){
@@ -41,7 +42,6 @@ void BattleFieldUI::draw_field(WINDOW *win, BattleField field){
             x += 2;
         }
         y+=2;
-        logfile << y << std::endl;
     }   
     wrefresh(win);
     refresh();
@@ -56,18 +56,22 @@ void BattleFieldUI::draw_enemy_field(BattleField field){
 }
 
 void BattleFieldUI::draw_hit_mark(WINDOW *win, position_t position, bool is_ship){
-    logfile << "foo";
-    attroff(COLOR_PAIR(1));
-    attron(COLOR_PAIR(3));
+    wattroff(win,COLOR_PAIR(1));
+    wattron(win,COLOR_PAIR(3));
     if(is_ship){
-        mvwaddch(win,position.y,position.x,'#');
+        mvwaddch(win,position.y+2,position.x+2,'#');
     } else {
-        mvwaddch(win,position.y,position.x,'X');
+        mvwaddch(win,position.y+2,position.x+2,'X');
     }
+    refresh();
+    wrefresh(win);
 }
 
-void BattleFieldUI::show_field(WINDOW *win){
-    
+void BattleFieldUI::show_field(BattleField home_content){
+    wattron(home_win,COLOR_PAIR(1)); 
+    draw_field(home_win,home_content);
+    wrefresh(home_win);
+    refresh();
 }
 
 WINDOW* BattleFieldUI::get_home_win(){

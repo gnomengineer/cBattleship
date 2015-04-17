@@ -8,4 +8,6 @@ int main() {
     test.draw_enemy_field(field);
     position_t pos(1,1);
     test.draw_hit_mark(test.get_home_win(),pos,false);
+    test.hide_field(field);
+    test.show_field(field);
 }
