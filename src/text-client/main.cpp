@@ -2,7 +2,7 @@
 #include <boost/asio.hpp>
 #include <common/Connection.h>
 #include <common/LogConfig.h>
-#include "SimpleClient.h"
+#include "TextClient.h"
 
 int main(int argc, char *argv[]){
 
@@ -28,19 +28,9 @@ int main(int argc, char *argv[]){
 
     LogConfig logClient(std::string(argv[0]) + ".log");
 
-    std::cout << "trying to connect to '" << argv[1] << "' ... " << std::endl;
-    boost::asio::io_service io_service;
-    boost::asio::ip::tcp::resolver resolver(io_service);
-    boost::asio::ip::tcp::resolver::query query(argv[1], "13477");
-    boost::asio::ip::tcp::socket socket(io_service);
-    boost::asio::connect(socket, resolver.resolve(query));
-    std::cout << "trying to join server... " << std::endl;
-
-    Connection connection(1, std::move(socket));
     try {
-        SimpleClient client(connection);
-        client.run();
-        io_service.run();
+        TextClient textClient(argv[1]);
+        textClient.run();
     } catch(std::runtime_error & ex) {
         std::cout << "error: " << ex.what() << std::endl;
     }
