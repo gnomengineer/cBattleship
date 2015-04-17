@@ -1,0 +1,31 @@
+#!/bin/bash
+set -m # so i can use 'fg'
+
+if [ -z "$1" ]; then
+    echo "please pass the directory where the compiled cbattleship binaries lie as the first parameter"
+    exit 127
+fi
+
+BINDIR="$(readlink -e "$1")"
+SCRIPTDIR="$(dirname "$(dirname "$(readlink -e "$0")")")"
+SERVER="$BINDIR/cbattleship-server"
+TEXTCLIENT="$BINDIR/cbattleship-text-client"
+EDGEBOT="$SCRIPTDIR/bots/edge-bot"
+
+"$SERVER" &
+sleep 0.1s
+"$EDGEBOT" tbot1 | "$TEXTCLIENT" localhost > /tmp/tbot1out &
+"$EDGEBOT" tbot2 | "$TEXTCLIENT" localhost > /tmp/tbot2out &
+fg 2
+fg 3
+kill %1
+
+exit_status=1
+if [[ "$(tail -n1 /tmp/tbot1out)" == "Until next time!" ]] &&
+   [[ "$(tail -n1 /tmp/tbot2out)" == "Until next time!" ]]; then
+    exit_status=0
+fi
+
+# rm /tmp/tbot{1,2}out &> /dev/null
+exit "$exit_status"
+

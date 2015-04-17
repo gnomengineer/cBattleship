@@ -36,10 +36,10 @@ def generate(args):
         args.members[i] = {"property": data[0], "type": data[1]}
 
     eval_template("scripts/network-package-template/source-file",
-                  "src/common/communication/" + args.name + "Package.cpp",
+                  "src/common/packages/" + args.name + "Package.cpp",
                   args)
     eval_template("scripts/network-package-template/header-file",
-                  "src/common/communication/" + args.name + "Package.h",
+                  "src/common/packages/" + args.name + "Package.h",
                   args)
 
 change_to_source_dir()

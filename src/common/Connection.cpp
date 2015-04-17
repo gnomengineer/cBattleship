@@ -1,13 +1,18 @@
 #include "Connection.h"
+#include <boost/log/trivial.hpp>
 
 Connection::Connection(conn_id_t conn_id, asio::ip::tcp::socket socket)
     : conn_id(conn_id),
       header(3),
       payload(1024),
+      writebuffer(1024),
       socket(std::move(socket)),
-      read_lock() {
+      read_lock(),
+      write_lock() {
+}
 
-
+Connection::~Connection() {
+    disconnect();
 }
 
 conn_id_t Connection::get_id() {
@@ -25,11 +30,12 @@ void Connection::read(ReadCommandHandler handler) {
 
 ReadCallback Connection::get_read_callback(ReadCommandHandler handler, int package_size) {
     return [this, handler, package_size](const boost::system::error_code& err_code, std::size_t bytes_read) {
-        std::cout << "read " << bytes_read << ", err_code: " << err_code << ", package_size: " << package_size << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << "conn #" << conn_id << ": read " << bytes_read << " byte(s), err_code: " << err_code << ", package_size: " << package_size;
+        BOOST_LOG_TRIVIAL(debug) << "conn #" << conn_id << ": recv package: " << debug_package(payload, package_size - 3);
         if(!err_code && bytes_read >= package_size - 3) {
             std::vector<unsigned char> command(header.begin(), header.end());
             command.insert(command.end(), payload.begin(), payload.end());
-            auto& network_command = network_package_manager.decode_command(command);
+            auto& network_command = network_package_manager.decode_package(command);
             read_lock.unlock();
             handler(network_command);
         } else {
@@ -41,10 +47,11 @@ ReadCallback Connection::get_read_callback(ReadCommandHandler handler, int packa
 
 ReadCallback Connection::get_read_header_callback(ReadHeaderCommandHandler handler) {
     return [this, handler](const boost::system::error_code& err_code, std::size_t bytes_read) {
-        std::cout << "read " << bytes_read << ", err_code: " << err_code << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << "conn #" << conn_id << ": read " << bytes_read << " byte(s), err_code: " << err_code;
         if(!err_code && bytes_read == 3) {
             int package_size = network_package_manager.get_package_size(header);
-            std::cout << "read header, package of size " << package_size << " incoming." << std::endl;
+            BOOST_LOG_TRIVIAL(debug) << "conn #" << conn_id << ": read header, package(" << (int)header[0] << ") of size " << package_size << " incoming.";
+            BOOST_LOG_TRIVIAL(debug) << "conn #" << conn_id << ": recv package: " << debug_package(payload, package_size - 3);
             if(package_size != -1) {
                 handler(package_size);
             } else {
@@ -59,8 +66,12 @@ ReadCallback Connection::get_read_header_callback(ReadHeaderCommandHandler handl
 }
 
 void Connection::write(NetworkPackage& command) {
-    auto data = network_package_manager.encode_command(command);
-    asio::async_write(socket, asio::buffer(data), [this](const boost::system::error_code& err_code, std::size_t bytes_written) {
+    write_lock.lock();
+    writebuffer = network_package_manager.encode_package(command);
+    BOOST_LOG_TRIVIAL(debug) << "conn #" << conn_id << ": send package: " << debug_package(writebuffer);
+    asio::async_write(socket, asio::buffer(writebuffer), [this](const boost::system::error_code& err_code, std::size_t bytes_written) {
+        BOOST_LOG_TRIVIAL(debug) << "conn #" << conn_id << ": send " << bytes_written << " byte(s), err_code: " << err_code;
+        write_lock.unlock();
     });
 }
 
@@ -69,7 +80,13 @@ bool Connection::is_connected() {
 }
 
 void Connection::disconnect() {
+    // wait until everything is written ...
+    std::lock_guard<std::mutex> l2(write_lock);
+    if(!is_connected()) return;
     boost::system::error_code ec;
+    BOOST_LOG_TRIVIAL(debug) << "shutting down connection #" << conn_id;
     socket.shutdown(asio::ip::tcp::socket::shutdown_both, ec);
+    BOOST_LOG_TRIVIAL(debug) << "connection #" << conn_id << ": error_code = " << ec;
     socket.close();
 }
+

@@ -1,0 +1,81 @@
+#!/usr/bin/env python
+# this is a script, not a module
+# pylint: disable=C0103
+
+"""A bot for the cbattleship game.
+   It interfaces with the cbattleship-simple-client.
+   The bot simply places all the ships at random.
+   Then it tries to hit enemy ships by shooting
+   every second field. If it finds a ship it tries
+   to destroy it immediately.
+"""
+
+import argparse
+from subprocess import Popen, PIPE, STDOUT
+import re
+import random
+
+def parse_args():
+    """parse command line arguments"""
+    parser = argparse.ArgumentParser(prog='mogria-bot',
+                                     description='Generate a CppUnit test class')
+    parser.add_argument('name', metavar='bot_name',
+                        help='playername the bot should use')
+    parser.add_argument('executable',
+                        help='path to the cbattleship-text-client executable')
+    parser.add_argument('server',
+                        help='the cbattleship-server to connect to')
+    args = parser.parse_args()
+    return args
+
+def run(args):
+    """runs the cbattleship-text-client and controls it's
+       input and output"""
+
+    client = Popen([args.executable, args.server], stdout=PIPE, stdin=PIPE, stderr=STDOUT)
+
+    print(read_until(client.stdout, "Nickname"))
+    client.stdin.write(args.name + "\n")
+    print(read_until(client.stdout, "Length:"))
+    position_ships(client)
+    print(client.stdout.read())
+
+def read_until(f, match):
+    out = ""
+    while True:
+        out += f.read(1)
+        if re.search(match, out):
+            break
+    return out
+
+def battlefield_set(battlefield, length, orientation, position):
+    for i in range(1, length):
+        battlefield[position[0]][position[1]] = True
+        position[orientation] += 1
+
+def battlefield_collide(battlefield, length, orientation, position):
+    used = False
+    for i in range(1, length):
+        used = used or battlefield[position[0]][position[1]]
+        position[orientation] += 1
+    return used
+
+def position_ships(client):
+    ships_available = {2: 3, 3: 2, 4: 2, 5: 1}
+    battlefield = [[False]*10]*10
+
+    for length in range(5, 2):
+        for _ in range(1, ships_available[length]):
+            while True:
+                orientation = randint(0, 1);
+                position_max = [9, 9]
+                position_max[orientation] -= length
+                position = [randint(0, position_max[0]), randint(0, position_max[1])]
+                if not battlefield_collide(battlefield, length, orientation, position):
+                    break
+            battlefield_set(battlefield, length, orientation, position)
+            ship_pos = '{0} {1} {2} {3}'
+            ship_pos  = ship_pos.format(length, 'v' if orientation else 'h', position[0], position[1])
+            client.stdin.write(ship_pos + "\n")
+
+run(parse_args())

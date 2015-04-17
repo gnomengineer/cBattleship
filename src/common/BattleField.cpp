@@ -4,35 +4,41 @@
 #include <algorithm>
 
 BattleField::BattleField() {
-    // fill battlefield with Field instances
-    for(int y = 0; y < BATTLEFIELD_WIDTH; y++) {
-        for(int x = 0; x < BATTLEFIELD_HEIGHT; x++) {
+    clear();
+}
+
+BattleField::BattleField(const BattleField& other) {
+    fields = std::array<std::array<std::shared_ptr<Field>, BATTLEFIELD_WIDTH>, BATTLEFIELD_HEIGHT>(other.fields);
+    ships = std::list<std::shared_ptr<Ship>>(other.ships);
+    ships_available = std::map<unsigned int, int>(other.ships_available);
+}
+
+void BattleField::clear() {
+    // fill battlefield with empty Field instances
+    for(int y = 0; y < BATTLEFIELD_HEIGHT; y++) {
+        for(int x = 0; x < BATTLEFIELD_WIDTH; x++) {
             fields[y][x] = std::shared_ptr<Field>(new Field(position(y, x)));
         }
     }
 
+    ships.clear();
+
     //define possible ship lengths    
+    ships_available.clear();
     ships_available[2] = 3;
     ships_available[3] = 2;
     ships_available[4] = 2;
     ships_available[5] = 1;
 }
 
-BattleField::BattleField(const BattleField& other) {
-        
-    fields = std::array<std::array<std::shared_ptr<Field>, BATTLEFIELD_HEIGHT>, BATTLEFIELD_WIDTH>(other.fields);
-    ships = std::list<std::shared_ptr<Ship>>(other.ships);
-    ships_available = std::map<unsigned int, int>(other.ships_available);
-}
-
 void BattleField::add_ship(unsigned int length, orientation_t orientation, position_t start_position) {
-    if(!check_position(start_position, BATTLEFIELD_WIDTH, BATTLEFIELD_HEIGHT)) throw std::out_of_range("position out of range");
+    if(!check_position(start_position, BATTLEFIELD_HEIGHT, BATTLEFIELD_WIDTH)) throw std::out_of_range("position out of range");
     if(ships_available[length] < 1) throw std::invalid_argument("no more ships of this length available");
 
     // check if length laps over the border of the battlefield
     position_t end_position = start_position;
     end_position[orientation] += length - 1;
-    if(!check_position(end_position, BATTLEFIELD_WIDTH, BATTLEFIELD_HEIGHT)) throw std::out_of_range("length out of range");
+    if(!check_position(end_position, BATTLEFIELD_HEIGHT, BATTLEFIELD_WIDTH)) throw std::out_of_range("length out of range");
     
     
     // check for collision of ships
@@ -62,7 +68,7 @@ bool BattleField::all_ships_destroyed() const {
 }
 
 bool BattleField::hit_field(position_t position) {
-    auto &hit_field = fields[position.y][position.x];
+    auto hit_field = get_field(position);
     hit_field->set_hit();
     return hit_field->is_ship_part();
 }
@@ -106,14 +112,27 @@ bool BattleField::check_ship_collision(Ship &new_ship) const {
 }
 
 std::shared_ptr<Field> BattleField::get_field(position_t position) {
-    return fields[position.x][position.y];
+    if(!check_position(position, BATTLEFIELD_HEIGHT, BATTLEFIELD_WIDTH)) throw std::out_of_range("position out of range");
+    return fields[position.y][position.x];
 }
+
 std::vector<ShipData> BattleField::get_ship_data() const {
     std::vector<ShipData> ship_data;
     for(auto it = ships.begin(); it != ships.end(); it++) {
         ship_data.push_back((*it)->get_data());
     }
     return ship_data;
+}
+
+void BattleField::add_ship_data(std::vector<ShipData> ship_data) {
+    for(int y = 0; y < BATTLEFIELD_HEIGHT; y++) {
+        for(int x = 0; x < BATTLEFIELD_WIDTH; x++) {
+            fields[y][x]->set_ship_part(false);
+        }
+    }
+    std::for_each(ship_data.begin(), ship_data.end(), [this](ShipData ship) {
+        add_ship(ship.length, ship.orientation, ship.start_position);
+    });
 }
 
 std::map<unsigned int, int> BattleField::get_ships_available() {

@@ -1,0 +1,23 @@
+#!/bin/bash
+if [ -z "$1" ]; then
+    echo "edge-bot"
+else
+    echo "$1"
+fi
+
+# place ships in the top left edge
+echo "5 v 0 0"
+echo "4 v 0 1"
+echo "4 v 0 2"
+echo "3 v 0 3"
+echo "3 v 0 4"
+echo "2 v 0 5"
+echo "2 v 0 6"
+echo "2 v 0 7"
+
+# shoot every field in sequence
+for y in $(seq 0 9); do
+    for x in $(seq 0 9); do
+        echo "$y $x"
+    done
+done
