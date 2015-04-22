@@ -113,6 +113,9 @@ void BattleFieldUI::draw_available_ships(BattleField field){
     wrefresh(message_win);
 }
 
+void BattleFieldUI::write_message(std::string message){
+    wprintw(message_win, "%s", message.c_str());
+}
 
 WINDOW* BattleFieldUI::get_home_win(){
     return this->home_win;

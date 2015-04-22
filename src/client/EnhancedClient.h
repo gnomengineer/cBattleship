@@ -4,7 +4,6 @@
 #include <clientlib/Player.h>
 #include <clientlib/ServerNetworkPackage.h>
 #include "BattleFieldUI.h"
-#include <string>
 
 class EnhancedClient{
 
@@ -18,11 +17,13 @@ private:
 
     bool visible_home;
 public:
+    EnhancedClient();
+    virtual ~EnhancedClient();
     void run();
     void set_fleet();
     void toggle_home();
 private:
-    void move_pointer();
+    void move_curser();
 };
 
 #endif

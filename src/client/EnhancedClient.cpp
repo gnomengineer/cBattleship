@@ -6,29 +6,38 @@ EnhancedClient::EnhancedClient(){
 }
 
 void EnhancedClient::run(){
-    while((input = getstr()) != "q"){
-        if(input == "set_fleet"){
-            this->set_fleet();
+    while(1){
+        int c = getch();
+        switch(c){
+            case KEY_LEFT:
+                battle_field_ui.write_message("Left key pressed");
+                break;
+            default:
+                battle_field_ui.write_message("nothing important");
         }
     }
 }
 
 void EnhancedClient::set_fleet(){
+    bool begin_ship = true;
     if(direction == "UP" || direction == "DOWN" || direction == "LEFT" || direction == "RIGHT"){
-        move_pointer();
+        move_curser();
     } else if (direction == "ENTER"){
         int first_x,first_y,sec_x,sec_y;
         if(begin_ship){
-            first_x = getcurx();
-            first_y = getcury();
+            begin_ship = !begin_ship;
+            //first_x = getcurx();
+            //first_y = getcury();
         } else {
-            sec_x = getcurx();
-            sec_y = getcury();
+            begin_ship = !begin_ship;
+            //sec_x = getcurx();
+            //sec_y = getcury();
             //continue with ship add process
-            if(sec_y == first_y && sec_x
+        }
+    }
 }
 
-void move_pointer(){
+void EnhancedClient::move_curser(){
     int y,x;
     WINDOW *win = battle_field_ui.get_home_win();
 
@@ -42,5 +51,5 @@ void move_pointer(){
     } else if (direction == "RIGHT"){
         x++;
     }
-    move(win,y,x);
+    wmove(win,y,x);
 }

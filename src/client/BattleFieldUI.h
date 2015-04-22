@@ -4,6 +4,7 @@
 #include <common/BattleField.h>
 #include <ncurses.h>
 #include <stdlib.h>
+#include <string>
 
 class BattleFieldUI {
     private:
@@ -21,6 +22,7 @@ void draw_enemy_field(BattleField field);
 void draw_hit_mark(WINDOW *win, position_t position, bool is_ship);
 void show_field(BattleField home_content);
 void draw_available_ships(BattleField field);
+void write_message(std::string message);
 //getter method
 WINDOW *get_home_win();
 WINDOW *get_enemy_win();
