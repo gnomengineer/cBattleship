@@ -16,9 +16,9 @@ void EnhancedClient::run(){
 
     BOOST_LOG_TRIVIAL(debug) << "test";
     while(!quit){
-        char c = getch();
+        int c = getch();
         switch(c){
-            case 'w':
+            case KEY_UP:
                 battle_field_ui.write_message("Left key pressed");
                 break;
             case 'q':
@@ -42,7 +42,7 @@ void EnhancedClient::set_fleet(){
 
     WINDOW *win = battle_field_ui.get_home_win();
     while(!quit_insert_ship){
-        char input = getch();
+        int input = getch();
         x = getcurx(win);
         y = getcury(win);
         switch (input){
