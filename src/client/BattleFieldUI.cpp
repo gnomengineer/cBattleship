@@ -111,10 +111,15 @@ void BattleFieldUI::draw_available_ships(BattleField field){
         wprintw(message_win,"%i", itr->second);
     }
     wrefresh(message_win);
+    logfile << getcury(message_win) << std::endl;
 }
 
 void BattleFieldUI::write_message(std::string message){
-    wprintw(message_win, "%s", message.c_str());
+    logfile << getcury(message_win) << std::endl;
+    int y = getcury(message_win)+1 ;
+    logfile << y << std::endl;
+    mvwprintw(message_win,y,3, "%s", message.c_str());
+    wrefresh(message_win);
 }
 
 WINDOW* BattleFieldUI::get_home_win(){

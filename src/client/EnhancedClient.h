@@ -10,9 +10,9 @@ class EnhancedClient{
 private:
     Player you;
     Player enemy;
-    BattleField battle_field;
+    BattleField home_field;
+    BattleField enemy_field;
 
-    std::string direction;
     BattleFieldUI battle_field_ui;
 
     bool visible_home;
@@ -20,10 +20,11 @@ public:
     EnhancedClient();
     virtual ~EnhancedClient();
     void run();
+private:
     void set_fleet();
     void toggle_home();
-private:
-    void move_curser();
+    void move_cursor(WINDOW *win, char direction, int x, int y);
+    void draw_game_ui();
 };
 
 #endif
