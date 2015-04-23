@@ -35,7 +35,6 @@ BattleFieldUI::BattleFieldUI(){
 }
 
 BattleFieldUI::~BattleFieldUI(){
-    getch();
     endwin();
 }
 

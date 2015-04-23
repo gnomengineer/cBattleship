@@ -1,5 +1,5 @@
 #include "EnhancedClient.h"
-#include "Log.h"
+#include <boost/log/trivial.hpp>
 
 EnhancedClient::EnhancedClient(){
     home_field = you.get_battle_field();
@@ -13,16 +13,16 @@ EnhancedClient::~EnhancedClient(){
 void EnhancedClient::run(){
     draw_game_ui();
     bool quit = false;
-logfile << "test run" << std::endl;
+
+    BOOST_LOG_TRIVIAL(debug) << "test";
     while(!quit){
         char c = getch();
-        logfile << "input: " << c << std::endl;
         switch(c){
             case 'w':
                 battle_field_ui.write_message("Left key pressed");
                 break;
             case 'q':
-                quit = !quit;
+                quit = true;
                 break;
             case 'i':
                 set_fleet();
@@ -32,7 +32,7 @@ logfile << "test run" << std::endl;
         }
     }
 
-    endwin();
+    //endwin();
 }
 
 void EnhancedClient::set_fleet(){
@@ -63,10 +63,10 @@ void EnhancedClient::set_fleet(){
                 move_cursor(win,input,x,y);
                 break;
             case 'q':
-                quit_insert_ship = !quit_insert_ship;
+                quit_insert_ship = true;
                 break;
             default:
-                logfile << std::endl;
+                break;
         }
 
     }

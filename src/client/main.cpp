@@ -1,7 +1,10 @@
 #include "EnhancedClient.h"
 #include "common/BattleField.h"
+#include <common/LogConfig.h>
 
-int main() {
+int main(int argc, char *argv[]) {
+    LogConfig logConfig(std::string(argv[0]) + ".log");
+
     EnhancedClient client;
     client.run();
 /*    BattleField field;
