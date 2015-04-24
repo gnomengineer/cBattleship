@@ -20,7 +20,8 @@ class GameEvents {
 
         signals::signal<void (Player &you, Player &enemy, position_t &position)> get_turn;
         signals::signal<void ()> turn_confirmation_wait;
-        signals::signal<void (bool did_you_hit)> turn_ok;
+        /* ship_of_length_destroyed == 0, if no ship has been destroyed */
+        signals::signal<void (bool did_you_hit, int ship_of_length_destroyed)> turn_ok;
         signals::signal<void ()> turn_error;
 
         signals::signal<void (Player &you, position_t position)> enemy_hit;

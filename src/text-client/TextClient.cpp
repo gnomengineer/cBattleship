@@ -61,10 +61,13 @@ TextClient::TextClient(std::string connection_string)
         std::cout << "waiting for confirmation ... " << std::endl;
     });
 
-    client_state_machine.events.turn_ok.connect([](bool did_you_hit) {
+    client_state_machine.events.turn_ok.connect([this](bool did_you_hit, int ship_of_length_destroyed) {
         std::cout << (did_you_hit
                      ? "you hit an enemy ship!"
                      : "you missed!") << std::endl;
+        if(ship_of_length_destroyed > 0) {
+            std::cout << "you destroyed an enemy " << get_ship_name_by_length(ship_of_length_destroyed) << " (" << ship_of_length_destroyed << ")!" << std::endl;
+        }
     });
 
     client_state_machine.events.turn_error.connect([]() {
