@@ -8,6 +8,7 @@ class TurnResponsePackage : public NetworkPackage {
     private:
         bool valid;
         bool ship_hit;
+        int ship_of_length_destroyed;
 
     public:
         TurnResponsePackage();
@@ -21,5 +22,7 @@ class TurnResponsePackage : public NetworkPackage {
         void set_valid(bool valid);
         bool get_ship_hit();
         void set_ship_hit(bool ship_hit);
+        int get_ship_of_length_destroyed();
+        void set_ship_of_length_destroyed(int ship_of_length_destroyed);
 };
 #endif /* _TURNRESPONSEPACKAGE_H */

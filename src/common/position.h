@@ -31,5 +31,6 @@ typedef struct position {
 bool check_position(position_t const &position, position_coordinate_t y, position_coordinate_t x);
 bool is_valid_orientation(orientation_t orientation);
 
+bool operator==(position_t position1, position_t position2);
 
 #endif
