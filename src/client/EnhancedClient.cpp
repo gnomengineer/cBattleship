@@ -11,10 +11,13 @@ EnhancedClient::~EnhancedClient(){
 }
 
 void EnhancedClient::run(){
+    noecho();
+    curs_set(0);
     draw_game_ui();
     bool quit = false;
 
     BOOST_LOG_TRIVIAL(debug) << "test";
+    keypad(stdscr,true);
     while(!quit){
         int c = getch();
         switch(c){
@@ -25,14 +28,13 @@ void EnhancedClient::run(){
                 quit = true;
                 break;
             case 'i':
+                battle_field_ui.write_message("Now set your fleet!");
                 set_fleet();
                 break;
             default:
                 battle_field_ui.write_message("nothing important");
         }
     }
-
-    //endwin();
 }
 
 void EnhancedClient::set_fleet(){
@@ -41,6 +43,7 @@ void EnhancedClient::set_fleet(){
     int x,y;
 
     WINDOW *win = battle_field_ui.get_home_win();
+    curs_set(1);
     while(!quit_insert_ship){
         int input = getch();
         x = getcurx(win);
@@ -49,47 +52,53 @@ void EnhancedClient::set_fleet(){
             case '\n':
                 int first_x,first_y,sec_x,sec_y;
                 if(begin_ship){
-                    begin_ship = !begin_ship;
+                    begin_ship = false;
                     first_x = x;
                     first_y = y;
                 } else {
-                    begin_ship = !begin_ship;
+                    begin_ship = true;
                     sec_x = x;
                     sec_y = y;
                     //continue with ship add process
                 }
                 break;
-            case 'm':
-                move_cursor(win,input,x,y);
-                break;
             case 'q':
                 quit_insert_ship = true;
+                battle_field_ui.write_message("Fleet is positioned!");
                 break;
             default:
+                BOOST_LOG_TRIVIAL(debug) << input;
+                move_cursor(win,input,x,y);
                 break;
         }
 
     }
+    curs_set(0);
 }
 
-void EnhancedClient::move_cursor(WINDOW *win, char direction, int x, int y){
+void EnhancedClient::move_cursor(WINDOW *win, int direction, int x, int y){
     switch(direction){
-        case '1':
-            x--;
+        case KEY_UP:
+            battle_field_ui.write_message("KEY UP");
+            y -= 2;
             break;
-        case '2':
-            x++;
+        case KEY_DOWN:
+            battle_field_ui.write_message("KEY DOWN");
+            y += 2;
             break;
-        case '3':
-            y--;
+        case KEY_LEFT:
+            battle_field_ui.write_message("KEY LEFT");
+            x -= 2;
             break;
-        case '4':
-            y++;
+        case KEY_RIGHT:
+            battle_field_ui.write_message("KEY RIGHT");
+            x += 2;
             break;
         default:
             break;
     }
     wmove(win,y,x);
+    wrefresh(win);
 }
 
 void EnhancedClient::draw_game_ui(){

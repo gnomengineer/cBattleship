@@ -23,7 +23,7 @@ public:
 private:
     void set_fleet();
     void toggle_home();
-    void move_cursor(WINDOW *win, char direction, int x, int y);
+    void move_cursor(WINDOW *win, int direction, int x, int y);
     void draw_game_ui();
 };
 
