@@ -44,6 +44,7 @@ void EnhancedClient::set_fleet(){
 
     WINDOW *win = battle_field_ui.get_home_win();
     curs_set(1);
+    wmove(win,1,1);
     while(!quit_insert_ship){
         int input = getch();
         x = getcurx(win);
