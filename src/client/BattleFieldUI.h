@@ -3,19 +3,20 @@
 
 #include <ncurses.h>
 #include <vector>
+#include "common/BattleField.h"
+#include "CursesWindow.h"
 
-class BattleFieldUI {
+class BattleFieldUI : CursesWindow {
     private:
-        WINDOW *field_window;
         BattleField *field_info;
     public: 
-        BattleFieldUI();
+        BattleFieldUI(int x, int y, WINDOW *parent_window);
         virtual ~BattleFieldUI();
-        void move_cursor(int x, int y);
         void draw_content();
         void draw_hit_mark(bool isShip, position_t position);
         void toggle_field_visibility(int attrs);
         WINDOW *get_window();
-        BattleField *get_battle_field;
+        BattleField *get_battle_field();
 };
 #endif
+

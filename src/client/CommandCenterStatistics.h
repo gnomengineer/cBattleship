@@ -5,17 +5,14 @@
 #include <string>
 
 #define STATISTIC_HEIGHT 7
-class CommandCenter{
+class CommandCenter : CursesWindow{
     private:
-        WINDOW *game_progress_window;
-        WINDOW *game_statistics_window;
         int shots;
         int hits;
         float calculate_hit_rate();
     public:
-        CommandCenter(int height, int width);
+        CommandCenter(int height, int width, int x, int y);
         virtual ~CommandCenter();
-        void write_message(std::string message);
         void increase_shots(bool is_hit);
         void print_ships(BattleField &battle_field,int attrs_number,int attrs_text);
 };
