@@ -1,4 +1,5 @@
 #include "Ship.h"
+#include <algorithm>
 #include "BattleField.h"
 
 Ship::Ship(ShipData ship_data, BattleField &battle_field)
