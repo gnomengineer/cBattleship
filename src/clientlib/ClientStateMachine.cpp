@@ -119,7 +119,7 @@ ClientState ClientStateMachine::your_turn(ServerNetworkPackage server_package) {
 
             field->set_ship_part(turn_response.get_ship_hit());
             field->set_hit();
-            events.turn_ok(turn_response.get_ship_hit());
+            events.turn_ok(turn_response.get_ship_hit(), turn_response.get_ship_of_length_destroyed());
             events.enemy_wait();
         }
     } else if(is_package_of_type<EnemyDisconnectedPackage>(package)) {

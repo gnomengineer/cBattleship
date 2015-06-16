@@ -55,6 +55,8 @@ class BattleField {
         std::map<unsigned int, int> get_ships_available();
         bool all_ships_placed();
 
+        std::shared_ptr<Ship> get_ship_at_position(position_t position);
+
     private:
         bool check_ship_collision(Ship &new_ship) const;
 };
