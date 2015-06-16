@@ -24,8 +24,12 @@ GameServer::StateMachineType::StateMap GameServer::get_state_map() {
 
 PlayerNetworkPackage GameServer::get_input() {
     while(true) {
-        std::lock_guard<std::mutex> lock(queue_lock);
-        if(!input_queue.empty()) {
+        auto read_something = [this]() -> bool {
+            std::lock_guard<std::mutex> lock(queue_lock);
+            return !input_queue.empty();
+        };
+        if(read_something()) {
+            std::lock_guard<std::mutex> lock(queue_lock);
             PlayerNetworkPackage player_command = input_queue.front();
             input_queue.pop();
             return player_command;
@@ -214,6 +218,11 @@ GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
                 TurnResponsePackage turn_response;
                 turn_response.set_valid(true);
                 turn_response.set_ship_hit(field->is_ship_part());
+                int ship_of_length_destroyed = 0;
+                auto ship_hit = get_enemy().get_battle_field().get_ship_at_position(position);
+                if(ship_hit.get() != nullptr && ship_hit->is_destroyed()) {
+                    turn_response.set_ship_of_length_destroyed(ship_hit->get_length());
+                }
                 (*current_player)->get_connection().write(turn_response);
 
                 // does a player not have any ships anymore?

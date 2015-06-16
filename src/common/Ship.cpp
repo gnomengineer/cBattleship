@@ -23,13 +23,9 @@ Ship::Ship(unsigned int length, orientation_t orientation, position_t start_posi
 
 bool Ship::is_destroyed() const {
     // check if each part/field has been hit
-    for(auto it = ship_parts.begin(); it != ship_parts.end(); it++) {
-        Field &ship_part = **it;
-        if(!ship_part.is_hit()) {
-            return false;
-        }
-    }
-    return true;
+    return std::all_of(ship_parts.begin(), ship_parts.end(), [](std::shared_ptr<Field> field) {
+        return field->is_hit();
+    });
 }
 
 unsigned int Ship::get_length() const {

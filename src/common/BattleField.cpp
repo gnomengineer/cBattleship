@@ -145,3 +145,17 @@ bool BattleField::all_ships_placed() {
         return number_available <= 0;
     });
 }
+
+std::shared_ptr<Ship> BattleField::get_ship_at_position(position_t position) {
+    std::shared_ptr<Ship> result(nullptr);
+    std::for_each(ships.begin(), ships.end(), [&result, position](std::shared_ptr<Ship> ship) {
+        auto parts = ship->get_ship_parts();
+        bool got_ship = std::any_of(parts.begin(), parts.end(), [position](std::shared_ptr<Field> field) {
+            return position == field->get_position();
+        });
+        if(got_ship) {
+            result = ship;
+        }
+    });
+    return result;
+}
