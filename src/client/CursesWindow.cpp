@@ -16,3 +16,10 @@ void CursesWindow::move_cursor(int x, int y){
     wmove(window,x,y);
 }
 
+void CursesWindow::set_attributes(int attributes){
+    wattron(window,attributes);
+}
+
+WINDOW* CursesWindow::get_window(){
+    return window;
+}

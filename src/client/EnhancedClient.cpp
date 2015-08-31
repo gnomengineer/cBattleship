@@ -2,8 +2,20 @@
 #include <boost/log/trivial.hpp>
 
 EnhancedClient::EnhancedClient(){
-    home_field = you.get_battle_field();
-    enemy_field = enemy.get_battle_field();
+    visible_home = true;
+    initscr();
+    int width = getmaxx(stdscr) / 3; 
+
+    //instatiate the 4 main windows
+    //furthest right 1st from top
+    statistics = std::unique_ptr<CommandCenterStatistics>(new CommandCenterStatistics(CommandCenterStatistics.STATISTIC_HEIGHT, width, 2*width,0));
+    //furthest right 2nd from top
+    combat_log = std::unique_ptr<CommandCenterCombatLog>(new CommandCenterCombatLog());
+    //furthest left
+    home_field = std::unique_ptr<BattleFieldUI>(new BattleFieldUI(0,0,stdscr));
+    //midst window
+    enemy_field = std::unique_ptr<BattleFieldUI>(new BattleFieldUI(2*BattleField.BATTLEFIELD_HEIGHT,0,stdscr);
+
 
 }
 
@@ -22,17 +34,14 @@ void EnhancedClient::run(){
         int c = getch();
         switch(c){
             case KEY_UP:
-                battle_field_ui.write_message("Left key pressed");
                 break;
             case 'q':
                 quit = true;
                 break;
             case 'i':
-                battle_field_ui.write_message("Now set your fleet!");
                 set_fleet();
                 break;
             default:
-                battle_field_ui.write_message("nothing important");
         }
     }
 }
@@ -51,16 +60,17 @@ void EnhancedClient::set_fleet(){
         y = getcury(win);
         switch (input){
             case '\n':
-                int first_x,first_y,sec_x,sec_y;
+                int first_x,first_y,second_x,second_y;
                 if(begin_ship){
                     begin_ship = false;
                     first_x = x;
                     first_y = y;
                 } else {
                     begin_ship = true;
-                    sec_x = x;
-                    sec_y = y;
+                    second_x = x;
+                    second_y = y;
                     //continue with ship add process
+                    add_ship_to_field(first_x,first_y,second_x,second_y);
                 }
                 break;
             case 'q':
@@ -77,33 +87,15 @@ void EnhancedClient::set_fleet(){
     curs_set(0);
 }
 
-void EnhancedClient::move_cursor(WINDOW *win, int direction, int x, int y){
-    switch(direction){
-        case KEY_UP:
-            battle_field_ui.write_message("KEY UP");
-            y -= 2;
-            break;
-        case KEY_DOWN:
-            battle_field_ui.write_message("KEY DOWN");
-            y += 2;
-            break;
-        case KEY_LEFT:
-            battle_field_ui.write_message("KEY LEFT");
-            x -= 2;
-            break;
-        case KEY_RIGHT:
-            battle_field_ui.write_message("KEY RIGHT");
-            x += 2;
-            break;
-        default:
-            break;
-    }
-    wmove(win,y,x);
-    wrefresh(win);
+void EnhancedClient::draw_game_ui(){
+    BOOST_LOG_TRIVIAL(debug) << "The UI has been drawn";
 }
 
-void EnhancedClient::draw_game_ui(){
-    battle_field_ui.draw_enemy_field(enemy_field);
-    battle_field_ui.draw_home_field(home_field);
-    battle_field_ui.draw_available_ships(home_field);
+void EnhancedClient::add_ship_to_field(int first_x,int first_y,int second_x,int second_y){
+    BOOST_LOG_TRIVIAL(debug) << "A ship has been added";
+}
+
+void EnhancedClient::toggle_home(){
+    home_field.toggle_visibility(visible_home);
+    visible_home = !visible_home;
 }
