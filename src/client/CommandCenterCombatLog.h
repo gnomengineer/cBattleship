@@ -2,9 +2,10 @@
 #define _COMMANDCENTERCOMBATLOG_H
 
 #include <ncurses.h>
+#include "CursesWindow.h"
 #include <string>
 
-class CommandCenterCombatLog : CursesWindow{
+class CommandCenterCombatLog : public CursesWindow{
     public:
         CommandCenterCombatLog(int height, int width, int x, int y);
         virtual ~CommandCenterCombatLog();

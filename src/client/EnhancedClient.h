@@ -4,6 +4,10 @@
 #include <clientlib/Player.h>
 #include <clientlib/ServerNetworkPackage.h>
 #include "BattleFieldUI.h"
+#include "CommandCenterStatistics.h"
+#include "CommandCenterCombatLog.h"
+
+#define STATISTIC_HEIGHT 14
 
 class EnhancedClient{
 

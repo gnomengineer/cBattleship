@@ -12,6 +12,7 @@ class CursesWindow{
         void set_scroll(bool status);
         void move_cursor(int x, int y);
         void set_attributes(int attributes);
+        void create_box(int side, int top);
         WINDOW *get_window();
 };
 #endif

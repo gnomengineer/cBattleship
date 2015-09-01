@@ -23,3 +23,7 @@ void CursesWindow::set_attributes(int attributes){
 WINDOW* CursesWindow::get_window(){
     return window;
 }
+
+void CursesWindow::create_box(int top,int side){
+    box(window,top,side);
+}

@@ -2,10 +2,11 @@
 #define _COMMANDCENTERSTATISTICS_H
 
 #include <ncurses.h>
+#include "CursesWindow.h"
+#include "common/BattleField.h"
 #include <string>
 
-#define STATISTIC_HEIGHT 14
-class CommandCenterStatistics : CursesWindow{
+class CommandCenterStatistics : public CursesWindow{
     private:
         int shots;
         int hits;
