@@ -16,11 +16,13 @@ if(Boost_FOUND)
 endif(Boost_FOUND)
 
 # use pkg-config to find gtk3
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(GTKMM REQUIRED gtkmm-3.0)
-include_directories(${GTKMM_INCLUDE_DIRS})
-link_directories(${GTKMM_LIBRARY_DIRS})
-add_definitions(${GTKMM_CFLAGS_OTHER})
+find_package(PkgConfig)
+if(PKG_CONFIG_FOUND)
+    pkg_check_modules(GTKMM REQUIRED gtkmm-3.0)
+    include_directories(${GTKMM_INCLUDE_DIRS})
+    link_directories(${GTKMM_LIBRARY_DIRS})
+    add_definitions(${GTKMM_CFLAGS_OTHER})
+endif(PKG_CONFIG_FOUND)
 
 # add src to include directories so, every module can include headers
 # from common
@@ -72,14 +74,16 @@ if(COMMAND cotire)
 endif()
 
 # gtk client
-set(CBATTLESHIP_GTK_CLIENT_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/gtk-client)
-configure_file(${CBATTLESHIP_GTK_CLIENT_SOURCE_PATH}/gui-design.glade ${PROJECT_BINARY_DIR}/gui-design.glade COPYONLY)
-file(GLOB_RECURSE CBATTLESHIP_GTK_CLIENT_SOURCE_FILES ${CBATTLESHIP_GTK_CLIENT_SOURCE_PATH}/*.cpp)
-add_executable(cbattleship-gtk-client ${CBATTLESHIP_GTK_CLIENT_SOURCE_FILES})
-target_link_libraries(cbattleship-gtk-client cbattleship-common ${Boost_LIBRARIES} ${GTKMM_LIBRARIES})
-if(COMMAND cotire)
-    cotire(cbattleship-gtk-client)
-endif()
+if(PKG_CONFIG_FOUND)
+    set(CBATTLESHIP_GTK_CLIENT_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/gtk-client)
+    configure_file(${CBATTLESHIP_GTK_CLIENT_SOURCE_PATH}/gui-design.glade ${PROJECT_BINARY_DIR}/gui-design.glade COPYONLY)
+    file(GLOB_RECURSE CBATTLESHIP_GTK_CLIENT_SOURCE_FILES ${CBATTLESHIP_GTK_CLIENT_SOURCE_PATH}/*.cpp)
+    add_executable(cbattleship-gtk-client ${CBATTLESHIP_GTK_CLIENT_SOURCE_FILES})
+    target_link_libraries(cbattleship-gtk-client cbattleship-common ${Boost_LIBRARIES} ${GTKMM_LIBRARIES})
+    if(COMMAND cotire)
+        cotire(cbattleship-gtk-client)
+    endif()
+endif(PKG_CONFIG_FOUND)
 
 
 # test cases
