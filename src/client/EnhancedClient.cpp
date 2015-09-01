@@ -5,12 +5,12 @@ EnhancedClient::EnhancedClient(){
     visible_home = true;
     initscr();
     int width = getmaxx(stdscr) / 3; 
-
+    int height = getmaxy(stdscr);
     //instatiate the 4 main windows
     //furthest right 1st from top
     statistics = std::unique_ptr<CommandCenterStatistics>(new CommandCenterStatistics(STATISTIC_HEIGHT, width, 2*width,0));
     //furthest right 2nd from top
-    //combat_log = std::unique_ptr<CommandCenterCombatLog>(new CommandCenterCombatLog());
+    combat_log = std::unique_ptr<CommandCenterCombatLog>(new CommandCenterCombatLog(height-STATISTIC_HEIGHT,width,2*width,STATISTIC_HEIGHT+1));
     //furthest left
     home_field = std::unique_ptr<BattleFieldUI>(new BattleFieldUI(0,0,stdscr));
     //midst window
@@ -28,8 +28,6 @@ void EnhancedClient::run(){
     draw_game_ui();
     bool quit = false;
 
-    BOOST_LOG_TRIVIAL(debug) << "running in loop";
-    BOOST_LOG_TRIVIAL(debug) << home_field->get_player()->get_identity();
     keypad(stdscr,true);
     while(!quit){
         int c = getch();
@@ -90,6 +88,7 @@ void EnhancedClient::set_fleet(){
             case 'q':
                 quit_insert_ship = true;
                 combat_log->log_message("Fleet is positioned!");
+BOOST_LOG_TRIVIAL(debug) << "writing quit message";
                 break;
             default:
                 BOOST_LOG_TRIVIAL(debug) << input;

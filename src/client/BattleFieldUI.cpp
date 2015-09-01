@@ -18,10 +18,8 @@ BattleFieldUI::~BattleFieldUI(){
 void BattleFieldUI::draw_content(){
     this->create_box(0,1);
     int y, x = 0;
-    BOOST_LOG_TRIVIAL(debug) << "creating the battle field";
-    std::vector<std::vector<unsigned char>> field_vector = player->get_battle_field().to_vector(false);
+    std::vector<std::vector<unsigned char>> field_vector = player.get_battle_field().to_vector(false);
 
-    BOOST_LOG_TRIVIAL(debug) << "creating the battle field part 2";
     for(auto field_vector_itr = field_vector.begin(); field_vector_itr != field_vector.end(); ++field_vector_itr){
         for(auto char_itr = field_vector_itr->begin(); char_itr != field_vector_itr->end(); ++char_itr){
             mvwaddch(this->window,y,x+=2,'~');
@@ -46,6 +44,6 @@ void BattleFieldUI::toggle_field_visibility(bool visible_flag){
     draw_content();
 }
 
-Player *BattleFieldUI::get_player(){
+Player& BattleFieldUI::get_player(){
     return player;
 }
