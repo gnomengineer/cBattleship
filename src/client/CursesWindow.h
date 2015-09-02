@@ -3,6 +3,11 @@
 
 #include <ncurses.h>
 
+#define RED 3
+#define GREEN 4
+#define BLUE 2
+#define BLACK 1
+
 class CursesWindow{
     protected:
         WINDOW *window;

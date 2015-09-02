@@ -16,6 +16,8 @@ class BattleFieldUI : public CursesWindow {
         void draw_hit_mark(bool isShip, position_t position);
         void toggle_field_visibility(bool visible_flag);
         Player &get_player();
+        BattleField &get_players_battle_field();
+        position_t get_position();
 };
 #endif
 

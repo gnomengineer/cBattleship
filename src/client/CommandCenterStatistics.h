@@ -8,15 +8,14 @@
 
 class CommandCenterStatistics : public CursesWindow{
     private:
-        int shots;
-        int hits;
+        float shots;
+        float hits;
         float calculate_hit_rate();
     public:
         CommandCenterStatistics(int height, int width, int x, int y);
         virtual ~CommandCenterStatistics();
         void increase_shots(bool is_hit);
-    private:
-        void print_ships(BattleField &battle_field,int attrs_number,int attrs_text);
+        void print_ships(BattleField &battle_field);
         void print_keys();
 };
 #endif

@@ -6,15 +6,16 @@ EnhancedClient::EnhancedClient(){
     initscr();
     int width = getmaxx(stdscr) / 3; 
     int height = getmaxy(stdscr);
+    BOOST_LOG_TRIVIAL(debug) << "height: " << height << " \nlogheight: " << height-STATISTIC_HEIGHT;
     //instatiate the 4 main windows
     //furthest right 1st from top
     statistics = std::unique_ptr<CommandCenterStatistics>(new CommandCenterStatistics(STATISTIC_HEIGHT, width, 2*width,0));
     //furthest right 2nd from top
-    combat_log = std::unique_ptr<CommandCenterCombatLog>(new CommandCenterCombatLog(height-STATISTIC_HEIGHT,width,2*width,STATISTIC_HEIGHT+1));
+    combat_log = std::unique_ptr<CommandCenterCombatLog>(new CommandCenterCombatLog(height-STATISTIC_HEIGHT-2,width,2*width,STATISTIC_HEIGHT+1));
     //furthest left
-    home_field = std::unique_ptr<BattleFieldUI>(new BattleFieldUI(0,0,stdscr));
+    home_field = std::unique_ptr<BattleFieldUI>(new BattleFieldUI(10,height/3,stdscr));
     //midst window
-    enemy_field = std::unique_ptr<BattleFieldUI>(new BattleFieldUI(2*BATTLEFIELD_HEIGHT,0,stdscr));
+    enemy_field = std::unique_ptr<BattleFieldUI>(new BattleFieldUI(width+10,height/3,stdscr));
 
     BOOST_LOG_TRIVIAL(debug) << "executing constructor...";
 }
@@ -38,7 +39,11 @@ void EnhancedClient::run(){
                 quit = true;
                 break;
             case 'i':
+                combat_log->log_message("Start positioning your ships");
                 set_fleet();
+                break;
+            case 'r':
+                combat_log->log_message("Ready!");
                 break;
             default:
                 break;
@@ -52,48 +57,55 @@ void EnhancedClient::set_fleet(){
     bool quit_insert_ship = false;
     int x,y;
 
-    curs_set(1);
     home_field->move_cursor(1,1);
+    curs_set(1);
     while(!quit_insert_ship){
         int input = getch();
         x = getcurx(home_field->get_window());
         y = getcury(home_field->get_window());
+                        BOOST_LOG_TRIVIAL(debug) << "x: " << x << " y: " << y;
         switch (input){
             case '\n':
-                int first_x,first_y,second_x,second_y;
-                if(begin_ship){
-                    begin_ship = false;
-                    first_x = x;
-                    first_y = y;
-                } else {
-                    begin_ship = true;
-                    second_x = x;
-                    second_y = y;
-                    //continue with ship add process
-                    add_ship_to_field(first_x,first_y,second_x,second_y);
+                try{
+                    position_t start_pos;
+                    position_t  end_pos;
+                    if(begin_ship){
+                        start_pos = home_field->get_position();
+                        begin_ship = false;
+                    } else {
+                        end_pos = home_field->get_position();
+                        begin_ship = true;
+                        if(!add_ship_to_field(start_pos,end_pos)){
+                            combat_log->log_message("An error occured. aborting ship insert modus");
+                            //quit_insert_ship = true;
+                        }
+                    }
+                } catch (std::out_of_range &ex){
+                    BOOST_LOG_TRIVIAL(error) << ex.what();
+                    combat_log->log_message(ex.what());
                 }
                 break;
-            case KEY_UP:
+            case KEY_RIGHT:
                 home_field->move_cursor(++x,y);
                 break;
-            case KEY_DOWN:
+            case KEY_LEFT:
                 home_field->move_cursor(--x,y);
                 break;
-            case KEY_RIGHT:
-                home_field->move_cursor(x,++y);
-                break;
-            case KEY_LEFT:
+            case KEY_UP:
                 home_field->move_cursor(x,--y);
+                break;
+            case KEY_DOWN:
+                home_field->move_cursor(x,++y);
                 break;
             case 'q':
                 quit_insert_ship = true;
                 combat_log->log_message("Fleet is positioned!");
-BOOST_LOG_TRIVIAL(debug) << "writing quit message";
                 break;
             default:
                 BOOST_LOG_TRIVIAL(debug) << input;
                 break;
         }
+        wrefresh(home_field->get_window());
 
     }
     curs_set(0);
@@ -102,11 +114,44 @@ BOOST_LOG_TRIVIAL(debug) << "writing quit message";
 void EnhancedClient::draw_game_ui(){
     home_field->draw_content();
     enemy_field->draw_content();
-    BOOST_LOG_TRIVIAL(debug) << "The UI has been drawn";
+    statistics->print_ships(home_field->get_players_battle_field());
 }
 
-void EnhancedClient::add_ship_to_field(int first_x,int first_y,int second_x,int second_y){
-    BOOST_LOG_TRIVIAL(debug) << "A ship has been added";
+bool EnhancedClient::add_ship_to_field(position_t start_pos, position_t end_pos){
+    if(start_pos == end_pos){
+        return false;
+    }
+    int length = 0;
+    orientation_t orientation;
+    if(start_pos.x == end_pos.x){
+        length = (end_pos.y - start_pos.y)+1;
+        orientation = ORIENTATION_VERTICAL;
+        if(length < 0){
+            length = length * -1;
+        }
+    } else if (start_pos.y == end_pos.y){
+        //@TODO fix the calculation of ship length
+        length = (end_pos.x - start_pos.x)/2+1;
+        orientation = ORIENTATION_HORIZONTAL;
+        if(length < 0){
+            length = length * -1;
+        }
+    }
+    BOOST_LOG_TRIVIAL(debug) << "sx: " << start_pos.x << " sy: " << start_pos.y;
+    BOOST_LOG_TRIVIAL(debug) << "ex: " << end_pos.x << " ey: " << end_pos.y;
+    BOOST_LOG_TRIVIAL(debug) << "length: " << length;
+    try{
+    home_field->get_player().get_battle_field().add_ship(length,orientation,start_pos);
+    } catch (std::out_of_range &ex){
+        BOOST_LOG_TRIVIAL(error) << ex.what();
+        return false;
+    } catch (std::invalid_argument &ex){
+        BOOST_LOG_TRIVIAL(error) << ex.what();
+        return false;
+    }
+    BOOST_LOG_TRIVIAL(info) << "A ship has been added";
+    combat_log->log_message("the ship has been added");
+    return true;
 }
 
 void EnhancedClient::toggle_home(){

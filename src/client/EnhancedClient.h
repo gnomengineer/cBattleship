@@ -6,6 +6,7 @@
 #include "BattleFieldUI.h"
 #include "CommandCenterStatistics.h"
 #include "CommandCenterCombatLog.h"
+#include <common/position.h>
 
 #define STATISTIC_HEIGHT 14
 
@@ -27,7 +28,7 @@ private:
     void set_fleet();
     void toggle_home();
     void draw_game_ui();
-    void add_ship_to_field(int first_x, int first_y, int second_x, int second_y);
+    bool add_ship_to_field(position_t start_pos, position_t end_pos);
 };
 
 #endif
