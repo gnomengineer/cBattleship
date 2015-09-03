@@ -1,12 +1,13 @@
 #include "EnhancedClient.h"
 #include <boost/log/trivial.hpp>
+#include <sstream>
 
 EnhancedClient::EnhancedClient(){
     visible_home = true;
     initscr();
     int width = getmaxx(stdscr) / 3; 
     int height = getmaxy(stdscr);
-    BOOST_LOG_TRIVIAL(debug) << "height: " << height << " \nlogheight: " << height-STATISTIC_HEIGHT;
+
     //instatiate the 4 main windows
     //furthest right 1st from top
     statistics = std::unique_ptr<CommandCenterStatistics>(new CommandCenterStatistics(STATISTIC_HEIGHT, width, 2*width,0));
@@ -14,10 +15,10 @@ EnhancedClient::EnhancedClient(){
     combat_log = std::unique_ptr<CommandCenterCombatLog>(new CommandCenterCombatLog(height-STATISTIC_HEIGHT-2,width,2*width,STATISTIC_HEIGHT+1));
     //furthest left
     home_field = std::unique_ptr<BattleFieldUI>(new BattleFieldUI(10,height/3,stdscr));
+    mvprintw(height/3-1,10,"YOUR FIELD");
     //midst window
     enemy_field = std::unique_ptr<BattleFieldUI>(new BattleFieldUI(width+10,height/3,stdscr));
-
-    BOOST_LOG_TRIVIAL(debug) << "executing constructor...";
+    mvprintw(height/3-1,width+10,"ENEMY FIELD");
 }
 
 EnhancedClient::~EnhancedClient(){
@@ -45,6 +46,10 @@ void EnhancedClient::run(){
             case 'r':
                 combat_log->log_message("Ready!");
                 break;
+            case 'v':
+                home_field->toggle_field_visibility(visible_home);
+                visible_home = !visible_home;
+                home_field->draw_content();
             default:
                 break;
         }
@@ -57,30 +62,42 @@ void EnhancedClient::set_fleet(){
     bool quit_insert_ship = false;
     int x,y;
 
+    position_t start_pos;
+    position_t  end_pos;
+
     home_field->move_cursor(1,1);
     curs_set(1);
     while(!quit_insert_ship){
         int input = getch();
         x = getcurx(home_field->get_window());
         y = getcury(home_field->get_window());
-                        BOOST_LOG_TRIVIAL(debug) << "x: " << x << " y: " << y;
         switch (input){
             case '\n':
                 try{
-                    position_t start_pos;
-                    position_t  end_pos;
                     if(begin_ship){
                         start_pos = home_field->get_position();
                         begin_ship = false;
+                        std::stringstream ss;
+                        ss << "start position x: " << start_pos.x << " y: " << start_pos.y;
+                        combat_log->log_message(ss.str());
                     } else {
                         end_pos = home_field->get_position();
                         begin_ship = true;
-                        if(!add_ship_to_field(start_pos,end_pos)){
-                            combat_log->log_message("An error occured. aborting ship insert modus");
-                            //quit_insert_ship = true;
+                        std::stringstream ss;
+                        ss << "end position x: " << end_pos.x << " y: " << end_pos.y;
+                        combat_log->log_message(ss.str());
+                        add_ship_to_field(start_pos,end_pos);
+                        home_field->draw_content();
+                        //@TODO make a message if every possible ship is set
+                        if(home_field->get_player().get_battle_field().get_ships_available().size() == 0){
+                            quit_insert_ship = true;
+                            combat_log->log_message("You can't place any more ships. Leaving ship insert mode.");
                         }
                     }
                 } catch (std::out_of_range &ex){
+                    BOOST_LOG_TRIVIAL(error) << ex.what();
+                    combat_log->log_message(ex.what());
+                } catch (std::invalid_argument &ex){
                     BOOST_LOG_TRIVIAL(error) << ex.what();
                     combat_log->log_message(ex.what());
                 }
@@ -117,41 +134,39 @@ void EnhancedClient::draw_game_ui(){
     statistics->print_ships(home_field->get_players_battle_field());
 }
 
-bool EnhancedClient::add_ship_to_field(position_t start_pos, position_t end_pos){
-    if(start_pos == end_pos){
-        return false;
-    }
+void EnhancedClient::add_ship_to_field(position_t start_pos, position_t end_pos){
     int length = 0;
     orientation_t orientation;
     if(start_pos.x == end_pos.x){
-        length = (end_pos.y - start_pos.y)+1;
+        length = end_pos.y - start_pos.y;
         orientation = ORIENTATION_VERTICAL;
-        if(length < 0){
-            length = length * -1;
-        }
     } else if (start_pos.y == end_pos.y){
-        //@TODO fix the calculation of ship length
-        length = (end_pos.x - start_pos.x)/2+1;
+        length = end_pos.x - start_pos.x ;
         orientation = ORIENTATION_HORIZONTAL;
-        if(length < 0){
-            length = length * -1;
-        }
     }
-    BOOST_LOG_TRIVIAL(debug) << "sx: " << start_pos.x << " sy: " << start_pos.y;
-    BOOST_LOG_TRIVIAL(debug) << "ex: " << end_pos.x << " ey: " << end_pos.y;
-    BOOST_LOG_TRIVIAL(debug) << "length: " << length;
+
+    if(length < 0){
+        int x = start_pos.x;
+        int y = start_pos.y;
+        start_pos.x = end_pos.x;
+        start_pos.y = end_pos.y;
+        end_pos.y = y;
+        end_pos.x = x;
+        length = length * -1;
+    }
+    length += 1;
+
     try{
     home_field->get_player().get_battle_field().add_ship(length,orientation,start_pos);
     } catch (std::out_of_range &ex){
-        BOOST_LOG_TRIVIAL(error) << ex.what();
-        return false;
+        throw std::out_of_range(ex.what());
     } catch (std::invalid_argument &ex){
-        BOOST_LOG_TRIVIAL(error) << ex.what();
-        return false;
+        throw std::invalid_argument(ex.what());
     }
     BOOST_LOG_TRIVIAL(info) << "A ship has been added";
-    combat_log->log_message("the ship has been added");
-    return true;
+    std::stringstream log_msg;
+    log_msg << "the ship of length " << length << " has been added";
+    combat_log->log_message(log_msg.str());
 }
 
 void EnhancedClient::toggle_home(){

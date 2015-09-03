@@ -28,7 +28,7 @@ private:
     void set_fleet();
     void toggle_home();
     void draw_game_ui();
-    bool add_ship_to_field(position_t start_pos, position_t end_pos);
+    void add_ship_to_field(position_t start_pos, position_t end_pos);
 };
 
 #endif

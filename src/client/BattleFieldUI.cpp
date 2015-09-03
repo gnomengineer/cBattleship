@@ -1,7 +1,7 @@
 #include "BattleFieldUI.h"
 
 BattleFieldUI::BattleFieldUI(int x, int y, WINDOW *parent) :
-    CursesWindow(x,y,BATTLEFIELD_HEIGHT+1,2*BATTLEFIELD_WIDTH,parent)
+    CursesWindow(x,y,BATTLEFIELD_HEIGHT+1,2*BATTLEFIELD_WIDTH+2,parent)
 {
     this->set_scroll(false);
     start_color();
@@ -22,9 +22,10 @@ void BattleFieldUI::draw_content(){
 
     for(auto field_vector_itr = field_vector.begin(); field_vector_itr != field_vector.end(); ++field_vector_itr){
         for(auto char_itr = field_vector_itr->begin(); char_itr != field_vector_itr->end(); ++char_itr){
-            mvwaddch(this->window,y,x+=2,'~');
+            mvwaddch(this->window,y,x+=2,char_itr[0]);
         }
         y++;
+        x=0;
     }
     wrefresh(this->window);    
 }
