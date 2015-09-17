@@ -6,9 +6,9 @@
 #include <algorithm>
 #include "GameServerUtil.h"
 
-GameServer::GameServer()
-    : state_machine(CHECK_FOR_CONNECTIONS, *this), server(boost::bind(&GameServer::handle_connection, this, _1)) {
-    BOOST_LOG_TRIVIAL(info) << "cbattleship-server listening on 0.0.0.0:13477 ...";
+GameServer::GameServer(std::string address, unsigned short port)
+    : state_machine(CHECK_FOR_CONNECTIONS, *this), server(boost::bind(&GameServer::handle_connection, this, _1), address, port) {
+    BOOST_LOG_TRIVIAL(info) << "cbattleship-server listening on " << address << ":" << port << " ...";
 }
 
 GameServer::~GameServer() {

@@ -25,7 +25,7 @@ class ConnectionServer {
         NewConnectionHandler handler;
 
     public:
-        ConnectionServer(NewConnectionHandler handler);
+        ConnectionServer(NewConnectionHandler handler, std::string address, unsigned short port);
         ~ConnectionServer();
         void run();
 

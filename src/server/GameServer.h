@@ -32,7 +32,7 @@ class GameServer {
         std::mutex queue_lock;
 
     public:
-        GameServer();
+        GameServer(std::string address, unsigned short port);
         virtual ~GameServer();
 
         StateMachineType::StateMap get_state_map();
