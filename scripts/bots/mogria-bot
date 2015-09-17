@@ -18,7 +18,7 @@ import random
 def parse_args():
     """parse command line arguments"""
     parser = argparse.ArgumentParser(prog='mogria-bot',
-                                     description='Generate a CppUnit test class')
+                                     description='A bot for cBattleship. Should be quite smart.')
     parser.add_argument('name', metavar='bot_name',
                         help='playername the bot should use')
     parser.add_argument('executable',
