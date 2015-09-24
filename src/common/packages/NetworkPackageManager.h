@@ -5,6 +5,7 @@
 #include <tuple>
 #include <memory>
 #include "NetworkPackage.h"
+#include "GameConfigurationPackage.h"
 #include "PlayerJoinPackage.h"
 #include "PlayerJoinAnswerPackage.h"
 #include "GameReadyPackage.h"

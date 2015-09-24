@@ -14,6 +14,12 @@ TextClient::TextClient(std::string connection_string)
         std::cout << "trying to join server... " << std::endl;
     });
 
+    client_state_machine.events.get_server_configuration([](bool hitspree) {
+        std::cout << "Game Configuration: " << std::endl;
+        std::cout << " * You " << (hitspree ? "can" : "can't") << " shoot again if you hit an enemy ship" << std::endl;
+        std::cout << std::endl;
+    });
+
     client_state_machine.events.get_player_name.connect([this](std::string &name) {
         name = ask_user("Your Nickname: ", "unnamed");
     });

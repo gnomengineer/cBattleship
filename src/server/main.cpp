@@ -46,10 +46,10 @@ po::options_description &get_common_options_description() {
         desc.add_options()
             ("bind-address,b", po::value<std::string>()
                                    ->value_name("ip")
-                                   ->default_value("0.0.0.0"), "the address the server should bind to")
+                                   ->default_value(DEFAULT_BIND_ADDRESS), "the address the server should bind to")
             ("port,p",         po::value<unsigned short>()
-                                   ->value_name("port_number")
-                                   ->default_value(13477),     "the port the server should listen to");
+                                   ->value_name("port")
+                                   ->default_value(DEFAULT_PORT),     "the port the server should listen to");
         return desc;
     });
     return cached.get();
@@ -177,7 +177,8 @@ int main(int argc, char *argv[]) {
             return generate_configuration_file(vm["config-gen"].as<std::string>());
         }
 
-        GameServer server(vm["bind-address"].as<std::string>(), vm["port"].as<unsigned short>());
+        GameServerConfiguration config(vm);
+        GameServer server(config);
         server.run();
     } catch(po::error &ex) {
         std::cout << "Error while parsing command line arguments: " <<  ex.what() << std::endl;

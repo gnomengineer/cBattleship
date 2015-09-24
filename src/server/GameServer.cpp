@@ -6,9 +6,10 @@
 #include <algorithm>
 #include "GameServerUtil.h"
 
-GameServer::GameServer(std::string address, unsigned short port)
-    : state_machine(CHECK_FOR_CONNECTIONS, *this), server(boost::bind(&GameServer::handle_connection, this, _1), address, port) {
-    BOOST_LOG_TRIVIAL(info) << "cbattleship-server listening on " << address << ":" << port << " ...";
+GameServer::GameServer(GameServerConfiguration &config) 
+    : state_machine(CHECK_FOR_CONNECTIONS, *this),
+      server(boost::bind(&GameServer::handle_connection, this, _1), config.get_bind_address(), config.get_port()),
+      config(config) {
 }
 
 GameServer::~GameServer() {
@@ -42,6 +43,8 @@ PlayerNetworkPackage GameServer::get_input() {
 void GameServer::handle_connection(Connection *connection) {
     if(can_handle_new_connection()) {
         register_new_connection(connection);
+
+        GameConfigurationPackage configuration;
     } else {
         connection->disconnect();
     }

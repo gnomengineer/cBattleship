@@ -10,6 +10,8 @@ class GameEvents {
         signals::signal<void (std::string connection_string)> connecting;
         signals::signal<void ()> connected;
 
+        signals::signal<void (bool hitspree)> get_server_configuration;
+
         signals::signal<void (std::string &name)> get_player_name;
         signals::signal<void (std::string)> new_identity;
 

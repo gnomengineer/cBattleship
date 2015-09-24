@@ -9,6 +9,8 @@
 #include <mutex>
 #include <sstream>
 
+#define DEFAULT_PORT 13477
+
 namespace asio = boost::asio;
 
 typedef std::function<void(NetworkPackage& command)> ReadCommandHandler;
