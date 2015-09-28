@@ -3,8 +3,8 @@ cBattleship
 
 Let's start off with a little [Haiku](https://de.wikipedia.org/wiki/Haiku):
 
-> We C Battleships
-> Battleships are on the C
+> We C Battleships  
+> Battleships are on the C  
 > Hit, Sink, and triumph
 
 A implementation of the classic Battleship game in C++. Includes a server program, and multiple different client programs. The server program wait's until two client program connected to start a game. The server dictates the rules of the game.
