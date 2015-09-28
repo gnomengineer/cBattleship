@@ -7,6 +7,10 @@ Let's start off with a little [Haiku](https://de.wikipedia.org/wiki/Haiku):
 > Battleships are on the C  
 > Hit, Sink, and triumph
 
+![cbattleship-server after intialization](https://raw.githubusercontent.com/troopa/cBattleship/master/doc/server.jpg)  
+![cbattleship-text-client which is connected to the server](https://raw.githubusercontent.com/troopa/cBattleship/master/doc/player1.jpg)
+![cbattleship-text-client which plays against the other client](https://raw.githubusercontent.com/troopa/cBattleship/master/doc/player2.jpg)
+
 A implementation of the classic Battleship game in C++. Includes a server program, and multiple different client programs. The server program wait's until two client program connected to start a game. The server dictates the rules of the game.
 
 ## Features
