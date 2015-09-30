@@ -9,7 +9,7 @@
 #include <mutex>
 #include <sstream>
 
-#define DEFAULT_PORT 13477
+#define DEFAULT_PORT ((unsigned short)13477)
 
 namespace asio = boost::asio;
 

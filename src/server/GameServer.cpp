@@ -43,8 +43,6 @@ PlayerNetworkPackage GameServer::get_input() {
 void GameServer::handle_connection(Connection *connection) {
     if(can_handle_new_connection()) {
         register_new_connection(connection);
-
-        GameConfigurationPackage configuration;
     } else {
         connection->disconnect();
     }
@@ -54,6 +52,10 @@ void GameServer::register_new_connection(Connection *connection) {
     Player *player = new Player(connection);
     players[connection->get_id()] = std::unique_ptr<Player>(new Player(connection));
     handle_player_connection(*player);
+
+    GameConfigurationPackage configuration;
+    configuration.set_config(this->config);
+    player->get_connection().write(configuration);
 }
 
 void GameServer::handle_player_connection(Player &player) {

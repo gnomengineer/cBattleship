@@ -2,7 +2,7 @@
 #define _GAMECONFIGURATION_H
 
 #include <common/packages/NetworkPackage.h>
-#include <boost/program_options/variables_map.hpp>
+#include <boost/program_options.hpp>
 
 class GameConfiguration {
     private:
