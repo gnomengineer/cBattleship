@@ -1,5 +1,6 @@
 #include "ConnectionServer.h"
 #include <boost/thread/thread.hpp> 
+#include <boost/log/trivial.hpp>
 
 ConnectionServer::ConnectionServer(NewConnectionHandler handler, std::string address, unsigned short port)
     : socket(io_service),
