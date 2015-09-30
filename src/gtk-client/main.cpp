@@ -4,7 +4,6 @@
 
 
 int main(int argc, char **argv) {
-ClienStateMachine stateMachine
     try {
         Glib::RefPtr<Gtk::Application> app =
             Gtk::Application::create(argc, argv);
