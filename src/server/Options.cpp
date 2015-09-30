@@ -61,7 +61,11 @@ po::variables_map &Options::parse(int argc, char *argv[]) {
     po::store(po::parse_command_line(argc, argv, command_line_options), vm);
     po::notify(vm);
 
-    if(!vm["config"].empty()) {
+    if(vm["config"].empty()) {
+        // store the default values for optoins defined
+        // in the config file in the variables_map
+        po::store(po::basic_parsed_options<char>(&config_file_options), vm);
+    } else {
         auto config_files = vm["config"].as<std::vector<std::string>>();
         for(auto it = config_files.begin(); it != config_files.end(); it++) {
             std::string config_file = *it;
