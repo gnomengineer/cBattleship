@@ -7,7 +7,7 @@ std::map<package_nr_t, std::unique_ptr<NetworkPackage>> NetworkPackageManager::n
 NetworkPackageManager::NetworkPackageManager() {
     if(network_commands.size() == 0) {
         add_network_commands<GameConfigurationPackage,
-                             GameConfigurationPackage,
+                             PlayerJoinPackage,
                              PlayerJoinAnswerPackage,
                              GameReadyPackage,
                              ShipPlacementPackage,

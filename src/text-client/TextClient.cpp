@@ -1,4 +1,5 @@
 #include "TextClient.h"
+#include <common/GameConfiguration.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp> 
@@ -14,9 +15,9 @@ TextClient::TextClient(std::string connection_string)
         std::cout << "trying to join server... " << std::endl;
     });
 
-    client_state_machine.events.get_server_configuration([](bool hitspree) {
+    client_state_machine.events.get_game_configuration.connect([](GameConfiguration config) {
         std::cout << "Game Configuration: " << std::endl;
-        std::cout << " * You " << (hitspree ? "can" : "can't") << " shoot again if you hit an enemy ship" << std::endl;
+        std::cout << " * You " << (config.get_hitspree() ? "can" : "can't") << " shoot again if you hit an enemy ship" << std::endl;
         std::cout << std::endl;
     });
 
