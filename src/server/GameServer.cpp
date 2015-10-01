@@ -116,6 +116,24 @@ void GameServer::request_turn(bool enemy_hit, position_t position) {
     (*current_player)->get_connection().write(turn_request_package);
 }
 
+bool GameServer::is_game_finished() {
+    return std::any_of(players_playing.begin(), players_playing.end(), [](Player *player) {
+        return player->get_battle_field().all_ships_destroyed();
+    });
+}
+
+void GameServer::send_game_ended_packages() {
+    auto current = current_player;
+    do {
+        next_player();
+        GameEndedPackage game_ended_package;
+        game_ended_package.set_won(!(*current_player)->get_battle_field().all_ships_destroyed());
+        game_ended_package.set_enemy_ships(get_enemy().get_battle_field().get_ship_data());
+        (*current_player)->get_connection().write(game_ended_package);
+    } while(current != current_player);
+    players_playing.clear();
+    players.clear();
+}
 
 GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_package) {
     BOOST_LOG_TRIVIAL(debug) << "entering state " << __FUNCTION__;
@@ -231,19 +249,9 @@ GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
                 (*current_player)->get_connection().write(turn_response);
 
                 // does a player not have any ships anymore?
-                if(std::any_of(players_playing.begin(), players_playing.end(),
-                    [](Player *player) { return player->get_battle_field().all_ships_destroyed(); })) {
+                if(is_game_finished()) {
                     // well then, finish up the game
-                    auto current = current_player;
-                    do {
-                        next_player();
-                        GameEndedPackage game_ended_package;
-                        game_ended_package.set_won(!(*current_player)->get_battle_field().all_ships_destroyed());
-                        game_ended_package.set_enemy_ships(get_enemy().get_battle_field().get_ship_data());
-                        (*current_player)->get_connection().write(game_ended_package);
-                    } while(current != current_player);
-                    players_playing.clear();
-                    players.clear();
+                    send_game_ended_packages();
                     return CHECK_FOR_CONNECTIONS;
                 }
 

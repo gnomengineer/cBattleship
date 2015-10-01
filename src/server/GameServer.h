@@ -54,6 +54,8 @@ class GameServer {
         void next_player();
         Player& get_enemy();
         void request_turn(bool enemy_hit, position_t position);
+        bool is_game_finished();
+        void send_game_ended_packages();
 
 };
 
