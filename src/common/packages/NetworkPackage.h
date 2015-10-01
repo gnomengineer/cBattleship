@@ -65,4 +65,14 @@ template<typename T> T & cast_package(NetworkPackage & package) {
     return dynamic_cast<T&>(package);
 }
 
+template<typename T> bool handle_package(NetworkPackage &package, std::function<void(T &package)> handler) {
+    bool ret = false;
+    if(ret = is_package_of_type<T>(package)) {
+        T & package = cast_package<T>(package);
+        handler(package);
+    }
+    return ret;
+}
+
+
 #endif

@@ -32,8 +32,7 @@ void ClientStateMachine::run() {
 
     static std::function<void(void)> get_input;
     get_input = [this]() -> void {
-        connection->read([this](NetworkPackage& command) {
-            ServerNetworkPackage package(command);
+        connection->read([this](NetworkPackage &package) {
             state_machine.run_state(package);
             get_input();
         });
@@ -52,24 +51,22 @@ void ClientStateMachine::get_turn() {
     events.turn_confirmation_wait();
 }
 
-ClientState ClientStateMachine::get_identity(ServerNetworkPackage server_package) {
-    NetworkPackage &package = server_package.get_package();
-    if(is_package_of_type<PlayerJoinAnswerPackage>(package)) {
-         PlayerJoinAnswerPackage & answer = cast_package<PlayerJoinAnswerPackage>(package);
-         events.new_identity(answer.get_identity());
-         you.set_identity(answer.get_identity());
-        return WAIT_FOR_GAME_START;
-    } else if(is_package_of_type<GameConfigurationPackage>(package)) {
+ClientState ClientStateMachine::get_identity(NetworkPackage &package) {
+    if(handle_package<PlayerJoinAnswerPackage>(package, [&](PlayerJoinAnswerPackage &package) {
+        events.new_identity(package.get_identity());
+        you.set_identity(package.get_identity());
+    })) return WAIT_FOR_GAME_START;
+    handle_package<GameConfigurationPackage>(package, [&](GameConfigurationPackage &package) {
         GameConfigurationPackage &gameConfig = cast_package<GameConfigurationPackage>(package);
         events.get_game_configuration(gameConfig.get_config());
-    }
+    });
     return GET_IDENTITY;
 }
 
-ClientState ClientStateMachine::wait_for_game_start(ServerNetworkPackage server_package) {
-    NetworkPackage &package = server_package.get_package();
-    if(is_package_of_type<GameReadyPackage>(package)) {
-        GameReadyPackage & game_ready_package = cast_package<GameReadyPackage>(package);
+ClientState ClientStateMachine::wait_for_game_start(NetworkPackage &package) {
+    ClientState state = WAIT_FOR_GAME_START;
+
+    handle_package<GameReadyPackage>(package, [&](GameReadyPackage &game_ready_package) {
         enemy.set_name(game_ready_package.get_enemy_name());
 
         events.place_ships(you);
@@ -78,11 +75,12 @@ ClientState ClientStateMachine::wait_for_game_start(ServerNetworkPackage server_
         ship_placement_package.set_ship_data(you.get_battle_field().get_ship_data());
         connection->write(ship_placement_package);
         events.place_ship_confirmation_wait();
-    } else if(is_package_of_type<ShipPlacementResponsePackage>(package)) {
-        auto &response = cast_package<ShipPlacementResponsePackage>(package);
+    });
+
+    handle_package<ShipPlacementResponsePackage>(package, [&](ShipPlacementResponsePackage &response) {
         if(response.get_valid()) {
             events.place_ship_ok();
-            return YOUR_TURN;
+            state = YOUR_TURN;
         } else {
             events.place_ship_error(
                 response.get_out_of_bounds(),
@@ -98,23 +96,23 @@ ClientState ClientStateMachine::wait_for_game_start(ServerNetworkPackage server_
             connection->write(ship_placement_package);
             events.place_ship_confirmation_wait();
         }
-    }
-    return WAIT_FOR_GAME_START;
+    });
+    return state;
 }
 
-ClientState ClientStateMachine::your_turn(ServerNetworkPackage server_package) {
-    NetworkPackage &package = server_package.get_package();
-    if(is_package_of_type<EnemyHitPackage>(package)) {
-        auto& enemy_hit_package = cast_package<EnemyHitPackage>(package);
+ClientState ClientStateMachine::your_turn(NetworkPackage &package) {
+    handle_package<EnemyHitPackage>(package, [&](EnemyHitPackage &enemy_hit_package) {
         if(enemy_hit_package.get_enemy_hit()) {
             you.get_battle_field().hit_field(enemy_hit_package.get_position());
         }
         events.enemy_hit(enemy_hit_package.get_enemy_hit(), enemy_hit_package.get_position());
-    } else if(is_package_of_type<TurnRequestPackage>(package)) {
-        get_turn();
-    } else if(is_package_of_type<TurnResponsePackage>(package)) {
-        auto& turn_response = cast_package<TurnResponsePackage>(package);
+    });
 
+    handle_package<TurnRequestPackage>(package, [&](TurnRequestPackage &package) {
+        get_turn();
+    });
+
+    handle_package<TurnResponsePackage>(package, [&](TurnResponsePackage &turn_response) {
         if(!turn_response.get_valid()) {
             events.turn_error();
             get_turn();
@@ -126,16 +124,16 @@ ClientState ClientStateMachine::your_turn(ServerNetworkPackage server_package) {
             events.turn_ok(turn_response.get_ship_hit(), turn_response.get_ship_of_length_destroyed());
             events.enemy_wait();
         }
-    } else if(is_package_of_type<EnemyDisconnectedPackage>(package)) {
-        events.enemy_disconnected();
-        return STOP;
+    });
 
-    } else if(is_package_of_type<GameEndedPackage>(package)) {
-        auto& end_package = cast_package<GameEndedPackage>(package);
+    if(handle_package<EnemyDisconnectedPackage>(package, [&](EnemyDisconnectedPackage &package) {
+        events.enemy_disconnected();
+    })) return STOP;
+
+    if(handle_package<GameEndedPackage>(package, [&](GameEndedPackage &end_package) {
         auto ship_data = end_package.get_enemy_ships();
         enemy.get_battle_field().add_ship_data(ship_data);
         events.game_ended(end_package.get_won(), you, enemy);
-        return STOP;
-    }
+    })) return STOP;
     return YOUR_TURN;
 }

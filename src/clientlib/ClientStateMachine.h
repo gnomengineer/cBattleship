@@ -9,7 +9,6 @@
 #include <common/Connection.h>
 #include <boost/asio.hpp>
 #include "Player.h"
-#include "ServerNetworkPackage.h"
 #include "GameEvents.h"
 
 enum ClientState {
@@ -21,7 +20,7 @@ enum ClientState {
 
 class ClientStateMachine {
     private:
-        typedef StateMachine<ClientState, ClientStateMachine, ServerNetworkPackage> StateMachineType;
+        typedef StateMachine<ClientState, ClientStateMachine, NetworkPackage&> StateMachineType;
         StateMachineType state_machine;
 
         std::unique_ptr<Connection> connection;
@@ -30,7 +29,7 @@ class ClientStateMachine {
         Player enemy;
         std::list<Player*> players_playing;
 
-        std::queue<ServerNetworkPackage> input_queue;
+        std::queue<NetworkPackage> input_queue;
         std::mutex queue_lock;
 
         boost::asio::io_service io_service;
@@ -47,11 +46,11 @@ class ClientStateMachine {
         ~ClientStateMachine();
 
         StateMachineType::StateMap get_state_map();
-        ServerNetworkPackage get_input();
+        NetworkPackage& get_input();
 
-        ClientState get_identity(ServerNetworkPackage server_package);
-        ClientState wait_for_game_start(ServerNetworkPackage server_package);
-        ClientState your_turn(ServerNetworkPackage server_package);
+        ClientState get_identity(NetworkPackage &package);
+        ClientState wait_for_game_start(NetworkPackage &package);
+        ClientState your_turn(NetworkPackage &package);
 
         void run();
 

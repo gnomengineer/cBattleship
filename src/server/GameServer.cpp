@@ -108,13 +108,24 @@ Player& GameServer::get_enemy() {
 }
 
 void GameServer::request_turn(bool enemy_hit, position_t position) {
+    auto player_shooting = current_player;
     next_player();
-    BOOST_LOG_TRIVIAL(info) << "requesting turn from " << (*current_player)->get_name();
+    auto player_hit = current_player;
+
     EnemyHitPackage enemy_hit_package;
     enemy_hit_package.set_enemy_hit(enemy_hit);
     enemy_hit_package.set_position(position);
-    (*current_player)->get_connection().write(enemy_hit_package);
+
     TurnRequestPackage turn_request_package;
+
+    BOOST_LOG_TRIVIAL(info) << "send hit message to " << (*player_hit)->get_name();
+    (*player_hit)->get_connection().write(enemy_hit_package);
+
+    if(config.get_hitspree() && enemy_hit) {
+        current_player = player_shooting;
+    }
+
+    BOOST_LOG_TRIVIAL(info) << "requesting turn from " << (*current_player)->get_name();
     (*current_player)->get_connection().write(turn_request_package);
 }
 
@@ -238,11 +249,12 @@ GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
             try {
                 auto field = get_enemy().get_battle_field().get_field(position);
                 field->set_hit();
+                bool enemy_hit = field->is_ship_part();
 
                 // everything ok with this turn, send feedback
                 TurnResponsePackage turn_response;
                 turn_response.set_valid(true);
-                turn_response.set_ship_hit(field->is_ship_part());
+                turn_response.set_ship_hit(enemy_hit);
                 int ship_of_length_destroyed = 0;
                 auto ship_hit = get_enemy().get_battle_field().get_ship_at_position(position);
                 if(ship_hit.get() != nullptr && ship_hit->is_destroyed()) {
@@ -257,8 +269,8 @@ GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
                     return CHECK_FOR_CONNECTIONS;
                 }
 
-                // request next turn from other player
-                request_turn(true, position);
+                // request next turn
+                request_turn(enemy_hit, position);
             } catch(std::out_of_range &ex) {
                 BOOST_LOG_TRIVIAL(info) << "player sent out of range position, asking again...";
                 TurnResponsePackage turn_response;
