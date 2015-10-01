@@ -14,6 +14,7 @@
 #include "TurnRequestPackage.h"
 #include "TurnPackage.h"
 #include "TurnResponsePackage.h"
+#include "EnemyHitPackage.h"
 #include "EnemyDisconnectedPackage.h"
 #include "GameEndedPackage.h"
 

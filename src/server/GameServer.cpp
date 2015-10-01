@@ -110,9 +110,11 @@ Player& GameServer::get_enemy() {
 void GameServer::request_turn(bool enemy_hit, position_t position) {
     next_player();
     BOOST_LOG_TRIVIAL(info) << "requesting turn from " << (*current_player)->get_name();
+    EnemyHitPackage enemy_hit_package;
+    enemy_hit_package.set_enemy_hit(enemy_hit);
+    enemy_hit_package.set_position(position);
+    (*current_player)->get_connection().write(enemy_hit_package);
     TurnRequestPackage turn_request_package;
-    turn_request_package.set_enemy_hit(enemy_hit);
-    turn_request_package.set_position(position);
     (*current_player)->get_connection().write(turn_request_package);
 }
 

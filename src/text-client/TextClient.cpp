@@ -81,7 +81,12 @@ TextClient::TextClient(std::string connection_string)
         std::cout << "error: invalid turn, try again" << std::endl;
     });
 
-    client_state_machine.events.enemy_hit.connect([](Player &you, position_t position) {
+    client_state_machine.events.enemy_hit.connect([](bool hit, position_t position) {
+        if(hit) {
+            std::cout << "You've been hit at (" << position.x << "|" << position.y << ")" << std::endl;
+        } else {
+            std::cout << "The enemy missed" << std::endl;
+        }
     });
 
 

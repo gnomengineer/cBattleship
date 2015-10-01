@@ -26,7 +26,7 @@ class GameEvents {
         signals::signal<void (bool did_you_hit, int ship_of_length_destroyed)> turn_ok;
         signals::signal<void ()> turn_error;
 
-        signals::signal<void (Player &you, position_t position)> enemy_hit;
+        signals::signal<void (bool hit, position_t position)> enemy_hit;
         signals::signal<void ()> enemy_wait;
         signals::signal<void ()> enemy_disconnected;
 

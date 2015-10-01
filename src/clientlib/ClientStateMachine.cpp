@@ -104,12 +104,13 @@ ClientState ClientStateMachine::wait_for_game_start(ServerNetworkPackage server_
 
 ClientState ClientStateMachine::your_turn(ServerNetworkPackage server_package) {
     NetworkPackage &package = server_package.get_package();
-    if(is_package_of_type<TurnRequestPackage>(package)) {
-        auto& turn_request = cast_package<TurnRequestPackage>(package);
-        if(turn_request.get_enemy_hit()) {
-            you.get_battle_field().hit_field(turn_request.get_position());
-            events.enemy_hit(you, turn_request.get_position());
+    if(is_package_of_type<EnemyHitPackage>(package)) {
+        auto& enemy_hit_package = cast_package<EnemyHitPackage>(package);
+        if(enemy_hit_package.get_enemy_hit()) {
+            you.get_battle_field().hit_field(enemy_hit_package.get_position());
         }
+        events.enemy_hit(enemy_hit_package.get_enemy_hit(), enemy_hit_package.get_position());
+    } else if(is_package_of_type<TurnRequestPackage>(package)) {
         get_turn();
     } else if(is_package_of_type<TurnResponsePackage>(package)) {
         auto& turn_response = cast_package<TurnResponsePackage>(package);

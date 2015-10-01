@@ -15,6 +15,7 @@ NetworkPackageManager::NetworkPackageManager() {
                              TurnRequestPackage,
                              TurnPackage,
                              TurnResponsePackage,
+                             EnemyHitPackage,
                              EnemyDisconnectedPackage,
                              GameEndedPackage>();
     }
