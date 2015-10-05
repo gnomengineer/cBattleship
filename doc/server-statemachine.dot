@@ -1,0 +1,14 @@
+digraph ServerStatemachine {
+    check_for_connections
+    setup_game
+    turn_wait
+
+    check_for_connections -> check_for_connections
+    check_for_connections -> setup_game [label="PlayerJoin"]
+
+    setup_game -> setup_game
+    setup_game -> turn_wait [label="ShipPlacement"]
+
+    turn_wait -> check_for_connections
+    turn_wait -> turn_wait [label="TurnPackage"]
+}

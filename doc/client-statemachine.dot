@@ -1,0 +1,15 @@
+digraph ClientStatemachine {
+    get_identity
+    wait_for_game_start
+    your_turn
+    stop [shape=record]
+
+    get_identity -> wait_for_game_start [label="PlayerJoinAnswer"]
+    get_identity -> get_identity
+
+    wait_for_game_start -> wait_for_game_start [label="GameReady"]
+    wait_for_game_start -> your_turn [label="ShipPlacementResponse"]
+
+    your_turn -> your_turn [label="TurnRequestPackage, TurnResponsePackage"]
+    your_turn -> stop [label="GameEnded, EnemyDisconnected"]
+}
