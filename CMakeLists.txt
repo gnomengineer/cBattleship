@@ -79,7 +79,9 @@ if(PKG_CONFIG_FOUND)
     set(resource_output ${PROJECT_BINARY_DIR}/gtk-resources.c)
     find_program(GLIB_COMPILE_RESOURCES NAMES glib-compile-resources HINTS ${GLIB3_PREFIX})
     add_custom_command(OUTPUT ${resource_output}
-        COMMAND ${GLIB_COMPILE_RESOURCES} --generate-source --target=${resource_output} ${CBATTLESHIP_GTK_CLIENT_SOURCE_PATH}/gui.gresource.xml)
+        COMMAND ${GLIB_COMPILE_RESOURCES} --generate-source --target=${resource_output} gui.gresource.xml
+        DEPENDS ${CBATTLESHIP_GTK_CLIENT_SOURCE_PATH}/gui.gresource.xml ${CBATTLESHIP_GTK_CLIENT_SOURCE_PATH}/gui-design.glade
+        WORKING_DIRECTORY ${CBATTLESHIP_GTK_CLIENT_SOURCE_PATH})
     file(GLOB_RECURSE CBATTLESHIP_GTK_CLIENT_SOURCE_FILES ${CBATTLESHIP_GTK_CLIENT_SOURCE_PATH}/*.cpp)
     add_executable(cbattleship-gtk-client ${CBATTLESHIP_GTK_CLIENT_SOURCE_FILES} ${resource_output})
     target_link_libraries(cbattleship-gtk-client cbattleship-common ${Boost_LIBRARIES} ${GTKMM_LIBRARIES})
