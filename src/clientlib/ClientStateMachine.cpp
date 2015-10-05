@@ -43,6 +43,10 @@ void ClientStateMachine::run() {
     io_service.run();
 }
 
+void ClientStateMachine::stop() {
+    io_service.stop();
+}
+
 void ClientStateMachine::get_turn() {
     events.get_turn(you, enemy, last_turn_position);
     TurnPackage turn;

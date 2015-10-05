@@ -54,6 +54,7 @@ class ClientStateMachine {
         ClientState your_turn(ServerNetworkPackage server_package);
 
         void run();
+        void stop();
 
         void get_turn();
 };
