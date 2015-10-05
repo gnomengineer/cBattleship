@@ -1,8 +1,5 @@
 #include "TextClient.h"
 #include <boost/lexical_cast.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/thread/thread.hpp> 
-#include <algorithm>
 
 TextClient::TextClient(std::string connection_string)
     : client_state_machine(connection_string) {
