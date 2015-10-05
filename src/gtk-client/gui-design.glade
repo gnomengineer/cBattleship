@@ -260,6 +260,7 @@ Mogria</property>
         <child>
           <object class="GtkTextView" id="log_textview">
             <property name="visible">True</property>
+            <property name="app_paintable">True</property>
             <property name="can_focus">True</property>
           </object>
           <packing>
@@ -359,6 +360,7 @@ Mogria</property>
                 <property name="can_focus">True</property>
                 <property name="activates_default">True</property>
                 <property name="text" translatable="yes">anon</property>
+                <property name="input_purpose">name</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -407,6 +409,7 @@ Mogria</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="text" translatable="yes">13477</property>
+                <property name="input_purpose">number</property>
               </object>
               <packing>
                 <property name="expand">False</property>
