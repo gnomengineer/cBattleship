@@ -1,6 +1,8 @@
 #include "Options.h"
+#include <boost/log/trivial.hpp>
 #include <common/Connection.h>
 #include "GameServerConfiguration.h"
+#include <fstream>
 #include <sstream>
 
 Options::Options()
