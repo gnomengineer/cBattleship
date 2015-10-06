@@ -2,8 +2,8 @@
 #define _NETWORKPACKAGEMANAGER_H
 
 #include <map>
-#include <tuple>
 #include <memory>
+#include <sstream>
 #include "NetworkPackage.h"
 #include "PlayerJoinPackage.h"
 #include "PlayerJoinAnswerPackage.h"
@@ -16,6 +16,8 @@
 #include "EnemyDisconnectedPackage.h"
 #include "GameEndedPackage.h"
 
+#define PACKAGE_TERMINATOR 0xCD
+
 class NetworkPackageManager {
     private:
         static std::map<package_nr_t, std::unique_ptr<NetworkPackage>> network_commands;
@@ -23,7 +25,7 @@ class NetworkPackageManager {
     public:
         NetworkPackageManager();
 
-        std::vector<unsigned char> encode_package(NetworkPackage& command);
+        std::vector<unsigned char> encode_package(NetworkPackage &package);
         NetworkPackage& decode_package(std::vector<unsigned char> package_data);
 
         bool check_packaging(std::vector<unsigned char> package_data);
@@ -47,6 +49,26 @@ class NetworkPackageManager {
             std::unique_ptr<command_t> command(new command_t());
             network_commands[command->get_package_nr()] = std::move(command);
             add_network_command<I + 1, Tp...>(tuple);
+        }
+
+
+        template<typename T>
+        std::vector<unsigned char> encode_package(T &package) {
+            std::vector<unsigned char> encoded(3);
+            encoded[0] = package.get_package_nr();
+
+            std::ostringstream archive_stream;
+            boost::archive::polymorphic_text_oarchive archive(archive_stream);
+            archive << package;
+            auto payload = archive_stream.str();
+            encoded.insert(encoded.end(), payload.begin(), payload.end());
+            encoded.push_back(PACKAGE_TERMINATOR);
+
+            unsigned short size = encoded.size();
+            encoded[1] = size & 0xFF;
+            encoded[2] = (size >> 8) & 0xFF;
+
+            return encoded;
         }
 
 };

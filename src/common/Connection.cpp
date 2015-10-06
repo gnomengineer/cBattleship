@@ -1,5 +1,4 @@
 #include "Connection.h"
-#include <boost/log/trivial.hpp>
 
 Connection::Connection(conn_id_t conn_id, asio::ip::tcp::socket socket)
     : conn_id(conn_id),
@@ -51,7 +50,6 @@ ReadCallback Connection::get_read_header_callback(ReadHeaderCommandHandler handl
         if(!err_code && bytes_read == 3) {
             int package_size = network_package_manager.get_package_size(header);
             BOOST_LOG_TRIVIAL(debug) << "conn #" << conn_id << ": read header, package(" << (int)header[0] << ") of size " << package_size << " incoming.";
-            BOOST_LOG_TRIVIAL(debug) << "conn #" << conn_id << ": recv package: " << debug_package(payload, package_size - 3);
             if(package_size != -1) {
                 handler(package_size);
             } else {
@@ -63,16 +61,6 @@ ReadCallback Connection::get_read_header_callback(ReadHeaderCommandHandler handl
             disconnect();
         }
     };
-}
-
-void Connection::write(NetworkPackage& command) {
-    write_lock.lock();
-    writebuffer = network_package_manager.encode_package(command);
-    BOOST_LOG_TRIVIAL(debug) << "conn #" << conn_id << ": send package: " << debug_package(writebuffer);
-    asio::async_write(socket, asio::buffer(writebuffer), [this](const boost::system::error_code& err_code, std::size_t bytes_written) {
-        BOOST_LOG_TRIVIAL(debug) << "conn #" << conn_id << ": send " << bytes_written << " byte(s), err_code: " << err_code;
-        write_lock.unlock();
-    });
 }
 
 bool Connection::is_connected() {

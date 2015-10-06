@@ -11,14 +11,16 @@ class AuthenticatedNetworkPackage : public NetworkPackage {
         std::string identity;
 
     public:
-        AuthenticatedNetworkPackage();
-        virtual ~AuthenticatedNetworkPackage();
+        AuthenticatedNetworkPackage() { }
+        virtual ~AuthenticatedNetworkPackage() { }
 
-        virtual package_nr_t get_package_nr() = 0;
-        virtual std::vector<unsigned char> encode_payload();
-        virtual void decode_payload(std::vector<unsigned char> package_data);
+        std::string get_identity() {
+            return identity;
+        }
 
-        std::string get_identity();
-        void set_identity(std::string identity);
+        void set_identity(std::string identity) {
+            this->identity = identity;
+        }
+
 };
 #endif /* _AUTHENTICATEDNETWORKPACKAGE_H */

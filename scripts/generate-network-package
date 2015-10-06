@@ -16,7 +16,7 @@ def parse_args():
                         + '(instead of inheriting NetworkPackage)')
     parser.add_argument('name', metavar='package_name',
                         help='Name of the new NetworkPackage without the "Package"-postfix')
-    parser.add_argument('command_nr', metavar='command_nr', type=int,
+    parser.add_argument('command_nr', metavar='command_nr',
                         help='Command number of the new NetworkPackage, should be unique')
     parser.add_argument('members', nargs='*',
                         help='Members the NetworkPackage should have. Pass in the format'
@@ -28,16 +28,15 @@ def parse_args():
 def generate(args):
     """generate the network package source and header file,
        from the arguments given"""
+    print "Generating", args.name + "Package with members: "
     args.uppercase_name = args.name.upper()
     for i, member in enumerate(args.members):
         data = member.split('|')
         if len(data) <= 1:
             data.append("int")
         args.members[i] = {"property": data[0], "type": data[1]}
+        print " -", args.members[i]["type"], args.members[i]["property"];
 
-    eval_template("scripts/network-package-template/source-file",
-                  "src/common/packages/" + args.name + "Package.cpp",
-                  args)
     eval_template("scripts/network-package-template/header-file",
                   "src/common/packages/" + args.name + "Package.h",
                   args)

@@ -4,6 +4,7 @@
 #include "Field.h"
 #include <list>
 #include <memory>
+#include <boost/serialization/access.hpp>
 #include "position.h"
 
 #ifndef _BATTLEFIELD_H
@@ -11,6 +12,15 @@ class BattleField;
 #endif
 
 struct ShipData {
+    private:
+        friend class boost::serialization::access;
+        template<class Archive>
+        void serialize(Archive &ar, const unsigned int version) {
+            ar & length;
+            ar & orientation;
+            ar & start_position;
+        }
+
     public:
         unsigned int length;
         orientation_t orientation;

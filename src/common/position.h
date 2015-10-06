@@ -3,6 +3,7 @@
 
 #include <utility>
 #include <stdexcept>
+#include <boost/serialization/access.hpp>
 
 typedef unsigned int position_coordinate_t;
 
@@ -13,19 +14,29 @@ typedef enum {
 
 // represents a 2 dimensional position
 typedef struct position {
-    position()
-        : x(0), y(0) { }
-    position(position_coordinate_t y, position_coordinate_t x)
-        : x(x), y(y) { }
-    position_coordinate_t y;
-    position_coordinate_t x;
+    private:
+        friend class boost::serialization::access;
 
-    position_coordinate_t& operator[](int index) {
-        if(index == ORIENTATION_VERTICAL) return y;
-        if(index == ORIENTATION_HORIZONTAL) return x;
-        throw std::out_of_range("position::operator[]: position has only two dimensions. Valid values: 0, 1");
+        template<class Archive>
+        void serialize(Archive &ar, const unsigned int version) {
+            ar & y;
+            ar & x;
+        }
 
-    }
+    public:
+        position()
+            : x(0), y(0) { }
+        position(position_coordinate_t y, position_coordinate_t x)
+            : x(x), y(y) { }
+        position_coordinate_t y;
+        position_coordinate_t x;
+
+        position_coordinate_t& operator[](int index) {
+            if(index == ORIENTATION_VERTICAL) return y;
+            if(index == ORIENTATION_HORIZONTAL) return x;
+            throw std::out_of_range("position::operator[]: position has only two dimensions. Valid values: 0, 1");
+
+        }
 } position_t;
 
 bool check_position(position_t const &position, position_coordinate_t y, position_coordinate_t x);

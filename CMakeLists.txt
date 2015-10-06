@@ -9,7 +9,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -DBOOST_LOG_DYN_LINK")
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREAD ON)
-find_package(Boost 1.55.0 REQUIRED COMPONENTS thread system filesystem log log_setup signals program_options)
+find_package(Boost 1.55.0 REQUIRED COMPONENTS thread system filesystem log log_setup signals program_options serialization)
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     link_directories(${Boost_LIBRARY_DIRS})
