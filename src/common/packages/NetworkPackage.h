@@ -13,6 +13,9 @@ class NetworkPackage {
         virtual std::vector<unsigned char> encode_payload() = 0;
         virtual void decode_payload(std::vector<unsigned char> package_data) = 0;
 
+        virtual void to_string() {
+        }
+
         // utility methods
         template<typename T>
         static std::vector<unsigned char> to_bytes(T value) {
@@ -43,7 +46,20 @@ class NetworkPackage {
 
         template<typename... Targs>
         static void get_from_bytes(std::vector<unsigned char> &bytes, unsigned int index, Targs&... values) {
-            int _[] = {0, (values = from_bytes<Targs>(bytes, (index += sizeof(Targs)) - sizeof(Targs)), 0)...};
+            int _[] = {
+                0,
+                (
+                    values
+                        = from_bytes<Targs>(
+                            bytes,
+                            (index += sizeof(Targs)) - sizeof(Targs)
+                        ),
+                    0
+                )... /* repeat for every variatic argument */
+            };
+            // the array _ was only used to have the
+            // `{ }` initializer available to run `from_bytes()`
+            // for all variadic template arguments
             (void)_;
         }
 };
