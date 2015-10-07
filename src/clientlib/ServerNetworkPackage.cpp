@@ -1,9 +1,9 @@
 #include "ServerNetworkPackage.h"
 
-ServerNetworkPackage::ServerNetworkPackage(NetworkPackage &package)
+ServerNetworkPackage::ServerNetworkPackage(::google::protobuf::Message &package)
     : package(package) {
 }
 
-NetworkPackage &ServerNetworkPackage::get_package() {
+::google::protobuf::Message &ServerNetworkPackage::get_package() {
     return package;
 }

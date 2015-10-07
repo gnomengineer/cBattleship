@@ -2,7 +2,7 @@
 #define CLIENTSTATEMACHINE_H
 
 #include <common/state-machine/StateMachine.h>
-#include <common/packages/NetworkPackageManager.h>
+#include <common/NetworkPackageManager.h>
 #include <map>
 #include <queue>
 #include <mutex>

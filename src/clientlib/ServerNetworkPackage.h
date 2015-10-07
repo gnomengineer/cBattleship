@@ -1,13 +1,14 @@
 #ifndef _SERVERNETWORKPACKAGE_H
 #define _SERVERNETWORKPACKAGE_H
 
-#include <common/packages/NetworkPackage.h>
+#include <google/protobuf/message.h>
+
 class ServerNetworkPackage {
     private:
-        NetworkPackage &package;
+        ::google::protobuf::Message &package;
 
     public:
-        ServerNetworkPackage(NetworkPackage &package);
-        NetworkPackage &get_package();
+        ServerNetworkPackage(::google::protobuf::Message &package);
+        ::google::protobuf::Message &get_package();
 };
 #endif /* _SERVERNETWORKPACKAGE_H */

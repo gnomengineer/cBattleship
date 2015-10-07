@@ -5,11 +5,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION(ShipTest);
 
 void ShipTest::setUp()
 {
-    ShipData ship_data;
-    ship_data.length = 2;
-    ship_data.orientation = ORIENTATION_HORIZONTAL;
-    ship_data.start_position = position(0, 0);
-    ship1 = new Ship(ship_data, battle_field);
+    ship1 = new Ship(2, ORIENTATION_HORIZONTAL, position(0, 0), battle_field);
 
     ship2 = new Ship(5, ORIENTATION_VERTICAL, position(1, 1), battle_field);
 }

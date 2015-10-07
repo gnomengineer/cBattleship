@@ -119,7 +119,7 @@ std::shared_ptr<Field> BattleField::get_field(position_t position) {
 std::vector<ShipData> BattleField::get_ship_data() const {
     std::vector<ShipData> ship_data;
     for(auto it = ships.begin(); it != ships.end(); it++) {
-        ship_data.push_back((*it)->get_data());
+        ship_data.push_back((*it)->as_package());
     }
     return ship_data;
 }
@@ -131,7 +131,7 @@ void BattleField::add_ship_data(std::vector<ShipData> ship_data) {
         }
     }
     std::for_each(ship_data.begin(), ship_data.end(), [this](ShipData ship) {
-        add_ship(ship.length, ship.orientation, ship.start_position);
+        add_ship(ship.length(), ship.orientation(), position(ship.start_position()));
     });
 }
 

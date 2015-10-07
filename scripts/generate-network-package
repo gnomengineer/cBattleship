@@ -38,7 +38,7 @@ def generate(args):
         print " -", args.members[i]["type"], args.members[i]["property"];
 
     eval_template("scripts/network-package-template/header-file",
-                  "src/common/packages/" + args.name + "Package.h",
+                  "src/common/packages/" + args.name + ".proto",
                   args)
 
 change_to_source_dir()

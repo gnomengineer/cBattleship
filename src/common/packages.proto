@@ -1,0 +1,77 @@
+syntax =  "proto3";
+
+import "google/protobuf/any.proto";
+
+message NetworkPackage {
+    uint32 package_nr = 1;
+    google.protobuf.Any content = 2;
+}
+
+message EnemyDisconnectedPackage {
+}
+
+message GameConfigurationPackage {
+    bool hitspree = 1;
+}
+
+enum orientation_t {
+    ORIENTATION_VERTICAL   = 0; // maps to y coordinate on position_t
+    ORIENTATION_HORIZONTAL = 1; // maps to x coordinate on position_t
+}
+
+message Position {
+    uint32 y = 1;
+    uint32 x = 2;
+}
+    
+message ShipData {
+    uint32 length = 1;
+    orientation_t orientation = 2;
+    Position start_position = 3;
+}
+
+message GameEndedPackage {
+    bool won = 1;
+    repeated ShipData enemy_ships = 2;
+}
+
+message GameReadyPackage {
+    string enemy_name = 1;
+}
+
+message PlayerJoinPackage {
+    string player_name = 1;
+}
+
+message PlayerJoinAnswerPackage {
+    bytes identity = 1;
+}
+
+message ShipPlacementPackage {
+    repeated ShipData enemy_ships = 1;
+}
+
+message ShipPlacementResponsePackage {
+    bool valid = 1;
+    bool out_of_bounds = 2;
+    bool ships_overlap = 3;
+    bool remaining_ships = 4;
+}
+
+message TurnRequestPackage {
+}
+
+message TurnPackage {
+    Position position = 1;
+}
+
+message EnemyHitPackage {
+    bool enemy_hit = 1;
+    Position position = 2;
+}
+
+message TurnResponsePackage {
+    bool valid = 1;
+    bool ship_hit = 2;
+    int32 ship_of_length_destroyed = 3;
+}
