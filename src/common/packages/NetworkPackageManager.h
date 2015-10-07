@@ -5,6 +5,7 @@
 #include <memory>
 #include <sstream>
 #include "NetworkPackage.h"
+#include "GameConfigurationPackage.h"
 #include "PlayerJoinPackage.h"
 #include "PlayerJoinAnswerPackage.h"
 #include "GameReadyPackage.h"
@@ -13,6 +14,7 @@
 #include "TurnRequestPackage.h"
 #include "TurnPackage.h"
 #include "TurnResponsePackage.h"
+#include "EnemyHitPackage.h"
 #include "EnemyDisconnectedPackage.h"
 #include "GameEndedPackage.h"
 

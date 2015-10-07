@@ -6,9 +6,10 @@
 #include <algorithm>
 #include "GameServerUtil.h"
 
-GameServer::GameServer(std::string address, unsigned short port)
-    : state_machine(CHECK_FOR_CONNECTIONS, *this), server(boost::bind(&GameServer::handle_connection, this, _1), address, port) {
-    BOOST_LOG_TRIVIAL(info) << "cbattleship-server listening on " << address << ":" << port << " ...";
+GameServer::GameServer(GameServerConfiguration &config) 
+    : state_machine(CHECK_FOR_CONNECTIONS, *this),
+      server(boost::bind(&GameServer::handle_connection, this, _1), config.get_bind_address(), config.get_port()),
+      config(config) {
 }
 
 GameServer::~GameServer() {
@@ -51,6 +52,10 @@ void GameServer::register_new_connection(Connection *connection) {
     Player *player = new Player(connection);
     players[connection->get_id()] = std::unique_ptr<Player>(new Player(connection));
     handle_player_connection(*player);
+
+    GameConfigurationPackage configuration;
+    configuration.set_config(this->config);
+    player->get_connection().write(configuration);
 }
 
 void GameServer::handle_player_connection(Player &player) {
@@ -105,12 +110,32 @@ Player& GameServer::get_enemy() {
 void GameServer::request_turn(bool enemy_hit, position_t position) {
     next_player();
     BOOST_LOG_TRIVIAL(info) << "requesting turn from " << (*current_player)->get_name();
+    EnemyHitPackage enemy_hit_package;
+    enemy_hit_package.set_enemy_hit(enemy_hit);
+    enemy_hit_package.set_position(position);
+    (*current_player)->get_connection().write(enemy_hit_package);
     TurnRequestPackage turn_request_package;
-    turn_request_package.set_enemy_hit(enemy_hit);
-    turn_request_package.set_position(position);
     (*current_player)->get_connection().write(turn_request_package);
 }
 
+bool GameServer::is_game_finished() {
+    return std::any_of(players_playing.begin(), players_playing.end(), [](Player *player) {
+        return player->get_battle_field().all_ships_destroyed();
+    });
+}
+
+void GameServer::send_game_ended_packages() {
+    auto current = current_player;
+    do {
+        next_player();
+        GameEndedPackage game_ended_package;
+        game_ended_package.set_won(!(*current_player)->get_battle_field().all_ships_destroyed());
+        game_ended_package.set_enemy_ships(get_enemy().get_battle_field().get_ship_data());
+        (*current_player)->get_connection().write(game_ended_package);
+    } while(current != current_player);
+    players_playing.clear();
+    players.clear();
+}
 
 GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_package) {
     BOOST_LOG_TRIVIAL(debug) << "entering state " << __FUNCTION__;
@@ -226,19 +251,9 @@ GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
                 (*current_player)->get_connection().write(turn_response);
 
                 // does a player not have any ships anymore?
-                if(std::any_of(players_playing.begin(), players_playing.end(),
-                    [](Player *player) { return player->get_battle_field().all_ships_destroyed(); })) {
+                if(is_game_finished()) {
                     // well then, finish up the game
-                    auto current = current_player;
-                    do {
-                        next_player();
-                        GameEndedPackage game_ended_package;
-                        game_ended_package.set_won(!(*current_player)->get_battle_field().all_ships_destroyed());
-                        game_ended_package.set_enemy_ships(get_enemy().get_battle_field().get_ship_data());
-                        (*current_player)->get_connection().write(game_ended_package);
-                    } while(current != current_player);
-                    players_playing.clear();
-                    players.clear();
+                    send_game_ended_packages();
                     return CHECK_FOR_CONNECTIONS;
                 }
 

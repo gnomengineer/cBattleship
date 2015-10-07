@@ -30,6 +30,14 @@ class GameEvents {
 
         //========== Authentication Signals ==========================
         /**
+         * This event is raised when the server sends you it's game
+         * configuration.
+         * @param GameConfiguration config  the configuration used by
+         *                                  the server.
+         */
+        signals::signal<void (GameConfiguration config)> get_game_configuration;
+
+        /**
          * This event is raised when the server requests your
          * player name.
          *
@@ -124,11 +132,11 @@ class GameEvents {
         /**
          * This event is raised if the enemy has hit your Battlefield
          *
-         * @param Player& you           your Player object
+         * @param bool hit              wheter the enemy hit a ship
          * @param position_t position   the position on your Battlefield
          *                              where the enemy hit
          */
-        signals::signal<void (Player &you, position_t position)> enemy_hit;
+        signals::signal<void (bool hit, position_t position)> enemy_hit;
 
         /**
          * This event is raised if you need to wait for the
