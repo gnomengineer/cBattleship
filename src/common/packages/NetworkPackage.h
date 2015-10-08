@@ -2,6 +2,7 @@
 #define _NETWORKPACKAGE_H
 
 #include <vector>
+#include <boost/log/trivial.hpp>
 
 typedef unsigned char package_nr_t;
 
@@ -68,6 +69,7 @@ template<typename T> T & cast_package(NetworkPackage & package) {
 template<typename T> bool handle_package(NetworkPackage &package, std::function<void(T &package)> handler) {
     bool ret = false;
     if(ret = is_package_of_type<T>(package)) {
+        BOOST_LOG_TRIVIAL(info) << "handling '" << typeid(package).name() << "'";
         T & package = cast_package<T>(package);
         handler(package);
     }

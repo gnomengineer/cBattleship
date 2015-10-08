@@ -190,8 +190,7 @@ GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
     Player& player = player_package.get_player();
     NetworkPackage& package = player_package.get_package();
 
-    if(is_package_of_type<ShipPlacementPackage>(package)) {
-        auto &ship_placement_package = cast_package<ShipPlacementPackage>(package);
+    handle_package<ShipPlacementPackage>(package, [this, &player](ShipPlacementPackage &ship_placement_package) {
         auto ship_data = ship_placement_package.get_ship_data();
         ShipPlacementResponsePackage response;
         try {
@@ -228,7 +227,7 @@ GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
             }
         }
         player.get_connection().write(response);
-    }
+    });
 
     if(GameServerUtil::players_ready_to_start(players_playing)) {
         request_turn(false, position());
@@ -242,9 +241,8 @@ GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
     Player& player = player_package.get_player();
     NetworkPackage& package = player_package.get_package();
 
-    if(is_package_of_type<TurnPackage>(package)) {
+    handle_package<TurnPackage>(package, [this, &player](TurnPackage &p) {
         if(&player == *current_player) {
-            TurnPackage & p = cast_package<TurnPackage>(package);
             position_t position = p.get_position();
             try {
                 auto field = get_enemy().get_battle_field().get_field(position);
@@ -279,6 +277,6 @@ GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
                 (*current_player)->get_connection().write(turn_response);
             }
         }
-    }
+    });
     return TURN_WAIT;
 }

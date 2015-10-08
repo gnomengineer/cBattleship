@@ -56,8 +56,7 @@ ClientState ClientStateMachine::get_identity(NetworkPackage &package) {
         events.new_identity(package.get_identity());
         you.set_identity(package.get_identity());
     })) return WAIT_FOR_GAME_START;
-    handle_package<GameConfigurationPackage>(package, [&](GameConfigurationPackage &package) {
-        GameConfigurationPackage &gameConfig = cast_package<GameConfigurationPackage>(package);
+    handle_package<GameConfigurationPackage>(package, [&](GameConfigurationPackage &gameConfig) {
         events.get_game_configuration(gameConfig.get_config());
     });
     return GET_IDENTITY;
