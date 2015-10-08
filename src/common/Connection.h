@@ -2,18 +2,21 @@
 #define _CONNECTION_H
 
 #include <boost/asio.hpp>
-#include <common/packages/NetworkPackage.h>
-#include <common/packages/NetworkPackageManager.h>
+#include <boost/log/trivial.hpp>
+#include <common/NetworkPackageManager.h>
 #include <iostream>
 #include <iomanip>
 #include <mutex>
 #include <sstream>
+#include <memory>
+
+#define DEFAULT_PORT ((unsigned short)13477)
 
 namespace asio = boost::asio;
 
-typedef std::function<void(NetworkPackage& command)> ReadCommandHandler;
+typedef std::function<void(std::shared_ptr<NetworkPackage> command)> ReadPackageHandler;
 typedef std::function<void(int package_size)> ReadHeaderCommandHandler;
-typedef std::function<void(const boost::system::error_code& err_code, std::size_t bytes_read)> ReadCallback;
+typedef std::function<void(const boost::system::error_code &err_code, std::size_t bytes_read)> ReadCallback;
 typedef int conn_id_t;
 
 class Connection {
@@ -34,17 +37,29 @@ class Connection {
 
         conn_id_t get_id();
 
-        void read(ReadCommandHandler handler);
+        void read(ReadPackageHandler handler);
         void write(NetworkPackage& command);
 
         bool is_connected();
         void disconnect();
 
+        template<typename T>
+        void write(T& command) {
+            write_lock.lock();
+            writebuffer = network_package_manager.encode_package<T>(command);
+            BOOST_LOG_TRIVIAL(debug) << "conn #" << conn_id << ": send package: " << debug_package(writebuffer);
+            asio::async_write(socket, asio::buffer(writebuffer), [this](const boost::system::error_code& err_code, std::size_t bytes_written) {
+                BOOST_LOG_TRIVIAL(debug) << "conn #" << conn_id << ": send " << bytes_written << " byte(s), err_code: " << err_code;
+                write_lock.unlock();
+            });
+        }
+
     private:
-        ReadCallback get_read_callback(ReadCommandHandler handler, int package_size);
+        ReadCallback get_read_callback(ReadPackageHandler handler, int package_size);
         ReadCallback get_read_header_callback(ReadHeaderCommandHandler handler);
 
-        template<typename T> std::string debug_package(T data, int num = -1) {
+        template<typename T>
+        std::string debug_package(T data, int num = -1) {
             std::stringstream ss;
             std::for_each(data.begin(), num == -1 ? data.end() : data.begin() + num, [&ss](unsigned char byte) {
                     ss << "$" << std::hex << std::setw(2) << std::setfill('0') << (int)byte << " ";

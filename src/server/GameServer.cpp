@@ -4,11 +4,13 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp> 
 #include <algorithm>
+#include <common/Ship.h>
 #include "GameServerUtil.h"
 
-GameServer::GameServer(std::string address, unsigned short port)
-    : state_machine(CHECK_FOR_CONNECTIONS, *this), server(boost::bind(&GameServer::handle_connection, this, _1), address, port) {
-    BOOST_LOG_TRIVIAL(info) << "cbattleship-server listening on " << address << ":" << port << " ...";
+GameServer::GameServer(GameServerConfiguration &config) 
+    : state_machine(CHECK_FOR_CONNECTIONS, *this),
+      server(boost::bind(&GameServer::handle_connection, this, _1), config.get_bind_address(), config.get_port()),
+      config(config) {
 }
 
 GameServer::~GameServer() {
@@ -51,27 +53,31 @@ void GameServer::register_new_connection(Connection *connection) {
     Player *player = new Player(connection);
     players[connection->get_id()] = std::unique_ptr<Player>(new Player(connection));
     handle_player_connection(*player);
+
+    GameConfigurationPackage configuration;
+    this->config.to_package(configuration);
+    player->get_connection().write(configuration);
 }
 
 void GameServer::handle_player_connection(Player &player) {
     auto & connection = player.get_connection();
-    connection.read([this, &player, &connection](NetworkPackage& command) {
-        BOOST_LOG_TRIVIAL(debug) << "add command #" << (int)command.get_package_nr() << " from '" << player.get_name() << "' to input queue";
-        if(is_authenticated(command, player)) {
+    connection.read([this, &player, &connection](std::shared_ptr<NetworkPackage> package) {
+        BOOST_LOG_TRIVIAL(debug) << "add package #" << (int)package->package_nr() << " from '" << player.get_name() << "' to input queue";
+        if(is_authenticated(*package, player)) {
             std::lock_guard<std::mutex> lock(queue_lock);
-            PlayerNetworkPackage pcmd(command, player);
+            PlayerNetworkPackage pcmd(package, player);
             input_queue.push(pcmd);
         } else {
-            BOOST_LOG_TRIVIAL(warning) << "dropping, command not properly authenticated";
+            BOOST_LOG_TRIVIAL(warning) << "dropping, package not properly authenticated";
         }
         handle_player_connection(player);
     });
 }
 
 bool GameServer::is_authenticated(NetworkPackage & command, Player & player) {
-    AuthenticatedNetworkPackage* authenticated_package = dynamic_cast<AuthenticatedNetworkPackage*>(&command);
-    if(authenticated_package == nullptr) return true;
-    return authenticated_package->get_identity() == player.get_identity();
+    /* TODO: reimplement authentication, with google protobuffer again */
+    /*       is this even required? */
+    return true;
 }
 
 bool GameServer::can_handle_new_connection() {
@@ -103,24 +109,57 @@ Player& GameServer::get_enemy() {
 }
 
 void GameServer::request_turn(bool enemy_hit, position_t position) {
+    auto player_shooting = current_player;
     next_player();
-    BOOST_LOG_TRIVIAL(info) << "requesting turn from " << (*current_player)->get_name();
+    auto player_hit = current_player;
+
+    EnemyHitPackage enemy_hit_package;
+    enemy_hit_package.set_enemy_hit(enemy_hit);
+    enemy_hit_package.set_allocated_position(new Position(position.as_package()));
+
     TurnRequestPackage turn_request_package;
-    turn_request_package.set_enemy_hit(enemy_hit);
-    turn_request_package.set_position(position);
+
+    BOOST_LOG_TRIVIAL(info) << "send hit message to " << (*player_hit)->get_name();
+    (*player_hit)->get_connection().write(enemy_hit_package);
+
+    if(config.get_hitspree() && enemy_hit) {
+        current_player = player_shooting;
+    }
+
+    BOOST_LOG_TRIVIAL(info) << "requesting turn from " << (*current_player)->get_name();
     (*current_player)->get_connection().write(turn_request_package);
 }
 
+bool GameServer::is_game_finished() {
+    return std::any_of(players_playing.begin(), players_playing.end(), [](Player *player) {
+        return player->get_battle_field().all_ships_destroyed();
+    });
+}
+
+void GameServer::send_game_ended_packages() {
+    auto current = current_player;
+    do {
+        next_player();
+        GameEndedPackage game_ended_package;
+        game_ended_package.set_won(!(*current_player)->get_battle_field().all_ships_destroyed());
+        std::vector<ShipData> ship_data_vector = get_enemy().get_battle_field().get_ship_data();
+        std::for_each(ship_data_vector.begin(), ship_data_vector.end(), [&](ShipData ship) {
+            ship.Swap(game_ended_package.add_enemy_ships());
+        });
+        (*current_player)->get_connection().write(game_ended_package);
+    } while(current != current_player);
+    players_playing.clear();
+    players.clear();
+}
 
 GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_package) {
     BOOST_LOG_TRIVIAL(debug) << "entering state " << __FUNCTION__;
     Player& player = player_package.get_player();
     NetworkPackage& package = player_package.get_package();
 
-    if(is_package_of_type<PlayerJoinPackage>(package)) {
-        PlayerJoinPackage & p = cast_package<PlayerJoinPackage>(package);
-        BOOST_LOG_TRIVIAL(info) << "Player '" << p.get_player_name() << "' joined the game";
-        player.set_name(p.get_player_name());
+    NetworkPackageManager::handle_package<PlayerJoinPackage>(package, [&](PlayerJoinPackage &p) {
+        BOOST_LOG_TRIVIAL(info) << "Player '" << p.player_name() << "' joined the game";
+        player.set_name(p.player_name());
 
         std::string identity = GameServerUtil::generate_identity();
         player.set_identity(identity);
@@ -129,7 +168,7 @@ GameServerState GameServer::check_for_connections(PlayerNetworkPackage player_pa
         PlayerJoinAnswerPackage answer;
         answer.set_identity(identity);
         player.get_connection().write(answer);
-    }
+    });
 
     if(players_playing.size() == 2) {
         auto last_player = players_playing.end();
@@ -154,15 +193,14 @@ GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
     Player& player = player_package.get_player();
     NetworkPackage& package = player_package.get_package();
 
-    if(is_package_of_type<ShipPlacementPackage>(package)) {
-        auto &ship_placement_package = cast_package<ShipPlacementPackage>(package);
-        auto ship_data = ship_placement_package.get_ship_data();
+    NetworkPackageManager::handle_package<ShipPlacementPackage>(package, [this, &player](ShipPlacementPackage &ship_placement_package) {
+        auto ship_data = ship_placement_package.ship_data();
         ShipPlacementResponsePackage response;
         try {
             player.get_battle_field().clear();
             std::for_each(ship_data.begin(), ship_data.end(), [&player](ShipData &ship) {
-                BOOST_LOG_TRIVIAL(debug) << player.get_name() << ": place ship(" << ship.length << ") or: " << ship.orientation << ", y: " << ship.start_position.y << ", x: " << ship.start_position.x;
-                player.get_battle_field().add_ship(ship.length, ship.orientation, ship.start_position);
+                BOOST_LOG_TRIVIAL(debug) << player.get_name() << ": place ship(" << ship.length() << ") or: " << ship.orientation() << ", y: " << ship.start_position().y() << ", x: " << ship.start_position().x();
+                player.get_battle_field().add_ship(ship.length(), ship.orientation(), ship.start_position());
             });
             response.set_out_of_bounds(false);
             response.set_ships_overlap(false);
@@ -192,7 +230,7 @@ GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
             }
         }
         player.get_connection().write(response);
-    }
+    });
 
     if(GameServerUtil::players_ready_to_start(players_playing)) {
         request_turn(false, position());
@@ -206,18 +244,18 @@ GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
     Player& player = player_package.get_player();
     NetworkPackage& package = player_package.get_package();
 
-    if(is_package_of_type<TurnPackage>(package)) {
+    NetworkPackageManager::handle_package<TurnPackage>(package, [this, &player](TurnPackage &p) {
         if(&player == *current_player) {
-            TurnPackage & p = cast_package<TurnPackage>(package);
-            position_t position = p.get_position();
+            position_t position(p.position());
             try {
                 auto field = get_enemy().get_battle_field().get_field(position);
                 field->set_hit();
+                bool enemy_hit = field->is_ship_part();
 
                 // everything ok with this turn, send feedback
                 TurnResponsePackage turn_response;
                 turn_response.set_valid(true);
-                turn_response.set_ship_hit(field->is_ship_part());
+                turn_response.set_ship_hit(enemy_hit);
                 int ship_of_length_destroyed = 0;
                 auto ship_hit = get_enemy().get_battle_field().get_ship_at_position(position);
                 if(ship_hit.get() != nullptr && ship_hit->is_destroyed()) {
@@ -226,24 +264,14 @@ GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
                 (*current_player)->get_connection().write(turn_response);
 
                 // does a player not have any ships anymore?
-                if(std::any_of(players_playing.begin(), players_playing.end(),
-                    [](Player *player) { return player->get_battle_field().all_ships_destroyed(); })) {
+                if(is_game_finished()) {
                     // well then, finish up the game
-                    auto current = current_player;
-                    do {
-                        next_player();
-                        GameEndedPackage game_ended_package;
-                        game_ended_package.set_won(!(*current_player)->get_battle_field().all_ships_destroyed());
-                        game_ended_package.set_enemy_ships(get_enemy().get_battle_field().get_ship_data());
-                        (*current_player)->get_connection().write(game_ended_package);
-                    } while(current != current_player);
-                    players_playing.clear();
-                    players.clear();
+                    send_game_ended_packages();
                     return CHECK_FOR_CONNECTIONS;
                 }
 
-                // request next turn from other player
-                request_turn(true, position);
+                // request next turn
+                request_turn(enemy_hit, position);
             } catch(std::out_of_range &ex) {
                 BOOST_LOG_TRIVIAL(info) << "player sent out of range position, asking again...";
                 TurnResponsePackage turn_response;
@@ -252,6 +280,6 @@ GameServerState GameServer::turn_wait(PlayerNetworkPackage player_package) {
                 (*current_player)->get_connection().write(turn_response);
             }
         }
-    }
+    });
     return TURN_WAIT;
 }

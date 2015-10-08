@@ -1,3 +1,6 @@
 [submodule "CMake/cotire"]
 	path = CMake/cotire
 	url = https://github.com/sakra/cotire.git
+[submodule "lib/protobuf"]
+	path = lib/protobuf
+	url = https://github.com/google/protobuf.git

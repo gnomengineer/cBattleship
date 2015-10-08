@@ -9,11 +9,18 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -DBOOST_LOG_DYN_LINK")
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREAD ON)
-find_package(Boost 1.55.0 REQUIRED COMPONENTS thread system filesystem log log_setup signals program_options)
+find_package(Boost 1.55.0 REQUIRED COMPONENTS thread system filesystem log log_setup signals program_options serialization)
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     link_directories(${Boost_LIBRARY_DIRS})
 endif(Boost_FOUND)
+
+# protobuf is included as a submodule
+set(BUILD_TESTING OFF CACHE BOOL "wheter to build tests for protobuf" FORCE)
+add_subdirectory(${PROJECT_SOURCE_DIR}/lib/protobuf/cmake)
+set(protobuf_INCLUDE_DIRECTORY ${PROJECT_SOURCE_DIR}/lib/protobuf/src)
+include_directories(${protobuf_INCLUDE_DIRECTORY})
+link_directories(${protobuf_BINARY_DIR})
 
 # use pkg-config to find gtk3
 find_package(PkgConfig)
@@ -31,8 +38,21 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 # common library
 set(CBATTLESHIP_COMMON_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/common)
 file(GLOB_RECURSE CBATTLESHIP_COMMON_SOURCE_FILES ${CBATTLESHIP_COMMON_SOURCE_PATH}/*.cpp)
-add_library(cbattleship-common ${CBATTLESHIP_COMMON_SOURCE_FILES})
-target_link_libraries(cbattleship-common ${Boost_LIBRARIES})
+set(protobuf_in_dir ${PROJECT_SOURCE_DIR}/src/common)
+set(protobuf_out_dir ${PROJECT_BINARY_DIR}/protobuf)
+file(MAKE_DIRECTORY ${protobuf_out_dir})
+set(protobuf_outfile_cc ${protobuf_out_dir}/packages.pb.cc)
+set(protobuf_outfile_h ${protobuf_out_dir}/packages.pb.h)
+add_custom_command(
+    OUTPUT ${protobuf_outfile_cc} ${protobuf_outfile_h}
+    COMMAND ${protobuf_BINARY_DIR}/protoc -I=${protobuf_in_dir} -I=${protobuf_INCLUDE_DIRECTORY} --cpp_out=${protobuf_out_dir} ${protobuf_in_dir}/packages.proto
+    DEPENDS ${protobuf_BINARY_DIR}/protoc ${protobuf_in_dir}/packages.proto
+)
+
+include_directories(${protobuf_out_dir})
+
+add_library(cbattleship-common ${CBATTLESHIP_COMMON_SOURCE_FILES} ${protobuf_outfile_cc})
+target_link_libraries(cbattleship-common ${Boost_LIBRARIES} protobuf)
 if(COMMAND cotire)
     cotire(cbattleship-common)
 endif()

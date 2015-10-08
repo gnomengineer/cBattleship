@@ -32,9 +32,8 @@ void ClientStateMachine::run() {
 
     static std::function<void(void)> get_input;
     get_input = [this]() -> void {
-        connection->read([this](NetworkPackage& command) {
-            ServerNetworkPackage package(command);
-            state_machine.run_state(package);
+        connection->read([this](std::shared_ptr<NetworkPackage> package) {
+            state_machine.run_state(*package);
             get_input();
         });
     };
@@ -51,91 +50,99 @@ void ClientStateMachine::get_turn() {
     events.get_turn(you, enemy, last_turn_position);
     TurnPackage turn;
     turn.set_identity(you.get_identity());
-    turn.set_position(last_turn_position);
+    turn.set_allocated_position(new Position(last_turn_position.as_package()));
     connection->write(turn);
     events.turn_confirmation_wait();
 }
 
-ClientState ClientStateMachine::get_identity(ServerNetworkPackage server_package) {
-    NetworkPackage &package = server_package.get_package();
-    if(is_package_of_type<PlayerJoinAnswerPackage>(package)) {
-         PlayerJoinAnswerPackage & answer = cast_package<PlayerJoinAnswerPackage>(package);
-         events.new_identity(answer.get_identity());
-         you.set_identity(answer.get_identity());
-        return WAIT_FOR_GAME_START;
-    }
+ClientState ClientStateMachine::get_identity(NetworkPackage &package) {
+    if(NetworkPackageManager::handle_package<PlayerJoinAnswerPackage>(package, [&](PlayerJoinAnswerPackage &package) {
+        events.new_identity(package.identity());
+        you.set_identity(package.identity());
+    })) return WAIT_FOR_GAME_START;
+    NetworkPackageManager::handle_package<GameConfigurationPackage>(package, [&](GameConfigurationPackage &gameConfig) {
+        GameConfiguration config(gameConfig);
+        events.get_game_configuration(config);
+    });
     return GET_IDENTITY;
 }
 
-ClientState ClientStateMachine::wait_for_game_start(ServerNetworkPackage server_package) {
-    NetworkPackage &package = server_package.get_package();
-    if(is_package_of_type<GameReadyPackage>(package)) {
-        GameReadyPackage & game_ready_package = cast_package<GameReadyPackage>(package);
-        enemy.set_name(game_ready_package.get_enemy_name());
+ClientState ClientStateMachine::wait_for_game_start(NetworkPackage &package) {
+    ClientState state = WAIT_FOR_GAME_START;
+
+    NetworkPackageManager::handle_package<GameReadyPackage>(package, [&](GameReadyPackage &game_ready_package) {
+        enemy.set_name(game_ready_package.enemy_name());
 
         events.place_ships(you);
         ShipPlacementPackage ship_placement_package;
         ship_placement_package.set_identity(you.get_identity());
-        ship_placement_package.set_ship_data(you.get_battle_field().get_ship_data());
+        std::vector<ShipData> ship_data = you.get_battle_field().get_ship_data();
+        std::for_each(ship_data.begin(), ship_data.end(), [&](ShipData ship) {
+            ship.Swap(ship_placement_package.add_ship_data());
+        });
         connection->write(ship_placement_package);
         events.place_ship_confirmation_wait();
-    } else if(is_package_of_type<ShipPlacementResponsePackage>(package)) {
-        auto &response = cast_package<ShipPlacementResponsePackage>(package);
-        if(response.get_valid()) {
+    });
+
+    NetworkPackageManager::handle_package<ShipPlacementResponsePackage>(package, [&](ShipPlacementResponsePackage &response) {
+        if(response.valid()) {
             events.place_ship_ok();
-            return YOUR_TURN;
+            state = YOUR_TURN;
         } else {
             events.place_ship_error(
-                response.get_out_of_bounds(),
-                response.get_ships_overlap(),
-                response.get_remaining_ships()
+                response.out_of_bounds(),
+                response.ships_overlap(),
+                response.remaining_ships()
             );
 
             you.get_battle_field().clear();
             events.place_ships(you);
             ShipPlacementPackage ship_placement_package;
             ship_placement_package.set_identity(you.get_identity());
-            ship_placement_package.set_ship_data(you.get_battle_field().get_ship_data());
+            auto ship_data_vector = you.get_battle_field().get_ship_data();
+            std::for_each(ship_data_vector.begin(), ship_data_vector.end(), [&](ShipData ship) {
+                ship.Swap(ship_placement_package.add_ship_data());
+            });
             connection->write(ship_placement_package);
             events.place_ship_confirmation_wait();
         }
-    }
-    return WAIT_FOR_GAME_START;
+    });
+    return state;
 }
 
-ClientState ClientStateMachine::your_turn(ServerNetworkPackage server_package) {
-    NetworkPackage &package = server_package.get_package();
-    if(is_package_of_type<TurnRequestPackage>(package)) {
-        auto& turn_request = cast_package<TurnRequestPackage>(package);
-        if(turn_request.get_enemy_hit()) {
-            you.get_battle_field().hit_field(turn_request.get_position());
-            events.enemy_hit(you, turn_request.get_position());
-        }
-        get_turn();
-    } else if(is_package_of_type<TurnResponsePackage>(package)) {
-        auto& turn_response = cast_package<TurnResponsePackage>(package);
+ClientState ClientStateMachine::your_turn(NetworkPackage &package) {
+    NetworkPackageManager::handle_package<EnemyHitPackage>(package, [&](EnemyHitPackage &enemy_hit_package) {
+        you.get_battle_field().hit_field(position(enemy_hit_package.position()));
+        events.enemy_hit(enemy_hit_package.enemy_hit(), position(enemy_hit_package.position()));
+    });
 
-        if(!turn_response.get_valid()) {
+    NetworkPackageManager::handle_package<TurnRequestPackage>(package, [&](TurnRequestPackage &package) {
+        get_turn();
+    });
+
+    NetworkPackageManager::handle_package<TurnResponsePackage>(package, [&](TurnResponsePackage &turn_response) {
+        if(!turn_response.valid()) {
             events.turn_error();
             get_turn();
         } else {
             auto field = enemy.get_battle_field().get_field(last_turn_position);
 
-            field->set_ship_part(turn_response.get_ship_hit());
+            field->set_ship_part(turn_response.ship_hit());
             field->set_hit();
-            events.turn_ok(turn_response.get_ship_hit(), turn_response.get_ship_of_length_destroyed());
+            events.turn_ok(turn_response.ship_hit(), turn_response.ship_of_length_destroyed());
             events.enemy_wait();
         }
-    } else if(is_package_of_type<EnemyDisconnectedPackage>(package)) {
-        events.enemy_disconnected();
-        return STOP;
+    });
 
-    } else if(is_package_of_type<GameEndedPackage>(package)) {
-        auto& end_package = cast_package<GameEndedPackage>(package);
-        auto ship_data = end_package.get_enemy_ships();
-        enemy.get_battle_field().add_ship_data(ship_data);
-        events.game_ended(end_package.get_won(), you, enemy);
-        return STOP;
-    }
+    if(NetworkPackageManager::handle_package<EnemyDisconnectedPackage>(package, [&](EnemyDisconnectedPackage &package) {
+        events.enemy_disconnected();
+    })) return STOP;
+
+    if(NetworkPackageManager::handle_package<GameEndedPackage>(package, [&](GameEndedPackage &end_package) {
+        auto ship_data = end_package.enemy_ships();
+        std::vector<ShipData> vector_ship_data(ship_data.begin(), ship_data.end());
+        enemy.get_battle_field().add_ship_data(vector_ship_data);
+        events.game_ended(end_package.won(), you, enemy);
+    })) return STOP;
     return YOUR_TURN;
 }

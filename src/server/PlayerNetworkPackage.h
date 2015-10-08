@@ -1,19 +1,19 @@
 #ifndef _PLAYERNETWORKPACKAGE_H
 #define _PLAYERNETWORKPACKAGE_H
 
-#include <common/packages/NetworkPackage.h>
 #include "Player.h"
+#include <packages.pb.h>
 
 class PlayerNetworkPackage {
     private:
-        NetworkPackage & command;
-        Player & player;
+        std::shared_ptr<NetworkPackage> package;
+        Player &player;
 
     public:
-        PlayerNetworkPackage(NetworkPackage & command, Player & player);
+        PlayerNetworkPackage(std::shared_ptr<NetworkPackage> package, Player &player);
 
-        Player & get_player();
-        NetworkPackage & get_package();
+        Player &get_player();
+        NetworkPackage &get_package();
 };
 
 #endif // _PLAYERNETWORKPACKAGE_H

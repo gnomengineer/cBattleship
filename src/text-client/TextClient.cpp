@@ -1,4 +1,5 @@
 #include "TextClient.h"
+#include <common/GameConfiguration.h>
 #include <boost/lexical_cast.hpp>
 
 TextClient::TextClient(std::string connection_string)
@@ -9,6 +10,12 @@ TextClient::TextClient(std::string connection_string)
 
     client_state_machine.events.connected.connect([]() {
         std::cout << "trying to join server... " << std::endl;
+    });
+
+    client_state_machine.events.get_game_configuration.connect([](GameConfiguration config) {
+        std::cout << "Game Configuration: " << std::endl;
+        std::cout << " * You " << (config.get_hitspree() ? "can" : "can't") << " shoot again if you hit an enemy ship" << std::endl;
+        std::cout << std::endl;
     });
 
     client_state_machine.events.get_player_name.connect([this](std::string &name) {
@@ -71,7 +78,12 @@ TextClient::TextClient(std::string connection_string)
         std::cout << "error: invalid turn, try again" << std::endl;
     });
 
-    client_state_machine.events.enemy_hit.connect([](Player &you, position_t position) {
+    client_state_machine.events.enemy_hit.connect([](bool hit, position_t position) {
+        if(hit) {
+            std::cout << "You've been hit at (" << position.x << "|" << position.y << ")" << std::endl;
+        } else {
+            std::cout << "The enemy missed" << std::endl;
+        }
     });
 
 

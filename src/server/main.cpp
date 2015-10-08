@@ -1,13 +1,15 @@
 #include "GameServer.h"
+#include "Options.h"
 #include <common/LogConfig.h>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
-#include <boost/program_options/cmdline.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/errors.hpp>
+#include <boost/program_options.hpp>
 #include <boost/log/exceptions.hpp>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <iostream>
 
 namespace po = boost::program_options;
+
 
 void print_header() {
     std::cout
@@ -21,46 +23,66 @@ void print_header() {
     << std::endl;
 }
 
-po::options_description &get_command_line_options_description() {
-    static bool configured = false;
-    static po::options_description desc("Allowed options");
-
-    if(!configured) {
-        desc.add_options()
-            ("help,h",                                         "produce this help message")
-            ("bind-address,b", po::value<std::string>()
-                                   ->value_name("ip")
-                                   ->default_value("0.0.0.0"), "the address the server should bind to")
-            ("port,p",         po::value<unsigned short>()
-                                   ->value_name("port_number")
-                                   ->default_value(13477),     "the port the server should listen to")
-        ;
-        configured = true;
+int generate_configuration_file(std::string config_file) {
+    {
+        std::ifstream f(config_file);
+        if(f.good()) {
+            std::cerr << "Error: There already exists a file called '" << config_file << "' and I won't overwrite it." << std::endl;
+            return 10;
+        }
     }
+    {
+        std::ofstream f(config_file, std::ios_base::out | std::ios_base::trunc);
+        f << "# Configuration file for the cbattleship-server" << std::endl
+          << "# Every line preceded by a # is a comment" << std::endl
+          << "" << std::endl
+          << "# The address this server binds to. Leave it at " << DEFAULT_BIND_ADDRESS << " (default) so clients" << std::endl
+          << "# can connect to the server from anywhere. If you change it to an other value" << std::endl
+          << "# only clients that connect to this IP can connect. For example if you set it to" << std::endl
+          << "# 127.0.0.1 only clients from localhost can connect. If you set it to something like" << std::endl
+          << "# 192.168.1.40 only clients in your network can connnect." << std::endl
+          << "#bind-address = " << DEFAULT_BIND_ADDRESS << std::endl
+          << "" << std::endl
+          << "# The TCP port which the server listens to." << std::endl
+          << "# The default port is " << DEFAULT_PORT << std::endl
+          << "#port = " << DEFAULT_PORT << std::endl
+          << "" << std::endl
+          << "[game]" << std::endl
+          << "     # 0 = Every player gets to shoot once in an alternating fashion (default)" << std::endl
+          << "     # 1 = Every Player gets to shoot as long as he misses. If he hits he can shoot again." << std::endl
+          << "     #hitspree = 0" << std::endl
+          << "" << std::endl
+          << "[board]" << std::endl
+          << "    # The following two options configure the size of the game board." << std::endl
+          << "    # width of the game board (default 10)" << std::endl
+          << "    #sizex = 10" << std::endl
+          << "    # height of the game board (default 10)" << std::endl
+          << "    #sizey = 10" << std::endl
+          << "" << std::endl;
 
-    return desc;
-}
-
-po::variables_map parse_command_line_options(int argc, char *argv[]) {
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, get_command_line_options_description()), vm);
-    po::notify(vm);
-    return vm;
+        std::cout << "Success: Generated configuration file '" << config_file << "'." << std::endl;
+        return 0;
+    }
 }
 
 int main(int argc, char *argv[]) {
     print_header();
+    Options options;
     try {
         LogConfig logConfig(std::string(argv[0]) + ".log", true);
-
-        po::variables_map vm = parse_command_line_options(argc, argv);
+        po::variables_map &vm = options.parse(argc, argv);
 
         if(vm.count("help")) {
-            std::cout << get_command_line_options_description() << "\n";
+            std::cout << options.get_help_message() << std::endl;
             return 1;
         }
 
-        GameServer server(vm["bind-address"].as<std::string>(), vm["port"].as<unsigned short>());
+        if(!vm["config-gen"].empty()) {
+            return generate_configuration_file(vm["config-gen"].as<std::string>());
+        }
+
+        GameServerConfiguration config(vm);
+        GameServer server(config);
         server.run();
     } catch(po::error &ex) {
         std::cout << "Error while parsing command line arguments: " <<  ex.what() << std::endl;
@@ -77,6 +99,10 @@ int main(int argc, char *argv[]) {
     } catch(std::logic_error &ex) {
         std::cout << "Logic error:" << ex.what() << std::endl;
         return 127;
+    } catch(boost::bad_any_cast &ex) {
+        std::cout << "Couln't cast value: " << ex.what() << std::endl;
+    } catch(std::exception &ex) {
+        std::cout << "exception: " << ex.what() << std::endl;
     } catch(...) {
         std::cout << "Something the programmer didn't think about went horribly wrong. Sorry :-(" << std::endl;
         return 127;

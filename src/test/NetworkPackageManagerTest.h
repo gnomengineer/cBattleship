@@ -2,34 +2,36 @@
 #define _NETWORKPACKAGEMANAGERTEST_H
 
 #include <cppunit/extensions/HelperMacros.h>
-#include <common/packages/NetworkPackage.h>
-#include <common/packages/NetworkPackageManager.h>
+#include <common/NetworkPackageManager.h>
+#include <packages.pb.h>
+
 
 class NetworkPackageManagerTest : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE(NetworkPackageManagerTest);
 
     CPPUNIT_TEST(encode_package_test);
-    CPPUNIT_TEST(decode_package_test);
+    CPPUNIT_TEST(decode_package_nr_test);
+    CPPUNIT_TEST(decode_inner_package_test);
 
     CPPUNIT_TEST_SUITE_END();
 
     private:
-        class TestNetworkPackage : public NetworkPackage {
-            public:
-                int some_payload;
-                virtual package_nr_t get_package_nr();
-                virtual std::vector<unsigned char> encode_payload();
-                virtual void decode_payload(std::vector<unsigned char> package_data);
+        class TestNetworkPackage : public PlayerJoinPackage {
         };
         NetworkPackageManager *network_package_manager;
+
+        std::vector<unsigned char> encoded;
+
+        std::shared_ptr<NetworkPackage> network_package;
       
     public:
         void setUp();
         void tearDown();
           
         void encode_package_test();
-        void decode_package_test();
+        void decode_package_nr_test();
+        void decode_inner_package_test();
 
 };
 

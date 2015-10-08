@@ -2,7 +2,6 @@
 #define ENHANCEDCLIENT_H
 
 #include <clientlib/Player.h>
-#include <clientlib/ServerNetworkPackage.h>
 #include "BattleFieldUI.h"
 #include "CommandCenterStatistics.h"
 #include "CommandCenterCombatLog.h"
