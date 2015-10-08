@@ -23,7 +23,7 @@ NetworkPackageManager::NetworkPackageManager() {
 NetworkPackageManager::~NetworkPackageManager() {
 }
 
-NetworkPackage NetworkPackageManager::decode_package(std::vector<unsigned char> package_data) {
+std::shared_ptr<NetworkPackage> NetworkPackageManager::decode_package(std::vector<unsigned char> package_data) {
     if(!NetworkPackageManager::check_packaging(package_data)) throw std::runtime_error("frame is packaged incorrectly");
 
     // remove terminator & header
@@ -33,11 +33,11 @@ NetworkPackage NetworkPackageManager::decode_package(std::vector<unsigned char> 
 
     std::string package_data_str(package_data.begin(), package_data.end());
 
-    NetworkPackage network_package;
-    bool result = network_package.ParseFromString(package_data_str);
+    auto network_package = std::shared_ptr<NetworkPackage>(new NetworkPackage);
+    bool result = network_package->ParseFromString(package_data_str);
     if(!result) throw std::runtime_error("couldn't parse pacakge");
 
-    package_nr_t package_nr = network_package.package_nr();
+    package_nr_t package_nr = network_package->package_nr();
     if(network_packages.find(package_nr) == network_packages.end()) throw std::runtime_error("invalid package nr");
 
     return network_package;
@@ -46,7 +46,7 @@ NetworkPackage NetworkPackageManager::decode_package(std::vector<unsigned char> 
 bool NetworkPackageManager::check_packaging(std::vector<unsigned char> package_data) {
     int size = this->get_package_size(package_data);
     if(size == -1) return false;
-    if(size < 4) return false;
+    if(size < 3) return false;
     if(package_data.size() < size) return false;
     if(package_data[size - 1] != PACKAGE_TERMINATOR) return false;
     return true;

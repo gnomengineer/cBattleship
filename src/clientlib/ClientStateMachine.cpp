@@ -32,8 +32,8 @@ void ClientStateMachine::run() {
 
     static std::function<void(void)> get_input;
     get_input = [this]() -> void {
-        connection->read([this](NetworkPackage &package) {
-            state_machine.run_state(package);
+        connection->read([this](std::shared_ptr<NetworkPackage> package) {
+            state_machine.run_state(*package);
             get_input();
         });
     };
@@ -112,9 +112,7 @@ ClientState ClientStateMachine::wait_for_game_start(NetworkPackage &package) {
 
 ClientState ClientStateMachine::your_turn(NetworkPackage &package) {
     NetworkPackageManager::handle_package<EnemyHitPackage>(package, [&](EnemyHitPackage &enemy_hit_package) {
-        if(enemy_hit_package.enemy_hit()) {
-            you.get_battle_field().hit_field(position(enemy_hit_package.position()));
-        }
+        you.get_battle_field().hit_field(position(enemy_hit_package.position()));
         events.enemy_hit(enemy_hit_package.enemy_hit(), position(enemy_hit_package.position()));
     });
 

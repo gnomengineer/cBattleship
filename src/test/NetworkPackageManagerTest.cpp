@@ -31,11 +31,11 @@ void NetworkPackageManagerTest::encode_package_test() {
 
 void NetworkPackageManagerTest::decode_package_nr_test() {
     CPPUNIT_ASSERT_EQUAL(NetworkPackageManager::get_package_nr<TestNetworkPackage>(),
-                         network_package.package_nr());
+                         network_package->package_nr());
 }
 
 void NetworkPackageManagerTest::decode_inner_package_test() {
-    bool ret = NetworkPackageManager::handle_package<TestNetworkPackage>(network_package,
+    bool ret = NetworkPackageManager::handle_package<TestNetworkPackage>(*network_package,
         [](TestNetworkPackage & package) {
             CPPUNIT_ASSERT_EQUAL(std::string("chuck testa"), package.player_name());
         }

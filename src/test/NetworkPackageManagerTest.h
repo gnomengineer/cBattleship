@@ -23,7 +23,7 @@ class NetworkPackageManagerTest : public CppUnit::TestFixture
 
         std::vector<unsigned char> encoded;
 
-        NetworkPackage network_package;
+        std::shared_ptr<NetworkPackage> network_package;
       
     public:
         void setUp();

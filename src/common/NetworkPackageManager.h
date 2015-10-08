@@ -5,6 +5,7 @@
 #include <memory>
 #include <sstream>
 #include <packages.pb.h>
+#include <boost/log/trivial.hpp>
 
 #define PACKAGE_TERMINATOR 0xCD
 #define INVALID_PACKAGE_NR (-1)
@@ -23,7 +24,7 @@ class NetworkPackageManager {
         NetworkPackageManager();
         virtual ~NetworkPackageManager();
 
-        NetworkPackage decode_package(std::vector<unsigned char> package_data);
+        std::shared_ptr<NetworkPackage> decode_package(std::vector<unsigned char> package_data);
 
         bool check_packaging(std::vector<unsigned char> package_data);
         int get_package_size(std::vector<unsigned char> package_data);
@@ -43,8 +44,8 @@ class NetworkPackageManager {
         add_network_package(std::tuple<Tp...>& tuple) {
             using package_t = typename std::remove_reference<decltype(std::get<I>(tuple))>::type;
             auto package = std::unique_ptr<::google::protobuf::Message>(new package_t);
-            network_packages[I] = std::move(package);
-            type_package_nr_map[typeid(package_t).hash_code()] = I;
+            network_packages[I + 1] = std::move(package);
+            type_package_nr_map[typeid(package_t).hash_code()] = I + 1;
             add_network_package<I + 1, Tp...>(tuple);
         }
 
@@ -90,10 +91,14 @@ class NetworkPackageManager {
 
     template<typename T>
     static bool handle_package(NetworkPackage &network_package, std::function<void(T &package)> handler) {
+        BOOST_LOG_TRIVIAL(debug) << "handle_package: NetworkPackage[nr=" << network_package.package_nr() << "]";
+        BOOST_LOG_TRIVIAL(debug) << network_package.DebugString();
         if(is_package_of_type<T>(network_package)) {
             package_nr_t package_nr = network_package.package_nr();
             auto &message_package = *network_packages[package_nr];
             auto &package = cast_package<T>(message_package);
+            BOOST_LOG_TRIVIAL(debug) << "inner package:";
+            BOOST_LOG_TRIVIAL(debug) << package.DebugString();
 
             auto content = network_package.content();
             content.UnpackTo(&package);
@@ -105,6 +110,7 @@ class NetworkPackageManager {
 
     template<typename T>
     static bool is_package_of_type(NetworkPackage &package) {
+        BOOST_LOG_TRIVIAL(debug) << "is_package_of_type<" << typeid(T).name() << ">(Package[nr=" << package.package_nr() << "]) == " << get_package_nr<T>();
         return get_package_nr<T>() == package.package_nr();
     }
 
@@ -112,8 +118,6 @@ class NetworkPackageManager {
     static T & cast_package(::google::protobuf::Message &package) {
         return dynamic_cast<T&>(package);
     }
-
-
 };
 
 

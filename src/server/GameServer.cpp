@@ -61,14 +61,14 @@ void GameServer::register_new_connection(Connection *connection) {
 
 void GameServer::handle_player_connection(Player &player) {
     auto & connection = player.get_connection();
-    connection.read([this, &player, &connection](NetworkPackage& command) {
-        BOOST_LOG_TRIVIAL(debug) << "add command #" << (int)command.package_nr() << " from '" << player.get_name() << "' to input queue";
-        if(is_authenticated(command, player)) {
+    connection.read([this, &player, &connection](std::shared_ptr<NetworkPackage> package) {
+        BOOST_LOG_TRIVIAL(debug) << "add package #" << (int)package->package_nr() << " from '" << player.get_name() << "' to input queue";
+        if(is_authenticated(*package, player)) {
             std::lock_guard<std::mutex> lock(queue_lock);
-            PlayerNetworkPackage pcmd(command, player);
+            PlayerNetworkPackage pcmd(package, player);
             input_queue.push(pcmd);
         } else {
-            BOOST_LOG_TRIVIAL(warning) << "dropping, command not properly authenticated";
+            BOOST_LOG_TRIVIAL(warning) << "dropping, package not properly authenticated";
         }
         handle_player_connection(player);
     });
@@ -115,8 +115,7 @@ void GameServer::request_turn(bool enemy_hit, position_t position) {
 
     EnemyHitPackage enemy_hit_package;
     enemy_hit_package.set_enemy_hit(enemy_hit);
-    Position pos(position.as_package());
-    enemy_hit_package.set_allocated_position(&pos);
+    enemy_hit_package.set_allocated_position(new Position(position.as_package()));
 
     TurnRequestPackage turn_request_package;
 

@@ -8,12 +8,13 @@
 #include <iomanip>
 #include <mutex>
 #include <sstream>
+#include <memory>
 
 #define DEFAULT_PORT ((unsigned short)13477)
 
 namespace asio = boost::asio;
 
-typedef std::function<void(NetworkPackage &command)> ReadCommandHandler;
+typedef std::function<void(std::shared_ptr<NetworkPackage> command)> ReadPackageHandler;
 typedef std::function<void(int package_size)> ReadHeaderCommandHandler;
 typedef std::function<void(const boost::system::error_code &err_code, std::size_t bytes_read)> ReadCallback;
 typedef int conn_id_t;
@@ -36,7 +37,7 @@ class Connection {
 
         conn_id_t get_id();
 
-        void read(ReadCommandHandler handler);
+        void read(ReadPackageHandler handler);
         void write(NetworkPackage& command);
 
         bool is_connected();
@@ -54,7 +55,7 @@ class Connection {
         }
 
     private:
-        ReadCallback get_read_callback(ReadCommandHandler handler, int package_size);
+        ReadCallback get_read_callback(ReadPackageHandler handler, int package_size);
         ReadCallback get_read_header_callback(ReadHeaderCommandHandler handler);
 
         template<typename T>

@@ -6,11 +6,11 @@
 
 class PlayerNetworkPackage {
     private:
-        NetworkPackage &package;
+        std::shared_ptr<NetworkPackage> package;
         Player &player;
 
     public:
-        PlayerNetworkPackage(NetworkPackage &command, Player &player);
+        PlayerNetworkPackage(std::shared_ptr<NetworkPackage> package, Player &player);
 
         Player &get_player();
         NetworkPackage &get_package();
