@@ -4,7 +4,7 @@
 #include "ConnectionServer.h"
 #include "GameServerConfiguration.h"
 #include <common/state-machine/StateMachine.h>
-#include <common/packages/NetworkPackageManager.h>
+#include <common/NetworkPackageManager.h>
 #include "PlayerNetworkPackage.h"
 #include <map>
 #include <queue>

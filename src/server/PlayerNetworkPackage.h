@@ -2,15 +2,15 @@
 #define _PLAYERNETWORKPACKAGE_H
 
 #include "Player.h"
-#include <google/protobuf/message.h>
+#include <packages.pb.h>
 
 class PlayerNetworkPackage {
     private:
-        ::google::protobuf::Message &package;
+        NetworkPackage &package;
         Player &player;
 
     public:
-        PlayerNetworkPackage(::google::protobuf::Message &command, Player &player);
+        PlayerNetworkPackage(NetworkPackage &command, Player &player);
 
         Player &get_player();
         NetworkPackage &get_package();

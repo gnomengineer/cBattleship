@@ -26,6 +26,6 @@ class Ship {
         unsigned int get_length() const;
 
         std::list<std::shared_ptr<Field>> get_ship_parts() const;
-        ShipData as_package() const;
+        void to_package(ShipData &ship) const;
 };
 #endif

@@ -35,10 +35,8 @@ std::list<std::shared_ptr<Field>> Ship::get_ship_parts() const {
     return ship_parts;
 }
 
-ShipData Ship::as_package() const {
-    ShipData ship;
+void Ship::to_package(ShipData &ship) const {
     ship.set_length(length);
     ship.set_orientation(orientation);
     ship.set_allocated_start_position(new Position(start_position.as_package()));
-    return ship;
 }

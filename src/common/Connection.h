@@ -13,7 +13,7 @@
 
 namespace asio = boost::asio;
 
-typedef std::function<void(::google::protobuf::Message &command)> ReadCommandHandler;
+typedef std::function<void(NetworkPackage &command)> ReadCommandHandler;
 typedef std::function<void(int package_size)> ReadHeaderCommandHandler;
 typedef std::function<void(const boost::system::error_code &err_code, std::size_t bytes_read)> ReadCallback;
 typedef int conn_id_t;

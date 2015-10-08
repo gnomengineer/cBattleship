@@ -48,7 +48,8 @@ message PlayerJoinAnswerPackage {
 }
 
 message ShipPlacementPackage {
-    repeated ShipData enemy_ships = 1;
+    bytes identity = 1;
+    repeated ShipData ship_data = 2;
 }
 
 message ShipPlacementResponsePackage {
@@ -62,7 +63,8 @@ message TurnRequestPackage {
 }
 
 message TurnPackage {
-    Position position = 1;
+    bytes identity = 1;
+    Position position = 2;
 }
 
 message EnemyHitPackage {

@@ -50,18 +50,19 @@ void ClientStateMachine::get_turn() {
     events.get_turn(you, enemy, last_turn_position);
     TurnPackage turn;
     turn.set_identity(you.get_identity());
-    turn.set_position(last_turn_position);
+    turn.set_allocated_position(new Position(last_turn_position.as_package()));
     connection->write(turn);
     events.turn_confirmation_wait();
 }
 
 ClientState ClientStateMachine::get_identity(NetworkPackage &package) {
-    if(handle_package<PlayerJoinAnswerPackage>(package, [&](PlayerJoinAnswerPackage &package) {
-        events.new_identity(package.get_identity());
-        you.set_identity(package.get_identity());
+    if(NetworkPackageManager::handle_package<PlayerJoinAnswerPackage>(package, [&](PlayerJoinAnswerPackage &package) {
+        events.new_identity(package.identity());
+        you.set_identity(package.identity());
     })) return WAIT_FOR_GAME_START;
-    handle_package<GameConfigurationPackage>(package, [&](GameConfigurationPackage &gameConfig) {
-        events.get_game_configuration(gameConfig.get_config());
+    NetworkPackageManager::handle_package<GameConfigurationPackage>(package, [&](GameConfigurationPackage &gameConfig) {
+        GameConfiguration config(gameConfig);
+        events.get_game_configuration(config);
     });
     return GET_IDENTITY;
 }
@@ -69,33 +70,39 @@ ClientState ClientStateMachine::get_identity(NetworkPackage &package) {
 ClientState ClientStateMachine::wait_for_game_start(NetworkPackage &package) {
     ClientState state = WAIT_FOR_GAME_START;
 
-    handle_package<GameReadyPackage>(package, [&](GameReadyPackage &game_ready_package) {
-        enemy.set_name(game_ready_package.get_enemy_name());
+    NetworkPackageManager::handle_package<GameReadyPackage>(package, [&](GameReadyPackage &game_ready_package) {
+        enemy.set_name(game_ready_package.enemy_name());
 
         events.place_ships(you);
         ShipPlacementPackage ship_placement_package;
         ship_placement_package.set_identity(you.get_identity());
-        ship_placement_package.set_ship_data(you.get_battle_field().get_ship_data());
+        std::vector<ShipData> ship_data = you.get_battle_field().get_ship_data();
+        std::for_each(ship_data.begin(), ship_data.end(), [&](ShipData ship) {
+            ship.Swap(ship_placement_package.add_ship_data());
+        });
         connection->write(ship_placement_package);
         events.place_ship_confirmation_wait();
     });
 
-    handle_package<ShipPlacementResponsePackage>(package, [&](ShipPlacementResponsePackage &response) {
-        if(response.get_valid()) {
+    NetworkPackageManager::handle_package<ShipPlacementResponsePackage>(package, [&](ShipPlacementResponsePackage &response) {
+        if(response.valid()) {
             events.place_ship_ok();
             state = YOUR_TURN;
         } else {
             events.place_ship_error(
-                response.get_out_of_bounds(),
-                response.get_ships_overlap(),
-                response.get_remaining_ships()
+                response.out_of_bounds(),
+                response.ships_overlap(),
+                response.remaining_ships()
             );
 
             you.get_battle_field().clear();
             events.place_ships(you);
             ShipPlacementPackage ship_placement_package;
             ship_placement_package.set_identity(you.get_identity());
-            ship_placement_package.set_ship_data(you.get_battle_field().get_ship_data());
+            auto ship_data_vector = you.get_battle_field().get_ship_data();
+            std::for_each(ship_data_vector.begin(), ship_data_vector.end(), [&](ShipData ship) {
+                ship.Swap(ship_placement_package.add_ship_data());
+            });
             connection->write(ship_placement_package);
             events.place_ship_confirmation_wait();
         }
@@ -104,39 +111,40 @@ ClientState ClientStateMachine::wait_for_game_start(NetworkPackage &package) {
 }
 
 ClientState ClientStateMachine::your_turn(NetworkPackage &package) {
-    handle_package<EnemyHitPackage>(package, [&](EnemyHitPackage &enemy_hit_package) {
-        if(enemy_hit_package.get_enemy_hit()) {
-            you.get_battle_field().hit_field(enemy_hit_package.get_position());
+    NetworkPackageManager::handle_package<EnemyHitPackage>(package, [&](EnemyHitPackage &enemy_hit_package) {
+        if(enemy_hit_package.enemy_hit()) {
+            you.get_battle_field().hit_field(position(enemy_hit_package.position()));
         }
-        events.enemy_hit(enemy_hit_package.get_enemy_hit(), enemy_hit_package.get_position());
+        events.enemy_hit(enemy_hit_package.enemy_hit(), position(enemy_hit_package.position()));
     });
 
-    handle_package<TurnRequestPackage>(package, [&](TurnRequestPackage &package) {
+    NetworkPackageManager::handle_package<TurnRequestPackage>(package, [&](TurnRequestPackage &package) {
         get_turn();
     });
 
-    handle_package<TurnResponsePackage>(package, [&](TurnResponsePackage &turn_response) {
-        if(!turn_response.get_valid()) {
+    NetworkPackageManager::handle_package<TurnResponsePackage>(package, [&](TurnResponsePackage &turn_response) {
+        if(!turn_response.valid()) {
             events.turn_error();
             get_turn();
         } else {
             auto field = enemy.get_battle_field().get_field(last_turn_position);
 
-            field->set_ship_part(turn_response.get_ship_hit());
+            field->set_ship_part(turn_response.ship_hit());
             field->set_hit();
-            events.turn_ok(turn_response.get_ship_hit(), turn_response.get_ship_of_length_destroyed());
+            events.turn_ok(turn_response.ship_hit(), turn_response.ship_of_length_destroyed());
             events.enemy_wait();
         }
     });
 
-    if(handle_package<EnemyDisconnectedPackage>(package, [&](EnemyDisconnectedPackage &package) {
+    if(NetworkPackageManager::handle_package<EnemyDisconnectedPackage>(package, [&](EnemyDisconnectedPackage &package) {
         events.enemy_disconnected();
     })) return STOP;
 
-    if(handle_package<GameEndedPackage>(package, [&](GameEndedPackage &end_package) {
-        auto ship_data = end_package.get_enemy_ships();
-        enemy.get_battle_field().add_ship_data(ship_data);
-        events.game_ended(end_package.get_won(), you, enemy);
+    if(NetworkPackageManager::handle_package<GameEndedPackage>(package, [&](GameEndedPackage &end_package) {
+        auto ship_data = end_package.enemy_ships();
+        std::vector<ShipData> vector_ship_data(ship_data.begin(), ship_data.end());
+        enemy.get_battle_field().add_ship_data(vector_ship_data);
+        events.game_ended(end_package.won(), you, enemy);
     })) return STOP;
     return YOUR_TURN;
 }

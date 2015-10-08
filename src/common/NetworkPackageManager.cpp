@@ -23,7 +23,7 @@ NetworkPackageManager::NetworkPackageManager() {
 NetworkPackageManager::~NetworkPackageManager() {
 }
 
-::google::protobuf::Message& NetworkPackageManager::decode_package(std::vector<unsigned char> package_data) {
+NetworkPackage NetworkPackageManager::decode_package(std::vector<unsigned char> package_data) {
     if(!NetworkPackageManager::check_packaging(package_data)) throw std::runtime_error("frame is packaged incorrectly");
 
     // remove terminator & header
@@ -40,12 +40,7 @@ NetworkPackageManager::~NetworkPackageManager() {
     package_nr_t package_nr = network_package.package_nr();
     if(network_packages.find(package_nr) == network_packages.end()) throw std::runtime_error("invalid package nr");
 
-    auto &package = *network_packages[package_nr];
-
-    auto content = network_package.content();
-    content.UnpackTo(&package);
-
-    return package;
+    return network_package;
 }
 
 bool NetworkPackageManager::check_packaging(std::vector<unsigned char> package_data) {

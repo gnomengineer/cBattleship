@@ -119,7 +119,9 @@ std::shared_ptr<Field> BattleField::get_field(position_t position) {
 std::vector<ShipData> BattleField::get_ship_data() const {
     std::vector<ShipData> ship_data;
     for(auto it = ships.begin(); it != ships.end(); it++) {
-        ship_data.push_back((*it)->as_package());
+        ShipData ship;
+        (*it)->to_package(ship);
+        ship_data.push_back(ship);
     }
     return ship_data;
 }

@@ -2,6 +2,7 @@
 #define GAMEEVENTS_H
 
 #include <boost/signals2/signal.hpp>
+#include <common/GameConfiguration.h>
 
 namespace signals = boost::signals2;
 

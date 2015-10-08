@@ -34,7 +34,7 @@ ReadCallback Connection::get_read_callback(ReadCommandHandler handler, int packa
         if(!err_code && bytes_read >= package_size - 3) {
             std::vector<unsigned char> command(header.begin(), header.end());
             command.insert(command.end(), payload.begin(), payload.end());
-            auto& network_command = network_package_manager.decode_package(command);
+            auto network_command = network_package_manager.decode_package(command);
             read_lock.unlock();
             handler(network_command);
         } else {

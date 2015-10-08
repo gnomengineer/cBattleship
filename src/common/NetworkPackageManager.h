@@ -9,7 +9,10 @@
 #define PACKAGE_TERMINATOR 0xCD
 #define INVALID_PACKAGE_NR (-1)
 
+#define IDENTITY_LENGTH 8
+
 typedef unsigned int package_nr_t;
+
 
 class NetworkPackageManager {
     private:
@@ -20,7 +23,7 @@ class NetworkPackageManager {
         NetworkPackageManager();
         virtual ~NetworkPackageManager();
 
-        ::google::protobuf::Message &decode_package(std::vector<unsigned char> package_data);
+        NetworkPackage decode_package(std::vector<unsigned char> package_data);
 
         bool check_packaging(std::vector<unsigned char> package_data);
         int get_package_size(std::vector<unsigned char> package_data);
@@ -85,14 +88,33 @@ class NetworkPackageManager {
         return type_package_nr_map[key];
     }
 
+    template<typename T>
+    static bool handle_package(NetworkPackage &network_package, std::function<void(T &package)> handler) {
+        if(is_package_of_type<T>(network_package)) {
+            package_nr_t package_nr = network_package.package_nr();
+            auto &message_package = *network_packages[package_nr];
+            auto &package = cast_package<T>(message_package);
+
+            auto content = network_package.content();
+            content.UnpackTo(&package);
+            handler(package);
+            return true;
+        }
+        return false;
+    }
+
+    template<typename T>
+    static bool is_package_of_type(NetworkPackage &package) {
+        return get_package_nr<T>() == package.package_nr();
+    }
+
+    template<typename T>
+    static T & cast_package(::google::protobuf::Message &package) {
+        return dynamic_cast<T&>(package);
+    }
+
+
 };
 
-template<typename T> bool is_package_of_type(NetworkPackage &package) {
-    return NetworkPackageManager::get_package_nr<T>() == package.package_nr();
-}
-
-template<typename T> T & cast_package(NetworkPackage & package) {
-    return dynamic_cast<T&>(package);
-}
 
 #endif
