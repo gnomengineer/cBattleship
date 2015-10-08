@@ -1,7 +1,0 @@
-package cbattleship;
-
-message {{{name}}} {
-{{#members}}
-    required {{{type}}} {{{property}}};
-{{/members}}
-}
