@@ -1,7 +1,6 @@
 #ifndef _GAMECONFIGURATION_H
 #define _GAMECONFIGURATION_H
 
-#include <common/packages/NetworkPackage.h>
 #include <boost/program_options.hpp>
 
 class GameConfiguration {
@@ -14,9 +13,6 @@ class GameConfiguration {
         virtual ~GameConfiguration();
         
         bool get_hitspree();
-
-        std::vector<unsigned char> to_bytes();
-        void from_bytes(std::vector<unsigned char> &bytes, unsigned int index);
 };
 
 

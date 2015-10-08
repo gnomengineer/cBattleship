@@ -5,26 +5,20 @@
 #include <list>
 #include <memory>
 #include "position.h"
+#include <packages.pb.h>
 
 #ifndef _BATTLEFIELD_H
 class BattleField;
 #endif
 
-struct ShipData {
-    public:
-        unsigned int length;
-        orientation_t orientation;
-        position_t start_position;
-};
-
 // represents a single Ship on the BattleField
 class Ship {
     private:
         std::list<std::shared_ptr<Field>> ship_parts;
-        ShipData ship_data;
+        unsigned int length;
+        orientation_t orientation;
+        position_t start_position;
     public:
-
-        Ship(ShipData ship_data, BattleField &battle_field);
         Ship(unsigned int length, orientation_t orientation, position_t start_position, BattleField &battle_field);
 
         bool is_destroyed() const;
@@ -32,6 +26,6 @@ class Ship {
         unsigned int get_length() const;
 
         std::list<std::shared_ptr<Field>> get_ship_parts() const;
-        ShipData get_data() const;
+        ShipData as_package() const;
 };
 #endif

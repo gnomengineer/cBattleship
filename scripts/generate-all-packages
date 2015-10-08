@@ -1,0 +1,21 @@
+#!/bin/bash
+generate_script="$(dirname "$0")/generate-network-package"
+a="--authenticated"
+
+"$generate_script"      PlayerJoin            0x20 "player_name|string"
+"$generate_script"      PlayerJoinAnswer      0x21 "identity|string"
+"$generate_script"      GameReady             0x23 "enemy_name|string"
+"$generate_script" "$a" ShipPlacement         0x40 "ship_data|std::vector<ShipData>"
+"$generate_script"      ShipPlacementResponse 0x41 "valid|bool" \
+                                                   "out_of_bounds|bool" \
+                                                   "ships_overlap|bool" \
+                                                   "remaining_ships|bool"
+"$generate_script" "$a" Turn                  0x40 "position|position_t"
+"$generate_script"      TurnRequest           0x41 "enemy_hit|bool" \
+                                                   "position|position_t"
+"$generate_script"      TurnResponse          0x43 "valid|bool" \
+                                                   "ship_hit|bool" \
+                                                   "ship_of_length_destroyed|int32"
+"$generate_script"      EnemyDisconnected     0x81 
+"$generate_script"      GameEnded             0x83 "won|bool" \
+                                                   "enemy_ships|std::vector<ShipData>"

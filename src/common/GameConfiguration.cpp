@@ -14,12 +14,3 @@ GameConfiguration::~GameConfiguration() {
 bool GameConfiguration::get_hitspree() {
     return hitspree;
 }
-
-std::vector<unsigned char> GameConfiguration::to_bytes() {
-    std::vector<unsigned char> result;
-    NetworkPackage::add_to_bytes(result, hitspree);
-    return result;
-}
-void GameConfiguration::from_bytes(std::vector<unsigned char> &bytes, unsigned int index) {
-    NetworkPackage::get_from_bytes(bytes, index, hitspree);
-}

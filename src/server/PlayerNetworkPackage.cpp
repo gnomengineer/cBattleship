@@ -1,14 +1,14 @@
 #include "PlayerNetworkPackage.h"
 
 PlayerNetworkPackage::PlayerNetworkPackage(NetworkPackage & command, Player & player)
-    : command(command), player(player) {
+    : package(package), player(player) {
 }
 
-NetworkPackage & PlayerNetworkPackage::get_package() {
-    return command;
+NetworkPackage &PlayerNetworkPackage::get_package() {
+    return package;
 }
 
-Player & PlayerNetworkPackage::get_player() {
+Player &PlayerNetworkPackage::get_player() {
     return player;
 }
 
