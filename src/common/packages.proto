@@ -12,6 +12,8 @@ message EnemyDisconnectedPackage {
 
 message GameConfigurationPackage {
     bool hitspree = 1;
+    uint32 size_y = 2;
+    uint32 size_x = 3;
 }
 
 enum orientation_t {

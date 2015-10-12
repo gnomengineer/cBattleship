@@ -3,12 +3,13 @@
 
 #include <common/BattleField.h>
 #include <string>
+#include <memory>
 
 class Player {
     private:
         std::string name;
         std::string identity;
-        BattleField battle_field;
+        std::unique_ptr<BattleField> battle_field;
 
     public:
         Player();
@@ -17,6 +18,7 @@ class Player {
         void set_name(std::string new_name);
         std::string get_identity() const;
         void set_identity(std::string new_identity);
+        void create_battle_field(unsigned int battlefield_size_y, unsigned int battlefield_size_x);
         BattleField &get_battle_field();
 };
 #endif

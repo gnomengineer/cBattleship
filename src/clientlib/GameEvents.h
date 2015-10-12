@@ -19,7 +19,7 @@ class GameEvents {
          * @param std::string connection_string the connection string
          *                                      used to connect.
          */
-        signals::signal<void (std::string connection_string)> connecting;
+        signals::signal<void (std::string host, unsigned int port)> connecting;
 
         /**
          * This event is raised when the connection to the server

@@ -12,7 +12,8 @@
 #include "GameEvents.h"
 
 enum ClientState {
-    GET_IDENTITY,
+    INITIALIZE,
+    WAIT_FOR_JOIN,
     WAIT_FOR_GAME_START,
     YOUR_TURN,
     STOP = -1
@@ -27,6 +28,7 @@ class ClientStateMachine {
 
         Player you;
         Player enemy;
+
         std::list<Player*> players_playing;
 
         std::queue<NetworkPackage> input_queue;
@@ -42,13 +44,14 @@ class ClientStateMachine {
     public:
         GameEvents events;
 
-        ClientStateMachine(std::string connection_string);
+        ClientStateMachine(std::string host, unsigned int port);
         ~ClientStateMachine();
 
         StateMachineType::StateMap get_state_map();
         NetworkPackage& get_input();
 
-        ClientState get_identity(NetworkPackage &package);
+        ClientState initialize(NetworkPackage &package);
+        ClientState wait_for_join(NetworkPackage &package);
         ClientState wait_for_game_start(NetworkPackage &package);
         ClientState your_turn(NetworkPackage &package);
 

@@ -16,7 +16,7 @@ class ShipTest : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
     private:
-        BattleField battle_field;
+        BattleField *battle_field;
         Ship *ship1;
         Ship *ship2;
       

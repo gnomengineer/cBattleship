@@ -45,11 +45,10 @@ void Client::connect(std::string name, std::string ip_address, unsigned short po
         state_machine_thread->join();
     }
 
-    // TODO: port is not used as of now
-    state_machine = std::unique_ptr<ClientStateMachine>(new ClientStateMachine(ip_address));
+    state_machine = std::unique_ptr<ClientStateMachine>(new ClientStateMachine(ip_address, port));
 
-    state_machine->events.connecting.connect([this](std::string connection_string) {
-        log("connecting to " + connection_string);
+    state_machine->events.connecting.connect([this](std::string host, unsigned short port) {
+        log("connecting to " + host);
     });
 
     state_machine->events.connected.connect([this]() {

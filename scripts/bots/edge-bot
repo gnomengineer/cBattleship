@@ -15,9 +15,5 @@ echo "2 v 0 5"
 echo "2 v 0 6"
 echo "2 v 0 7"
 
-# shoot every field in sequence
-for y in $(seq 0 9); do
-    for x in $(seq 0 9); do
-        echo "$y $x"
-    done
-done
+# shoot every field in sequence, row for row
+echo {0..9}x{0..9} | tr x ' '

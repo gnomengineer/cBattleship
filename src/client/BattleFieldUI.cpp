@@ -1,5 +1,11 @@
 #include "BattleFieldUI.h"
 
+/* @TODO: dummy default definitions, remove if not needed anymore
+          the battlefield width and height should be read from the 
+          GameConfiguration sent from the server */
+#define BATTLEFIELD_HEIGHT 10
+#define BATTLEFIELD_WIDTH 10
+
 BattleFieldUI::BattleFieldUI(int x, int y, WINDOW *parent) :
     CursesWindow(x,y,BATTLEFIELD_HEIGHT+1,2*BATTLEFIELD_WIDTH+2,parent)
 {

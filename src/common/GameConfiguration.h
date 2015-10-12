@@ -7,6 +7,8 @@
 class GameConfiguration {
     private:
         bool hitspree;
+        unsigned int size_y;
+        unsigned int size_x;
 
     public:
         GameConfiguration();
@@ -15,6 +17,9 @@ class GameConfiguration {
         virtual ~GameConfiguration();
         
         bool get_hitspree();
+
+        unsigned int get_size_y();
+        unsigned int get_size_x();
 
         void to_package(GameConfigurationPackage &package);
 };

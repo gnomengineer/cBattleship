@@ -5,7 +5,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION(BattleFieldTest);
 
 void BattleFieldTest::setUp()
 {
-    battleField = new BattleField();
+    battleField = new BattleField(10, 10);
 }
 
 
