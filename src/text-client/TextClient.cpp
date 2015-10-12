@@ -14,6 +14,8 @@ TextClient::TextClient(std::string connection_string)
 
     client_state_machine.events.get_game_configuration.connect([](GameConfiguration config) {
         std::cout << "Game Configuration: " << std::endl;
+        std::cout << " * The board size is " << config.get_size_y() <<  " in height" << std::endl;
+        std::cout << " * The board size is " << config.get_size_x() <<  " in width" << std::endl;
         std::cout << " * You " << (config.get_hitspree() ? "can" : "can't") << " shoot again if you hit an enemy ship" << std::endl;
         std::cout << std::endl;
     });
@@ -128,7 +130,7 @@ void TextClient::ask_ship_placement(Player &you) {
         print_ships_available(you.get_battle_field());
         auto length = ask_ship_length(you);
         auto orientation = ask_ship_orientation();
-        auto position = ask_position();
+        auto position = ask_position(you);
         try {
             you.get_battle_field().add_ship(length, orientation, position);
         } catch(std::out_of_range &ex) {
@@ -178,13 +180,14 @@ orientation_t TextClient::ask_ship_orientation() {
     return orientation;
 }
 
-position_t TextClient::ask_position() {
+position_t TextClient::ask_position(Player &you) {
     position_t position;
     bool ok = false;
     while(!ok) {
+        auto &battle_field = you.get_battle_field();
         position.y = ask_coord("y");
         position.x = ask_coord("x");
-        if(check_position(position, BATTLEFIELD_HEIGHT, BATTLEFIELD_WIDTH)) {
+        if(check_position(position, battle_field.get_size_y(), battle_field.get_size_x())) {
             ok = true;
         } else {
             std::cout << "error: out of bounds." << std::endl;
@@ -198,7 +201,7 @@ position_t TextClient::ask_turn(Player &you, Player &enemy) {
         print_battle_field(you);
 
         std::cout << "Enter enemy field you want to hit." << std::endl;
-        position_t position = ask_position();
+        position_t position = ask_position(you);
 
         return position;
 }
@@ -243,23 +246,26 @@ std::string TextClient::get_ship_name_by_length(unsigned int length) {
 
 void TextClient::print_battle_field(Player & player) {
     int x = 0, y = 0;
-    std::vector<int> x_numbers(BATTLEFIELD_WIDTH), y_numbers(BATTLEFIELD_HEIGHT);
-    std::generate_n(x_numbers.begin(), BATTLEFIELD_WIDTH, [&x]() { return x++; });
-    std::generate_n(y_numbers.begin(), BATTLEFIELD_HEIGHT, [&y]() { return y++; });
+    auto &battle_field = player.get_battle_field();
+    const unsigned int width = battle_field.get_size_x();
+    const unsigned int height = battle_field.get_size_y();
+    std::vector<int> x_numbers(width), y_numbers(height);
+    std::generate_n(x_numbers.begin(), width, [&x]() { return x++; });
+    std::generate_n(y_numbers.begin(), height, [&y]() { return y++; });
 
-    std::string under_line = std::string(BATTLEFIELD_WIDTH * 2 + 1, '_');
+    std::string under_line = std::string(width * 2 + 1, '_');
     std::stringstream ss;
     std::for_each(x_numbers.begin(), x_numbers.end(), [&](int x) { ss << std::setw(2) << x; });
     std::string number_line = ss.str();
 
     std::cout << " " << under_line << std::endl;
-    std::cout << "/ " << std::setw(PLAYER_NAME_MAX_LENGTH) << player.get_name() << " \\" << std::endl;
+    std::cout << "/ " << std::setw(width * 2 - 1) << player.get_name() << " \\" << std::endl;
     std::cout << "|" << number_line << " x" << std::endl;
     
     auto fields = player.get_battle_field().to_vector();
-    for(int y = 0; y < BATTLEFIELD_HEIGHT; y++) {
+    for(int y = 0; y < height; y++) {
         std::cout << std::setw(1) << y_numbers[y];
-        for(int x = 0; x < BATTLEFIELD_WIDTH; x++) {
+        for(int x = 0; x < width; x++) {
             std::cout << std::setw(2) << fields[y][x];
         }
         std::cout << std::setw(2) << y_numbers[y];

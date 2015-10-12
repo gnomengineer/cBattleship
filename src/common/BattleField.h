@@ -13,29 +13,31 @@ struct ShipData;
 class Ship;
 #endif
 
-#define BATTLEFIELD_WIDTH 10
-#define BATTLEFIELD_HEIGHT 10
-
 #define FIELD_WATER '~'
 #define FIELD_SHIP 'O'
 #define FIELD_HIT 'X'
 #define FIELD_DESTROYED '#'
 
-#define PLAYER_NAME_MAX_LENGTH (BATTLEFIELD_WIDTH * 2 - 1)
+#define PLAYER_NAME_MAX_LENGTH (16)
 
 
 // This class provides the functionality of a battle
 // field. It gives methods for reading position of ships
 class BattleField {
     private:
-        std::array<std::array<std::shared_ptr<Field>, BATTLEFIELD_WIDTH>, BATTLEFIELD_HEIGHT> fields;
-        std::list<std::shared_ptr<Ship>> ships;
+        unsigned int size_y;
+        unsigned int size_x;
+        std::vector<std::vector<std::shared_ptr<Field> > > fields;
+        std::list<std::shared_ptr<Ship> > ships;
         //key: ship length, value: max ship quantity
         std::map<unsigned int, int> ships_available;
 
     public:
-        BattleField();
+        BattleField(unsigned int size_y, unsigned int size_x);
         BattleField(const BattleField& other);
+
+        unsigned int get_size_y() const;
+        unsigned int get_size_x() const;
 
         void clear();
 

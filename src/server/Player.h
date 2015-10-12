@@ -14,7 +14,7 @@ class Player {
         BattleField battle_field;
 
     public:
-        Player(Connection *connection);
+        Player(Connection *connection, unsigned int size_y, unsigned int size_x);
 
         Connection & get_connection();
         std::string get_name() const;

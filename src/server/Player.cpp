@@ -1,10 +1,11 @@
 #include "Player.h"
 #include <sstream>
 
-Player::Player(Connection *connection)
+Player::Player(Connection *connection, unsigned int size_y, unsigned int size_x)
     : name(std::string("unnamed player #")),
       connection(std::unique_ptr<Connection>(connection)),
-      is_ready_to_start_(false) { 
+      is_ready_to_start_(false),
+      battle_field(size_y, size_x) { 
     std::stringstream ss;
     ss << (long)connection->get_id();
     name += ss.str();

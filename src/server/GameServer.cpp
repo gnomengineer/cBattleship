@@ -50,8 +50,8 @@ void GameServer::handle_connection(Connection *connection) {
 }
 
 void GameServer::register_new_connection(Connection *connection) {
-    Player *player = new Player(connection);
-    players[connection->get_id()] = std::unique_ptr<Player>(new Player(connection));
+    Player *player = new Player(connection, config.get_size_y(), config.get_size_x());
+    players[connection->get_id()] = std::unique_ptr<Player>(player);
     handle_player_connection(*player);
 
     GameConfigurationPackage configuration;

@@ -5,9 +5,10 @@ CPPUNIT_TEST_SUITE_REGISTRATION(ShipTest);
 
 void ShipTest::setUp()
 {
-    ship1 = new Ship(2, ORIENTATION_HORIZONTAL, position(0, 0), battle_field);
+    battle_field = new BattleField(10, 10);
+    ship1 = new Ship(2, ORIENTATION_HORIZONTAL, position(0, 0), *battle_field);
 
-    ship2 = new Ship(5, ORIENTATION_VERTICAL, position(1, 1), battle_field);
+    ship2 = new Ship(5, ORIENTATION_VERTICAL, position(1, 1), *battle_field);
 }
 
 
@@ -15,6 +16,7 @@ void ShipTest::tearDown()
 {
     delete ship1;
     delete ship2;
+    delete battle_field;
 }
 
 void ShipTest::test_length()

@@ -1,11 +1,15 @@
 digraph ClientStatemachine {
-    get_identity
+    initialize
+    wait_for_join
     wait_for_game_start
     your_turn
     stop [shape=record]
 
-    get_identity -> wait_for_game_start [label="PlayerJoinAnswer"]
-    get_identity -> get_identity
+    initialize -> wait_for_join [label="GameConfiguration"]
+    initialize -> initialize
+
+    wait_for_join -> wait_for_game_start [label="PlayerJoinAnswer"]
+    wait_for_join -> wait_for_join
 
     wait_for_game_start -> wait_for_game_start [label="GameReady"]
     wait_for_game_start -> your_turn [label="ShipPlacementResponse"]

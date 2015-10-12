@@ -2,7 +2,7 @@
 
 ClientStateMachine::ClientStateMachine(std::string connection_string)
     : io_service(), resolver(io_service), query(connection_string, "13477"),
-      state_machine(GET_IDENTITY, *this),
+      state_machine(INITIALIZE, *this),
       last_turn_position() {
     events.connecting(connection_string);
     boost::asio::ip::tcp::socket socket(io_service);
@@ -16,20 +16,14 @@ ClientStateMachine::~ClientStateMachine() {
 
 ClientStateMachine::StateMachineType::StateMap ClientStateMachine::get_state_map() {
     StateMachineType::StateMap map;
-    map[GET_IDENTITY] = &ClientStateMachine::get_identity;
+    map[INITIALIZE] = &ClientStateMachine::initialize;
+    map[WAIT_FOR_JOIN] = &ClientStateMachine::wait_for_join;
     map[WAIT_FOR_GAME_START] = &ClientStateMachine::wait_for_game_start;
     map[YOUR_TURN] = &ClientStateMachine::your_turn;
     return map;
 }
 
 void ClientStateMachine::run() {
-    std::string name;
-    events.get_player_name(name);
-    you.set_name(name);
-    PlayerJoinPackage player_join_package;
-    player_join_package.set_player_name(name);
-    connection->write(player_join_package);
-
     static std::function<void(void)> get_input;
     get_input = [this]() -> void {
         connection->read([this](std::shared_ptr<NetworkPackage> package) {
@@ -55,16 +49,30 @@ void ClientStateMachine::get_turn() {
     events.turn_confirmation_wait();
 }
 
-ClientState ClientStateMachine::get_identity(NetworkPackage &package) {
+ClientState ClientStateMachine::initialize(NetworkPackage &package) {
+    if(NetworkPackageManager::handle_package<GameConfigurationPackage>(package, [&](GameConfigurationPackage &gameConfig) {
+        GameConfiguration config(gameConfig);
+        you.create_battle_field(config.get_size_y(), config.get_size_x());
+        enemy.create_battle_field(config.get_size_y(), config.get_size_x());
+        events.get_game_configuration(config);
+
+        std::string name;
+        events.get_player_name(name);
+        you.set_name(name);
+        PlayerJoinPackage player_join_package;
+        player_join_package.set_player_name(name);
+        connection->write(player_join_package);
+
+    })) return WAIT_FOR_JOIN;
+    return INITIALIZE;
+}
+
+ClientState ClientStateMachine::wait_for_join(NetworkPackage &package) {
     if(NetworkPackageManager::handle_package<PlayerJoinAnswerPackage>(package, [&](PlayerJoinAnswerPackage &package) {
         events.new_identity(package.identity());
         you.set_identity(package.identity());
     })) return WAIT_FOR_GAME_START;
-    NetworkPackageManager::handle_package<GameConfigurationPackage>(package, [&](GameConfigurationPackage &gameConfig) {
-        GameConfiguration config(gameConfig);
-        events.get_game_configuration(config);
-    });
-    return GET_IDENTITY;
+    return WAIT_FOR_JOIN;
 }
 
 ClientState ClientStateMachine::wait_for_game_start(NetworkPackage &package) {
