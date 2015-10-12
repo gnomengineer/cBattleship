@@ -60,7 +60,15 @@ po::variables_map &Options::parse(int argc, char *argv[]) {
     variables.push_back(std::unique_ptr<po::variables_map>(new po::variables_map()));
     po::variables_map &vm = *variables.at(index);
 
-    po::store(po::parse_command_line(argc, argv, command_line_options), vm);
+    // dummy positional arguments object
+    // so an error is reported on the command line
+    // when to many arguments are passed
+    // See: https://stackoverflow.com/questions/3858251/parsing-positional-arguments
+    po::positional_options_description positional_dummy;
+    po::store(po::command_line_parser(argc, argv)
+                  .options(command_line_options)
+                  .positional(positional_dummy)
+                  .run(), vm);
     po::notify(vm);
 
     if(vm["config"].empty()) {
