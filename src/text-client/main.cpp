@@ -1,38 +1,48 @@
-#include <iostream>
-#include <boost/asio.hpp>
+#include "TextClient.h"
+#include "Options.h"
 #include <common/Connection.h>
 #include <common/LogConfig.h>
-#include "TextClient.h"
 
-int main(int argc, char *argv[]){
+namespace po = boost::program_options;
 
-    if(argc != 2) {
-        std::cout << "Usage: " << argv[0] << " <server>" << std::endl;
-        return 1;
-    }
+void print_header() {
+    std::cout << 
+        "v0.1  __        __  __  __        __   _    \n"
+        " ____/ /  ___ _/ /_/ /_/ /__ ___ / /  (_)__ \n"
+        "/ __/ _ \\/ _ `/ __/ __/ / -_|_-</ _ \\/ / _ \\\n"
+        "\\__/_.__/\\_,_/\\__/\\__/_/\\__/___/_//_/_/ .__/\n"
+        "GPLv3  github.com/troopa/cBattleship /_/    \n"
+        "  __          __        ___          __ \n"
+        " / /______ __/ /_  ____/ (_)__ ___  / /_\n"
+        "/ __/ -_) \\ / __/ / __/ / / -_) _ \\/ __/\n"
+        "\\__/\\__/_\\_\\\\__/  \\__/_/_/\\__/_//_/\\__/\n"
+        "by Troopa & Mogria " << std::setw(20) <<  ("built: " __DATE__) << "\n"
+        "This program comes with ABSOLUTELY NO WARRANTY; This is free software,\n"
+        "and you are welcome to redistribute it under certain conditions.\n"
+        << std::endl;
+}
 
-    std::cout
-    << "v0.1  __        __  __  __        __   _    \n"
-    << " ____/ /  ___ _/ /_/ /_/ /__ ___ / /  (_)__ \n"
-    << "/ __/ _ \\/ _ `/ __/ __/ / -_|_-</ _ \\/ / _ \\\n"
-    << "\\__/_.__/\\_,_/\\__/\\__/_/\\__/___/_//_/_/ .__/\n"
-    << "GPLv3  github.com/troopa/cBattleship /_/    \n"
-    << "  __          __        ___          __ \n"
-    << " / /______ __/ /_  ____/ (_)__ ___  / /_\n"
-    << "/ __/ -_) \\ / __/ / __/ / / -_) _ \\/ __/\n"
-    << "\\__/\\__/_\\_\\\\__/  \\__/_/_/\\__/_//_/\\__/\n"
-    << "by Troopa & Mogria " << std::setw(20) <<  ("built: " __DATE__) << "\n"
-    << "This program comes with ABSOLUTELY NO WARRANTY; This is free software,\n"
-    << "and you are welcome to redistribute it under certain conditions.\n"
-    << std::endl;
-
-    LogConfig logClient(std::string(argv[0]) + ".log");
+int main(int argc, char *argv[]) {
+    print_header();
+    Options options;
 
     try {
-        TextClient textClient(argv[1]);
+        LogConfig logClient(std::string(argv[0]) + ".log");
+        po::variables_map &vm = options.parse(argc, argv);
+
+        if(argc < 2 || vm.count("help")) {
+            std::cout << options.get_help_message() << std::endl;
+            return 1;
+        }
+
+        TextClient textClient(vm["server"].as<std::string>(), vm["port"].as<unsigned int>());
         textClient.run();
+    } catch(po::error &ex) {
+        std::cout << "Error while parsing command line arguments: " <<  ex.what() << std::endl;
+        return 125;
     } catch(std::runtime_error & ex) {
         std::cout << "error: " << ex.what() << std::endl;
+        return 127;
     }
 
     return 0;

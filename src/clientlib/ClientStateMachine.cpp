@@ -1,10 +1,11 @@
 #include "ClientStateMachine.h"
+#include <boost/lexical_cast.hpp>
 
-ClientStateMachine::ClientStateMachine(std::string connection_string)
-    : io_service(), resolver(io_service), query(connection_string, "13477"),
+ClientStateMachine::ClientStateMachine(std::string host, unsigned int port)
+    : io_service(), resolver(io_service), query(host, boost::lexical_cast<std::string>(port)),
       state_machine(INITIALIZE, *this),
       last_turn_position() {
-    events.connecting(connection_string);
+    events.connecting(host, port);
     boost::asio::ip::tcp::socket socket(io_service);
     boost::asio::connect(socket, resolver.resolve(query));
     connection = std::unique_ptr<Connection>(new Connection(1, std::move(socket)));

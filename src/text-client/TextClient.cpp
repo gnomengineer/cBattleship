@@ -2,10 +2,10 @@
 #include <common/GameConfiguration.h>
 #include <boost/lexical_cast.hpp>
 
-TextClient::TextClient(std::string connection_string)
-    : client_state_machine(connection_string) {
-    client_state_machine.events.connecting.connect([](std::string connection_string) {
-        std::cout << "trying to connect to '" << connection_string << "' ... " << std::endl;
+TextClient::TextClient(std::string host, unsigned int port)
+    : client_state_machine(host, port) {
+    client_state_machine.events.connecting.connect([](std::string host, unsigned int port) {
+        std::cout << "trying to connect to '" << host << ":" << port << "' ... " << std::endl;
     });
 
     client_state_machine.events.connected.connect([]() {

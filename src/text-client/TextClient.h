@@ -11,7 +11,7 @@ class TextClient {
         ClientStateMachine client_state_machine;
 
     public:
-        TextClient(std::string connection_string);
+        TextClient(std::string host, unsigned int port);
         virtual ~TextClient();
 
         void run();

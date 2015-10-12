@@ -44,7 +44,7 @@ class ClientStateMachine {
     public:
         GameEvents events;
 
-        ClientStateMachine(std::string connection_string);
+        ClientStateMachine(std::string host, unsigned int port);
         ~ClientStateMachine();
 
         StateMachineType::StateMap get_state_map();
