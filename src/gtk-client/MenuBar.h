@@ -1,11 +1,15 @@
 #ifndef _MENU_BAR_H
 #define _MENU_BAR_H
 
-#include <gtkmm/menubar.h>
-#include <gtkmm/menuitem.h>
-#include <gtkmm/builder.h>
 #include <glibmm/refptr.h>
-#include "ConnectDialog.h"
+#include <gtkmm/menubar.h>
+
+namespace Gtk {
+    class Builder;
+    class MenuItem;
+}
+
+class ConnectDialog;
 
 class MenuBar : public Gtk::MenuBar {
     private:

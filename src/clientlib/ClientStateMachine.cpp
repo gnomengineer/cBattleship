@@ -1,5 +1,9 @@
 #include "ClientStateMachine.h"
 #include <boost/lexical_cast.hpp>
+#include <common/Connection.h>
+#include <common/Field.h>
+#include <common/BattleField.h>
+#include <packages.pb.h>
 
 ClientStateMachine::ClientStateMachine(std::string host, unsigned int port)
     : io_service(), resolver(io_service), query(host, boost::lexical_cast<std::string>(port)),

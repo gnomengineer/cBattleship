@@ -2,9 +2,13 @@
 #define _CONNECT_DIALOG_H
 
 #include <gtkmm/dialog.h>
-#include <gtkmm/builder.h>
-#include <gtkmm/entry.h>
 #include <glibmm/refptr.h>
+
+namespace Gtk {
+    class Builder;
+    class Button;
+    class Entry;
+}
 
 class ConnectDialog : public Gtk::Dialog {
     private:

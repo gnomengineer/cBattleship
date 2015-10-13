@@ -1,15 +1,15 @@
 #ifndef CLIENTSTATEMACHINE_H
 #define CLIENTSTATEMACHINE_H
 
-#include <common/state-machine/StateMachine.h>
-#include <common/NetworkPackageManager.h>
-#include <map>
-#include <queue>
-#include <mutex>
-#include <common/Connection.h>
 #include <boost/asio.hpp>
-#include "Player.h"
+#include <map>
+#include <mutex>
+#include <common/state-machine/StateMachine.h>
+#include <NetworkPackage.pb.h>
 #include "GameEvents.h"
+#include "Player.h"
+
+class Connection;
 
 enum ClientState {
     INITIALIZE,
@@ -31,9 +31,6 @@ class ClientStateMachine {
 
         std::list<Player*> players_playing;
 
-        std::queue<NetworkPackage> input_queue;
-        std::mutex queue_lock;
-
         boost::asio::io_service io_service;
         boost::asio::ip::tcp::resolver resolver;
         boost::asio::ip::tcp::resolver::query query;
@@ -48,7 +45,7 @@ class ClientStateMachine {
         ~ClientStateMachine();
 
         StateMachineType::StateMap get_state_map();
-        NetworkPackage& get_input();
+        NetworkPackage &get_input();
 
         ClientState initialize(NetworkPackage &package);
         ClientState wait_for_join(NetworkPackage &package);

@@ -1,5 +1,8 @@
 #include "MenuBar.h"
 #include <gtkmm/applicationwindow.h>
+#include <gtkmm/menuitem.h>
+#include <gtkmm/builder.h>
+#include "ConnectDialog.h"
 
 MenuBar::MenuBar(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &builder)
     : Gtk::MenuBar(cobject),

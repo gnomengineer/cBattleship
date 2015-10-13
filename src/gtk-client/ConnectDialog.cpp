@@ -1,5 +1,9 @@
 #include "ConnectDialog.h"
+
 #include "Client.h"
+
+#include <gtkmm/builder.h>
+#include <gtkmm/entry.h>
 
 ConnectDialog::ConnectDialog(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &builder) 
     : Gtk::Dialog(cobject),

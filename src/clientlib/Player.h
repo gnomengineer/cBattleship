@@ -1,9 +1,10 @@
 #ifndef _PLAYER_H
 #define _PLAYER_H
 
-#include <common/BattleField.h>
 #include <string>
 #include <memory>
+
+class BattleField;
 
 class Player {
     private:

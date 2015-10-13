@@ -4,11 +4,9 @@
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/bind.hpp>
+#include <common/conn_id.h>
 
-#include <list>
-#include <memory>
-
-#include <common/Connection.h>
+class Connection;
 
 namespace asio = boost::asio;
 typedef std::function<void(Connection*)> NewConnectionHandler;

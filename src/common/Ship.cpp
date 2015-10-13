@@ -1,6 +1,7 @@
 #include "Ship.h"
 #include <algorithm>
 #include "BattleField.h"
+#include "Field.h"
 
 Ship::Ship(unsigned int length, orientation_t orientation, position_t start_position, BattleField &battle_field) {
     this->length = length;

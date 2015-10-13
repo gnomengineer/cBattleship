@@ -1,4 +1,5 @@
 #include "Player.h"
+#include <common/BattleField.h>
 #include <sstream>
 
 Player::Player()

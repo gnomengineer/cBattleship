@@ -1,4 +1,5 @@
 #include "BattleFieldUI.h"
+#include <common/BattleField.h>
 
 /* @TODO: dummy default definitions, remove if not needed anymore
           the battlefield width and height should be read from the 

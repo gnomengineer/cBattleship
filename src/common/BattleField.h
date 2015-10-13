@@ -1,17 +1,16 @@
 #ifndef _BATTLEFIELD_H
 #define _BATTLEFIELD_H
 
-#include "Field.h"
-#include <array>
+#include "position.h"
+
 #include <list>
 #include <map>
 #include <memory>
 #include <vector>
+#include <ShipData.pb.h>
 
-#ifndef _SHIP_H
-struct ShipData;
 class Ship;
-#endif
+class Field;
 
 #define FIELD_WATER '~'
 #define FIELD_SHIP 'O'

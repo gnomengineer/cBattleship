@@ -21,6 +21,8 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/lib/protobuf/cmake)
 set(protobuf_INCLUDE_DIRECTORY ${PROJECT_SOURCE_DIR}/lib/protobuf/src)
 include_directories(${protobuf_INCLUDE_DIRECTORY})
 link_directories(${protobuf_BINARY_DIR})
+# we don't need protobuf lite
+set_target_properties(libprotobuf-lite PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
 
 # use pkg-config to find gtk3
 find_package(PkgConfig)
@@ -35,23 +37,29 @@ endif(PKG_CONFIG_FOUND)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
 # build protobuf C++ classes
-set(protobuf_in_dir ${PROJECT_SOURCE_DIR}/src/common)
-set(protobuf_out_dir ${PROJECT_BINARY_DIR}/protobuf)
-file(MAKE_DIRECTORY ${protobuf_out_dir})
-set(protobuf_outfile_cc ${protobuf_out_dir}/packages.pb.cc)
-set(protobuf_outfile_h ${protobuf_out_dir}/packages.pb.h)
+set(PROTOBUF_IN_DIR ${PROJECT_SOURCE_DIR}/src/common)
+FILE(GLOB_RECURSE PROTO_FILES ${PROTOBUF_IN_DIR}/*.proto)
+
+set(PROTOBUF_OUT_DIR ${PROJECT_BINARY_DIR}/protobuf)
+file(MAKE_DIRECTORY ${PROTOBUF_OUT_DIR})
+foreach(PROTO_FILE ${PROTO_FILES})
+    get_filename_component(FILE_NAME ${PROTO_FILE} NAME_WE)
+    list(APPEND PROTO_OUTFILES_CC ${PROTOBUF_OUT_DIR}/${FILE_NAME}.pb.cc)
+    list(APPEND PROTO_OUTFILES_H ${PROTOBUF_OUT_DIR}/${FILE_NAME}.pb.h)
+endforeach()
+
 add_custom_command(
-    OUTPUT ${protobuf_outfile_cc} ${protobuf_outfile_h}
-    COMMAND ${protobuf_BINARY_DIR}/protoc -I=${protobuf_in_dir} -I=${protobuf_INCLUDE_DIRECTORY} --cpp_out=${protobuf_out_dir} ${protobuf_in_dir}/packages.proto
-    DEPENDS ${protobuf_BINARY_DIR}/protoc ${protobuf_in_dir}/packages.proto
+    OUTPUT ${PROTO_OUTFILES_CC} ${PROTO_OUTFILES_H}
+    COMMAND ${protobuf_BINARY_DIR}/protoc -I=${PROTOBUF_IN_DIR} -I=${protobuf_INCLUDE_DIRECTORY} --cpp_out=${PROTOBUF_OUT_DIR} ${PROTO_FILES}
+    DEPENDS ${protobuf_BINARY_DIR}/protoc ${PROTO_FILES}
 )
 
-include_directories(${protobuf_out_dir})
+include_directories(${PROTOBUF_OUT_DIR})
 
 # common library
 set(CBATTLESHIP_COMMON_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/common)
 file(GLOB_RECURSE CBATTLESHIP_COMMON_SOURCE_FILES ${CBATTLESHIP_COMMON_SOURCE_PATH}/*.cpp)
-add_library(cbattleship-common ${CBATTLESHIP_COMMON_SOURCE_FILES} ${protobuf_outfile_cc})
+add_library(cbattleship-common ${CBATTLESHIP_COMMON_SOURCE_FILES} ${PROTO_OUTFILES_CC})
 target_link_libraries(cbattleship-common ${Boost_LIBRARIES} protobuf)
 if(COMMAND cotire)
     cotire(cbattleship-common)

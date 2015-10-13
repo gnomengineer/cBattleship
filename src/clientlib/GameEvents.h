@@ -3,6 +3,9 @@
 
 #include <boost/signals2/signal.hpp>
 #include <common/GameConfiguration.h>
+#include <common/position.h>
+
+class Player;
 
 namespace signals = boost::signals2;
 

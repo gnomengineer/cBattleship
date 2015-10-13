@@ -1,4 +1,6 @@
 #include "ShipTest.h"
+#include <common/Field.h>
+#include <common/position.h>
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ShipTest);
 

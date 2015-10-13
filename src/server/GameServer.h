@@ -4,11 +4,14 @@
 #include "ConnectionServer.h"
 #include "GameServerConfiguration.h"
 #include <common/state-machine/StateMachine.h>
-#include <common/NetworkPackageManager.h>
+#include <common/position.h>
 #include "PlayerNetworkPackage.h"
 #include <map>
 #include <queue>
 #include <mutex>
+
+class Player;
+class NetworkPackage;
 
 enum GameServerState {
     CHECK_FOR_CONNECTIONS,

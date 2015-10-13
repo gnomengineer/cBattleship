@@ -1,5 +1,9 @@
 #include "MainWindow.h"
 
+#include <gtkmm/builder.h>
+#include "ConnectDialog.h"
+#include "MenuBar.h"
+
 MainWindow::MainWindow(BaseObjectType *cobject, const Glib::RefPtr<Gtk::Builder> &builder)
     : Gtk::ApplicationWindow(cobject),
     builder(builder),

@@ -1,4 +1,5 @@
 #include "BattleField.h"
+#include "Field.h"
 #include "Ship.h"
 
 #include <algorithm>

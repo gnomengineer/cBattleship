@@ -1,8 +1,10 @@
 #ifndef _PLAYERNETWORKPACKAGE_H
 #define _PLAYERNETWORKPACKAGE_H
 
-#include "Player.h"
-#include <packages.pb.h>
+#include <memory>
+
+class Player;
+class NetworkPackage;
 
 class PlayerNetworkPackage {
     private:

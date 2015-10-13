@@ -1,5 +1,8 @@
 #include "PlayerNetworkPackage.h"
 
+#include <NetworkPackage.pb.h>
+#include "Player.h"
+
 PlayerNetworkPackage::PlayerNetworkPackage(std::shared_ptr<NetworkPackage> package, Player &player)
     : package(package), player(player) {
 }

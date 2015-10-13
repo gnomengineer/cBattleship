@@ -1,4 +1,5 @@
 #include "GameServerConfiguration.h"
+#include <boost/program_options/variables_map.hpp>
 
 GameServerConfiguration::GameServerConfiguration()
     : GameConfiguration(),

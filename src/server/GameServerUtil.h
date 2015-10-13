@@ -1,6 +1,9 @@
 #ifndef GAMESERVERUTIL_H
 #define GAMESERVERUTIL_H
 
+#include <string.h>
+#include "Player.h"
+
 class GameServerUtil {
     public:
         static std::string generate_identity() {

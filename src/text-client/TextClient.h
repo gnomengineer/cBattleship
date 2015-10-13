@@ -1,9 +1,7 @@
 #ifndef _TEXTCLIENT_H
 #define _TEXTCLIENT_H
 
-
 #include <clientlib/ClientStateMachine.h>
-
 
 class TextClient {
     private:

@@ -1,7 +1,7 @@
 #ifndef _GAMESERVERCONFIGURATION_H
 #define _GAMESERVERCONFIGURATION_H
 
-#include <common/Connection.h>
+#include <string>
 #include <common/GameConfiguration.h>
 #define DEFAULT_BIND_ADDRESS "0.0.0.0"
 

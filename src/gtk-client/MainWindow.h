@@ -2,11 +2,15 @@
 #define _MAIN_WINDOW_H
 
 #include <gtkmm/applicationwindow.h>
-#include <gtkmm/dialog.h>
-#include <gtkmm/builder.h>
 #include <glibmm/refptr.h>
-#include "ConnectDialog.h"
-#include "MenuBar.h"
+
+namespace Gtk {
+    class Builder;
+    class Dialog;
+}
+
+class ConnectDialog;
+class MenuBar;
 
 class MainWindow : public Gtk::ApplicationWindow {
     private:

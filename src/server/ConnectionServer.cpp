@@ -1,4 +1,5 @@
 #include "ConnectionServer.h"
+#include <common/Connection.h>
 #include <boost/thread/thread.hpp> 
 #include <boost/log/trivial.hpp>
 

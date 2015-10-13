@@ -3,8 +3,9 @@
 
 #include <ncurses.h>
 #include <vector>
-#include "clientlib/Player.h"
+#include <clientlib/Player.h>
 #include "CursesWindow.h"
+#include <common/position.h>
 
 class BattleFieldUI : public CursesWindow {
     private:

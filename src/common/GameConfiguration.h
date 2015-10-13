@@ -1,8 +1,10 @@
 #ifndef _GAMECONFIGURATION_H
 #define _GAMECONFIGURATION_H
 
-#include <packages.pb.h>
-#include <boost/program_options.hpp>
+#define DEFAULT_PORT ((unsigned short)13477)
+
+namespace boost { namespace program_options { class variables_map; } }
+class GameConfigurationPackage;
 
 class GameConfiguration {
     private:

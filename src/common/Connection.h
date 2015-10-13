@@ -3,12 +3,14 @@
 
 #include <boost/asio.hpp>
 #include <boost/log/trivial.hpp>
-#include <common/NetworkPackageManager.h>
 #include <iostream>
 #include <iomanip>
 #include <mutex>
 #include <sstream>
 #include <memory>
+
+#include <common/NetworkPackageManager.h>
+#include <common/conn_id.h>
 
 #define DEFAULT_PORT ((unsigned short)13477)
 
@@ -17,7 +19,6 @@ namespace asio = boost::asio;
 typedef std::function<void(std::shared_ptr<NetworkPackage> command)> ReadPackageHandler;
 typedef std::function<void(int package_size)> ReadHeaderCommandHandler;
 typedef std::function<void(const boost::system::error_code &err_code, std::size_t bytes_read)> ReadCallback;
-typedef int conn_id_t;
 
 class Connection {
     private:
@@ -26,7 +27,7 @@ class Connection {
         std::vector<unsigned char> payload;
         std::vector<unsigned char> writebuffer;
         asio::ip::tcp::socket socket;
-        NetworkPackageManager network_package_manager;
+        std::unique_ptr<NetworkPackageManager> network_package_manager;
 
         std::mutex read_lock;
         std::mutex write_lock;
@@ -46,7 +47,7 @@ class Connection {
         template<typename T>
         void write(T& command) {
             write_lock.lock();
-            writebuffer = network_package_manager.encode_package<T>(command);
+            writebuffer = network_package_manager->encode_package<T>(command);
             BOOST_LOG_TRIVIAL(debug) << "conn #" << conn_id << ": send package: " << debug_package(writebuffer);
             asio::async_write(socket, asio::buffer(writebuffer), [this](const boost::system::error_code& err_code, std::size_t bytes_written) {
                 BOOST_LOG_TRIVIAL(debug) << "conn #" << conn_id << ": send " << bytes_written << " byte(s), err_code: " << err_code;

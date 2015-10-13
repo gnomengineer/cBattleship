@@ -7,7 +7,8 @@ Connection::Connection(conn_id_t conn_id, asio::ip::tcp::socket socket)
       writebuffer(1024),
       socket(std::move(socket)),
       read_lock(),
-      write_lock() {
+      write_lock(),
+      network_package_manager(new NetworkPackageManager()) {
 }
 
 Connection::~Connection() {
@@ -34,7 +35,7 @@ ReadCallback Connection::get_read_callback(ReadPackageHandler handler, int packa
         if(!err_code && bytes_read >= package_size - 2) {
             std::vector<unsigned char> command(header.begin(), header.end());
             command.insert(command.end(), payload.begin(), payload.end());
-            auto network_command = network_package_manager.decode_package(command);
+            auto network_command = network_package_manager->decode_package(command);
             read_lock.unlock();
             handler(network_command);
         } else {
@@ -48,7 +49,7 @@ ReadCallback Connection::get_read_header_callback(ReadHeaderCommandHandler handl
     return [this, handler](const boost::system::error_code& err_code, std::size_t bytes_read) {
         BOOST_LOG_TRIVIAL(debug) << "conn #" << conn_id << ": read " << bytes_read << " byte(s), err_code: " << err_code;
         if(!err_code && bytes_read == 2) {
-            int package_size = network_package_manager.get_package_size(header);
+            int package_size = network_package_manager->get_package_size(header);
             BOOST_LOG_TRIVIAL(debug) << "conn #" << conn_id << ": read header, package of size " << package_size << " incoming.";
             if(package_size != -1) {
                 handler(package_size);

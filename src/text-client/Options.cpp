@@ -5,16 +5,18 @@
 #include <sstream>
 
 Options::Options()
-    : options("Allowed Options") {
+    : options("Allowed Options"),
+      positional_options(),
+      variables(nullptr) {
     options.add_options()
         ("help,h", "Produce this help message")
-        ("host,h",         po::value<std::string>()
-                               ->value_name("server"),
-                               "the host to connect to (can be an IP as well as an hostname)")
-        ("port,p",         po::value<unsigned short>()
-                               ->value_name("port")
-                               ->default_value(DEFAULT_PORT),
-                               "the port to connect to");
+        ("host",   po::value<std::string>()
+                       ->value_name("server"),
+                       "the host to connect to (can be an IP as well as an hostname)")
+        ("port,p", po::value<unsigned short>()
+                       ->value_name("port")
+                       ->default_value(DEFAULT_PORT),
+                       "the port to connect to");
     positional_options.add("host", 1);
 }
 
@@ -31,12 +33,12 @@ po::variables_map &Options::parse(int argc, char *argv[]) {
                   .run(), vm);
     po::notify(vm);
 
-    return vm;
+    return *variables;
 }
 
 std::string Options::get_help_message() {
     std::stringstream ss;
-    ss << "Usage: cbattleship-text-client [--port port] server\n\n";
+    ss << "Usage: cbattleship-text-client [--port port] host\n\n";
     ss << options;
     return ss.str();
 }

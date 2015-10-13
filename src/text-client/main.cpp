@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
             return 1;
         }
 
-        TextClient textClient(vm["server"].as<std::string>(), vm["port"].as<unsigned int>());
+        TextClient textClient(vm["host"].as<std::string>(), vm["port"].as<unsigned short>());
         textClient.run();
     } catch(po::error &ex) {
         std::cout << "Error while parsing command line arguments: " <<  ex.what() << std::endl;

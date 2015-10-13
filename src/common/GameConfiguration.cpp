@@ -1,5 +1,8 @@
 #include "GameConfiguration.h"
 
+#include <packages.pb.h>
+#include <boost/program_options.hpp>
+
 GameConfiguration::GameConfiguration()
     : hitspree(false),
       size_y(10),

@@ -4,7 +4,7 @@
 #include <map>
 #include <memory>
 #include <sstream>
-#include <packages.pb.h>
+#include <NetworkPackage.pb.h>
 #include <boost/log/trivial.hpp>
 
 #define PACKAGE_TERMINATOR 0xCD

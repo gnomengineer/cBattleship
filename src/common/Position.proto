@@ -1,0 +1,11 @@
+syntax =  "proto3";
+
+enum orientation_t {
+    ORIENTATION_VERTICAL   = 0; // maps to y coordinate on position_t
+    ORIENTATION_HORIZONTAL = 1; // maps to x coordinate on position_t
+}
+
+message Position {
+    uint32 y = 1;
+    uint32 x = 2;
+}

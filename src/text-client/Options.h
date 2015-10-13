@@ -16,6 +16,7 @@ class Options {
     public:
         Options();
         virtual ~Options();
+
         po::variables_map &parse(int argc, char *argv[]);
 
         std::string get_help_message();

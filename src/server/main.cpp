@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <iomanip>
 
 namespace po = boost::program_options;
 

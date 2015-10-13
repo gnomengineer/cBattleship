@@ -1,13 +1,17 @@
 #ifndef _CLIENT_H
 #define _CLIENT_H
 
-#include <glibmm/thread.h>
-#include <glibmm/threads.h>
 #include <glibmm/dispatcher.h>
-#include <gtkmm/textview.h>
-#include "MainWindow.h"
-#include <clientlib/ClientStateMachine.h>
+#include <glibmm/threads.h>
 #include <memory>
+
+class MainWindow;
+class ClientStateMachine;
+namespace Gtk {
+    class TextView;
+    class Builder;
+}
+namespace Glib { class Thread; }
 
 class Client {
     private:

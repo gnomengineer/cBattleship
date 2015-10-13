@@ -1,5 +1,6 @@
 #include "Player.h"
 #include <sstream>
+#include <common/Connection.h>
 
 Player::Player(Connection *connection, unsigned int size_y, unsigned int size_x)
     : name(std::string("unnamed player #")),

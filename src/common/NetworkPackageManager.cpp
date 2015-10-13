@@ -1,4 +1,5 @@
 #include "NetworkPackageManager.h"
+#include <packages.pb.h>
 
 std::map<package_nr_t, std::unique_ptr<::google::protobuf::Message>> NetworkPackageManager::network_packages;
 std::map<size_t, package_nr_t> NetworkPackageManager::type_package_nr_map;

@@ -1,5 +1,12 @@
 #include "Client.h"
 
+#include <glibmm/thread.h>
+#include <gtkmm/builder.h>
+#include <gtkmm/textview.h>
+
+#include "MainWindow.h"
+#include <clientlib/ClientStateMachine.h>
+
 Client::Client()
     : builder(Gtk::Builder::create_from_resource("/gui/gui-design.glade")),
     main_window(nullptr),

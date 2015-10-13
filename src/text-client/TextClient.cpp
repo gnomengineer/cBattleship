@@ -1,4 +1,7 @@
 #include "TextClient.h"
+#include <iostream>
+#include <iomanip>
+#include <common/BattleField.h>
 #include <common/GameConfiguration.h>
 #include <boost/lexical_cast.hpp>
 

@@ -4,8 +4,13 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp> 
 #include <algorithm>
+#include <common/Connection.h>
+#include <common/NetworkPackageManager.h>
 #include <common/Ship.h>
+#include <common/Field.h>
 #include "GameServerUtil.h"
+#include "Player.h"
+#include <packages.pb.h>
 
 GameServer::GameServer(GameServerConfiguration &config) 
     : state_machine(CHECK_FOR_CONNECTIONS, *this),

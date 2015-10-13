@@ -1,15 +1,13 @@
 #ifndef _SHIP_H
 #define _SHIP_H
 
-#include "Field.h"
 #include <list>
 #include <memory>
 #include "position.h"
-#include <packages.pb.h>
+#include <ShipData.pb.h>
 
-#ifndef _BATTLEFIELD_H
 class BattleField;
-#endif
+class Field;
 
 // represents a single Ship on the BattleField
 class Ship {
