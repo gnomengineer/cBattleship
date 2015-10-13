@@ -10,6 +10,7 @@
 #include "Player.h"
 
 class Connection;
+class GameConfiguration;
 
 enum ClientState {
     INITIALIZE,
@@ -25,6 +26,8 @@ class ClientStateMachine {
         StateMachineType state_machine;
 
         std::unique_ptr<Connection> connection;
+
+        std::unique_ptr<GameConfiguration> config;
 
         Player you;
         Player enemy;
@@ -56,6 +59,7 @@ class ClientStateMachine {
         void stop();
 
         void get_turn();
+        void ask_for_ship_placement();
 };
 
 #endif /* CLIENTSTATEMACHINE_H */

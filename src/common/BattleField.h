@@ -11,6 +11,7 @@
 
 class Ship;
 class Field;
+class GameConfiguration;
 
 #define FIELD_WATER '~'
 #define FIELD_SHIP 'O'
@@ -26,19 +27,18 @@ class BattleField {
     private:
         unsigned int size_y;
         unsigned int size_x;
+
         std::vector<std::vector<std::shared_ptr<Field> > > fields;
         std::list<std::shared_ptr<Ship> > ships;
         //key: ship length, value: max ship quantity
-        std::map<unsigned int, int> ships_available;
+        std::map<unsigned int, unsigned int> ships_available;
 
     public:
-        BattleField(unsigned int size_y, unsigned int size_x);
+        BattleField(GameConfiguration &config);
         BattleField(const BattleField& other);
 
         unsigned int get_size_y() const;
         unsigned int get_size_x() const;
-
-        void clear();
 
         void add_ship(unsigned int length, orientation_t orientation, position_t position);
         bool all_ships_destroyed() const;
@@ -53,7 +53,7 @@ class BattleField {
 
         void add_ship_data(std::vector<ShipData> ship_data);
 
-        std::map<unsigned int, int> get_ships_available();
+        std::map<unsigned int, unsigned int> get_ships_available();
         bool all_ships_placed();
 
         std::shared_ptr<Ship> get_ship_at_position(position_t position);

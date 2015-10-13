@@ -1,12 +1,13 @@
 #include "Player.h"
 #include <sstream>
 #include <common/Connection.h>
+#include <common/BattleField.h>
 
-Player::Player(Connection *connection, unsigned int size_y, unsigned int size_x)
+Player::Player(Connection *connection)
     : name(std::string("unnamed player #")),
       connection(std::unique_ptr<Connection>(connection)),
       is_ready_to_start_(false),
-      battle_field(size_y, size_x) { 
+      battle_field(nullptr) { 
     std::stringstream ss;
     ss << (long)connection->get_id();
     name += ss.str();
@@ -40,6 +41,10 @@ void Player::set_ready_to_start(bool ready_to_start) {
     is_ready_to_start_ = ready_to_start;
 }
 
+void Player::create_battle_field(GameConfiguration &config) {
+    battle_field = std::unique_ptr<BattleField>(new BattleField(config));
+}
+
 BattleField &Player::get_battle_field() {
-    return battle_field;
+    return *battle_field;
 }

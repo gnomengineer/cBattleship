@@ -3,6 +3,7 @@
 #include <common/Connection.h>
 #include <common/Field.h>
 #include <common/BattleField.h>
+#include <common/GameConfiguration.h>
 #include <packages.pb.h>
 
 ClientStateMachine::ClientStateMachine(std::string host, unsigned int port)
@@ -54,12 +55,25 @@ void ClientStateMachine::get_turn() {
     events.turn_confirmation_wait();
 }
 
+void ClientStateMachine::ask_for_ship_placement() {
+    // begin with a new battle field
+    // before the placement
+    you.create_battle_field(*config);
+    events.place_ships(you);
+    ShipPlacementPackage ship_placement_package;
+    ship_placement_package.set_identity(you.get_identity());
+    std::vector<ShipData> ship_data = you.get_battle_field().get_ship_data();
+    std::for_each(ship_data.begin(), ship_data.end(), [&](ShipData ship) {
+        ship.Swap(ship_placement_package.add_ship_data());
+    });
+    connection->write(ship_placement_package);
+    events.place_ship_confirmation_wait();
+}
+
 ClientState ClientStateMachine::initialize(NetworkPackage &package) {
     if(NetworkPackageManager::handle_package<GameConfigurationPackage>(package, [&](GameConfigurationPackage &gameConfig) {
-        GameConfiguration config(gameConfig);
-        you.create_battle_field(config.get_size_y(), config.get_size_x());
-        enemy.create_battle_field(config.get_size_y(), config.get_size_x());
-        events.get_game_configuration(config);
+        config = std::unique_ptr<GameConfiguration>(new GameConfiguration(gameConfig));
+        events.get_game_configuration(*config);
 
         std::string name;
         events.get_player_name(name);
@@ -84,17 +98,11 @@ ClientState ClientStateMachine::wait_for_game_start(NetworkPackage &package) {
     ClientState state = WAIT_FOR_GAME_START;
 
     NetworkPackageManager::handle_package<GameReadyPackage>(package, [&](GameReadyPackage &game_ready_package) {
+        // make the enemy ready
         enemy.set_name(game_ready_package.enemy_name());
+        enemy.create_battle_field(*config);
 
-        events.place_ships(you);
-        ShipPlacementPackage ship_placement_package;
-        ship_placement_package.set_identity(you.get_identity());
-        std::vector<ShipData> ship_data = you.get_battle_field().get_ship_data();
-        std::for_each(ship_data.begin(), ship_data.end(), [&](ShipData ship) {
-            ship.Swap(ship_placement_package.add_ship_data());
-        });
-        connection->write(ship_placement_package);
-        events.place_ship_confirmation_wait();
+        ask_for_ship_placement();
     });
 
     NetworkPackageManager::handle_package<ShipPlacementResponsePackage>(package, [&](ShipPlacementResponsePackage &response) {
@@ -108,16 +116,7 @@ ClientState ClientStateMachine::wait_for_game_start(NetworkPackage &package) {
                 response.remaining_ships()
             );
 
-            you.get_battle_field().clear();
-            events.place_ships(you);
-            ShipPlacementPackage ship_placement_package;
-            ship_placement_package.set_identity(you.get_identity());
-            auto ship_data_vector = you.get_battle_field().get_ship_data();
-            std::for_each(ship_data_vector.begin(), ship_data_vector.end(), [&](ShipData ship) {
-                ship.Swap(ship_placement_package.add_ship_data());
-            });
-            connection->write(ship_placement_package);
-            events.place_ship_confirmation_wait();
+            ask_for_ship_placement();
         }
     });
     return state;

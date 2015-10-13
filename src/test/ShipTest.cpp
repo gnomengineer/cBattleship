@@ -1,13 +1,17 @@
 #include "ShipTest.h"
+#include <common/Ship.h>
 #include <common/Field.h>
+#include <common/BattleField.h>
 #include <common/position.h>
+#include <common/GameConfiguration.h>
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ShipTest);
 
 
 void ShipTest::setUp()
 {
-    battle_field = new BattleField(10, 10);
+    config = new GameConfiguration();
+    battle_field = new BattleField(*config);
     ship1 = new Ship(2, ORIENTATION_HORIZONTAL, position(0, 0), *battle_field);
 
     ship2 = new Ship(5, ORIENTATION_VERTICAL, position(1, 1), *battle_field);
@@ -19,6 +23,7 @@ void ShipTest::tearDown()
     delete ship1;
     delete ship2;
     delete battle_field;
+    delete config;
 }
 
 void ShipTest::test_length()

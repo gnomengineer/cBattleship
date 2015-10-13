@@ -8,6 +8,7 @@
 #include <common/NetworkPackageManager.h>
 #include <common/Ship.h>
 #include <common/Field.h>
+#include <common/Battlefield.h>
 #include "GameServerUtil.h"
 #include "Player.h"
 #include <packages.pb.h>
@@ -55,7 +56,7 @@ void GameServer::handle_connection(Connection *connection) {
 }
 
 void GameServer::register_new_connection(Connection *connection) {
-    Player *player = new Player(connection, config.get_size_y(), config.get_size_x());
+    Player *player = new Player(connection);
     players[connection->get_id()] = std::unique_ptr<Player>(player);
     handle_player_connection(*player);
 
@@ -202,7 +203,7 @@ GameServerState GameServer::setup_game(PlayerNetworkPackage player_package) {
         auto ship_data = ship_placement_package.ship_data();
         ShipPlacementResponsePackage response;
         try {
-            player.get_battle_field().clear();
+            player.create_battle_field(config);
             std::for_each(ship_data.begin(), ship_data.end(), [&player](ShipData &ship) {
                 BOOST_LOG_TRIVIAL(debug) << player.get_name() << ": place ship(" << ship.length() << ") or: " << ship.orientation() << ", y: " << ship.start_position().y() << ", x: " << ship.start_position().x();
                 player.get_battle_field().add_ship(ship.length(), ship.orientation(), ship.start_position());
