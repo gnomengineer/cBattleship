@@ -10,6 +10,7 @@ message GameConfigurationPackage {
     bool hitspree = 1;
     uint32 size_y = 2;
     uint32 size_x = 3;
+    repeated uint32 ship_length = 5;
 }
 
 

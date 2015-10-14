@@ -15,6 +15,7 @@ GameConfiguration::GameConfiguration()
     ships_available[4] = 2;
     ships_available[3] = 2;
     ships_available[2] = 3;
+    ships_available[1] = 0;
 }
 
 GameConfiguration::GameConfiguration(boost::program_options::variables_map &vm)
@@ -32,6 +33,11 @@ GameConfiguration::GameConfiguration(GameConfigurationPackage &game_configuratio
     : hitspree(game_configuration_package.hitspree()),
       size_y(game_configuration_package.size_y()), 
       size_x(game_configuration_package.size_x()) {
+
+    unsigned int max_length = game_configuration_package.ship_length_size();
+    for(unsigned int i = 0; i < max_length; i++) {
+        ships_available[max_length - i] = game_configuration_package.ship_length(i);
+    }
 }
 
 GameConfiguration::~GameConfiguration() {
@@ -57,4 +63,7 @@ void GameConfiguration::to_package(GameConfigurationPackage &package) {
     package.set_hitspree(hitspree);
     package.set_size_y(size_y);
     package.set_size_x(size_x);
+    for(unsigned int i = MAX_SHIP_LENGTH; i >= MIN_SHIP_LENGTH; i--) {
+        package.add_ship_length(ships_available[i]);
+    }
 }
