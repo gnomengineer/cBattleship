@@ -6,6 +6,7 @@
 #include <common/state-machine/StateMachine.h>
 #include <common/position.h>
 #include "PlayerNetworkPackage.h"
+#include <list>
 #include <map>
 #include <queue>
 #include <mutex>
