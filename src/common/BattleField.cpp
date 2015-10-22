@@ -1,24 +1,15 @@
 #include "BattleField.h"
+#include "GameConfiguration.h"
 #include "Field.h"
 #include "Ship.h"
 
 #include <algorithm>
 
-BattleField::BattleField(unsigned int size_y, unsigned int size_x)
-    : size_y(size_y),
-      size_x(size_x) {
-    clear();
-}
+BattleField::BattleField(GameConfiguration &config)
+    : size_y(config.get_size_y()),
+      size_x(config.get_size_x()) {
+    ships_available = config.get_ships_available();
 
-BattleField::BattleField(const BattleField& other)
-    : size_y(other.size_y),
-      size_x(other.size_x),
-      fields(std::vector<std::vector<std::shared_ptr<Field> > >(other.fields)),
-      ships(std::list<std::shared_ptr<Ship> >(other.ships)),
-      ships_available(std::map<unsigned int, int>(other.ships_available)) {
-}
-
-void BattleField::clear() {
     // fill battlefield with empty Field instances
     fields.resize(size_y);
     for(int y = 0; y < size_y; y++) {
@@ -27,16 +18,16 @@ void BattleField::clear() {
             fields[y][x] = std::shared_ptr<Field>(new Field(position(y, x)));
         }
     }
-
-    ships.clear();
-
-    //define possible ship lengths    
-    ships_available.clear();
-    ships_available[2] = 3;
-    ships_available[3] = 2;
-    ships_available[4] = 2;
-    ships_available[5] = 1;
 }
+
+BattleField::BattleField(const BattleField& other)
+    : size_y(other.size_y),
+      size_x(other.size_x),
+      fields(std::vector<std::vector<std::shared_ptr<Field> > >(other.fields)),
+      ships(std::list<std::shared_ptr<Ship> >(other.ships)),
+      ships_available(std::map<unsigned int, unsigned int>(other.ships_available)) {
+}
+
 
 unsigned int BattleField::get_size_y() const {
     return size_y;
@@ -152,7 +143,7 @@ void BattleField::add_ship_data(std::vector<ShipData> ship_data) {
     });
 }
 
-std::map<unsigned int, int> BattleField::get_ships_available() {
+std::map<unsigned int, unsigned int> BattleField::get_ships_available() {
     return ships_available;
 }
 

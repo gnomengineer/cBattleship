@@ -59,11 +59,32 @@ int generate_configuration_file(std::string config_file) {
           << "    #sizex = 10" << std::endl
           << "    # height of the game board (default 10)" << std::endl
           << "    #sizey = 10" << std::endl
+          << "" << std::endl
+          << "# configure the amount of ships available to every player" << std::endl
+          << "[ship.5]" << std::endl
+          << "    # 1 ship of length 5 is available" << std::endl
+          << "    #amount = 1" << std::endl
+          << "" << std::endl
+          << "[ship.4]" << std::endl
+          << "    # 2 ships of length 5 are available" << std::endl
+          << "    #amount = 2" << std::endl
+          << "" << std::endl
+          << "[ship.3]" << std::endl
+          << "    # 2 ships of length 5 are available" << std::endl
+          << "    #amount = 2" << std::endl
+          << "" << std::endl
+          << "[ship.2]" << std::endl
+          << "    # 3 ships of length 2 are available" << std::endl
+          << "    #amount = 3" << std::endl
+          << "" << std::endl
+          << "[ship.1]" << std::endl
+          << "    # 0 ships of length 1 are available" << std::endl
+          << "    #amount = 0" << std::endl
           << "" << std::endl;
-
-        std::cout << "Success: Generated configuration file '" << config_file << "'." << std::endl;
-        return 0;
     }
+
+    std::cout << "Successfully generated example config file '" << config_file << "'" << std::endl;
+    return 0;
 }
 
 int main(int argc, char *argv[]) {
