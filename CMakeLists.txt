@@ -96,9 +96,9 @@ if(COMMAND cotire)
 endif()
 
 # text client
-set(CBATTLESHIP_SIMPLE_CLIENT_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/text-client)
-file(GLOB_RECURSE CBATTLESHIP_SIMPLE_CLIENT_SOURCE_FILES ${CBATTLESHIP_SIMPLE_CLIENT_SOURCE_PATH}/*.cpp)
-add_executable(cbattleship-text-client ${CBATTLESHIP_SIMPLE_CLIENT_SOURCE_FILES})
+set(CBATTLESHIP_TEXT_CLIENT_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/text-client)
+file(GLOB_RECURSE CBATTLESHIP_TEXT_CLIENT_SOURCE_FILES ${CBATTLESHIP_TEXT_CLIENT_SOURCE_PATH}/*.cpp)
+add_executable(cbattleship-text-client ${CBATTLESHIP_TEXT_CLIENT_SOURCE_FILES})
 target_link_libraries(cbattleship-text-client cbattleship-clientlib ${Boost_signals_LIBRARIES})
 if(COMMAND cotire)
     cotire(cbattleship-text-client)
@@ -121,6 +121,15 @@ if(PKG_CONFIG_FOUND)
         cotire(cbattleship-gtk-client)
     endif()
 endif(PKG_CONFIG_FOUND)
+
+# bot client
+set(CBATTLESHIP_BOT_CLIENT_SOURCE_PATH ${PROJECT_SOURCE_DIR}/src/bot-client)
+file(GLOB_RECURSE CBATTLESHIP_BOT_CLIENT_SOURCE_FILES ${CBATTLESHIP_BOT_CLIENT_SOURCE_PATH}/*.cpp)
+add_executable(cbattleship-bot-client ${CBATTLESHIP_BOT_CLIENT_SOURCE_FILES})
+target_link_libraries(cbattleship-bot-client cbattleship-clientlib ${Boost_signals_LIBRARIES})
+if(COMMAND cotire)
+    cotire(cbattleship-bot-client)
+endif()
 
 
 # test cases
