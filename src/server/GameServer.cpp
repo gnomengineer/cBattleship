@@ -8,7 +8,7 @@
 #include <common/NetworkPackageManager.h>
 #include <common/Ship.h>
 #include <common/Field.h>
-#include <common/Battlefield.h>
+#include <common/BattleField.h>
 #include "GameServerUtil.h"
 #include "Player.h"
 #include <packages.pb.h>
