@@ -5,6 +5,7 @@
 #include <memory>
 
 class BattleField;
+class GameConfiguration;
 
 class Player {
     private:
@@ -19,7 +20,7 @@ class Player {
         void set_name(std::string new_name);
         std::string get_identity() const;
         void set_identity(std::string new_identity);
-        void create_battle_field(unsigned int battlefield_size_y, unsigned int battlefield_size_x);
+        void create_battle_field(GameConfiguration &config);
         BattleField &get_battle_field();
 };
 #endif

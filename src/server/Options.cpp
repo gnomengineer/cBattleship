@@ -40,13 +40,33 @@ Options::Options()
                                ->default_value(false),
                                "wheter a player can shoot again, if the last shot was a hit")
         ("board.sizex",    po::value<unsigned int>()
-                               ->value_name("uint")
+                               ->value_name("width")
                                ->default_value(10),
                                "the size of the gameboard (width)")
         ("board.sizey",    po::value<unsigned int>()
-                               ->value_name("uint")
+                               ->value_name("height")
                                ->default_value(10),
-                               "the size of the gameboard (height)");
+                               "the size of the gameboard (height)")
+        ("ship.5.amount",  po::value<unsigned int>()
+                               ->value_name("amount")
+                               ->default_value(1),
+                               "amount of ships with length 5")
+        ("ship.4.amount",  po::value<unsigned int>()
+                               ->value_name("amount")
+                               ->default_value(2),
+                               "amount of ships with length 4")
+        ("ship.3.amount",  po::value<unsigned int>()
+                               ->value_name("amount")
+                               ->default_value(2),
+                               "amount of ships with length 3")
+        ("ship.2.amount",  po::value<unsigned int>()
+                               ->value_name("amount")
+                               ->default_value(3),
+                               "amount of ships with length 2")
+        ("ship.1.amount",  po::value<unsigned int>()
+                               ->value_name("amount")
+                               ->default_value(0),
+                               "amount of ships with length 1");
     config_file_options.add(common_options);
 
 }

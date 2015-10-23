@@ -23,8 +23,8 @@ void Player::set_identity(std::string new_identity) {
     identity = new_identity;
 }
 
-void Player::create_battle_field(unsigned int size_y, unsigned int size_x) {
-    battle_field = std::unique_ptr<BattleField>(new BattleField(size_y, size_x));
+void Player::create_battle_field(GameConfiguration &config) {
+    battle_field = std::unique_ptr<BattleField>(new BattleField(config));
 }
 
 BattleField &Player::get_battle_field() {
