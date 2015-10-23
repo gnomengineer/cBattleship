@@ -2,7 +2,7 @@
 #define ENHANCEDCLIENT_H
 
 #include <clientlib/Player.h>
-#include <clientlib/ServerNetworkPackage.h>
+#include <clientlib/ClientStateMachine.h>
 #include "BattleFieldUI.h"
 #include "CommandCenterStatistics.h"
 #include "CommandCenterCombatLog.h"
@@ -23,8 +23,9 @@ private:
 public:
     EnhancedClient();
     virtual ~EnhancedClient();
-    void run();
+    void setup();
 private:
+    void run(std::string connection_string);
     void set_fleet();
     void toggle_home();
     void draw_game_ui();

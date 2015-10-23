@@ -6,7 +6,7 @@ int main(int argc, char *argv[]) {
     LogConfig logConfig(std::string(argv[0]) + ".log");
 
     EnhancedClient client;
-    client.run();
+    client.setup();
 /*    BattleField field;
     BattleFieldUI test;
     test.draw_home_field(field);

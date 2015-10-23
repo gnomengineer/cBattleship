@@ -3,6 +3,7 @@
 #include <sstream>
 
 EnhancedClient::EnhancedClient(){
+    
     visible_home = true;
     initscr();
     int width = getmaxx(stdscr) / 3; 
@@ -24,7 +25,7 @@ EnhancedClient::EnhancedClient(){
 EnhancedClient::~EnhancedClient(){
 }
 
-void EnhancedClient::run(){
+void EnhancedClient::setup() {
     noecho();
     curs_set(0);
     draw_game_ui();
@@ -44,17 +45,43 @@ void EnhancedClient::run(){
                 set_fleet();
                 break;
             case 'r':
+                //ask for connection string
+                //check connection string
+                //std::string connection_string = "";
                 combat_log->log_message("Ready!");
+                //run(connection_string);
                 break;
             case 'v':
                 home_field->toggle_field_visibility(visible_home);
                 visible_home = !visible_home;
                 home_field->draw_content();
+                break;
             default:
                 break;
         }
     }
     endwin();
+}
+
+void EnhancedClient::run(std::string connection_string){
+    //connect to server
+    //
+    //while connected stay
+    //
+    //set curses focus on enemy_field
+    //
+    //if 'v' set home visible
+    //if 'enter' and your turn send shot
+    //if not your turn wait
+    //if 'q' disconnect
+    //
+    //update field according to turn result
+    bool quit_connection = false;
+    
+
+    while(!quit_connection){
+        
+    }
 }
 
 void EnhancedClient::set_fleet(){
@@ -64,6 +91,7 @@ void EnhancedClient::set_fleet(){
 
     position_t start_pos;
     position_t  end_pos;
+    std::string positions;
 
     home_field->move_cursor(1,1);
     curs_set(1);
@@ -88,6 +116,7 @@ void EnhancedClient::set_fleet(){
                         combat_log->log_message(ss.str());
                         add_ship_to_field(start_pos,end_pos);
                         home_field->draw_content();
+                        statistics->print_ships(home_field->get_player().get_battle_field());
                         //@TODO make a message if every possible ship is set
                         if(home_field->get_player().get_battle_field().get_ships_available().size() == 0){
                             quit_insert_ship = true;
@@ -156,13 +185,8 @@ void EnhancedClient::add_ship_to_field(position_t start_pos, position_t end_pos)
     }
     length += 1;
 
-    try{
     home_field->get_player().get_battle_field().add_ship(length,orientation,start_pos);
-    } catch (std::out_of_range &ex){
-        throw std::out_of_range(ex.what());
-    } catch (std::invalid_argument &ex){
-        throw std::invalid_argument(ex.what());
-    }
+
     BOOST_LOG_TRIVIAL(info) << "A ship has been added";
     std::stringstream log_msg;
     log_msg << "the ship of length " << length << " has been added";
