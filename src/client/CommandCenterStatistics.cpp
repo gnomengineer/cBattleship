@@ -24,7 +24,7 @@ void CommandCenterStatistics::increase_shots(bool is_hit){
 }
 
 void CommandCenterStatistics::print_ships(BattleField &battle_field){
-    std::map<unsigned int, int> ship_list = battle_field.get_ships_available();
+    std::map<unsigned int, unsigned int> ship_list = battle_field.get_ships_available();
     std::string ship_names[] = {"Cruiser","Destroyer","Battleship","Aircraft Carrier"};
     int y = 1;
     for(auto iterator = ship_list.begin(); iterator != ship_list.end(); ++iterator){

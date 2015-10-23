@@ -17,6 +17,7 @@ class BattleFieldTest : public CppUnit::TestFixture
     CPPUNIT_TEST_SUITE_END();
 
     private:
+        GameConfiguration *config;
         BattleField *battleField;
       
     public:

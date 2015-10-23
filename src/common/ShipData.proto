@@ -1,0 +1,9 @@
+syntax =  "proto3";
+
+import "Position.proto";
+
+message ShipData {
+    uint32 length = 1;
+    orientation_t orientation = 2;
+    Position start_position = 3;
+}

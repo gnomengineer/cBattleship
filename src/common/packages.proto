@@ -1,0 +1,63 @@
+syntax =  "proto3";
+
+import "Position.proto";
+import "ShipData.proto";
+
+message EnemyDisconnectedPackage {
+}
+
+message GameConfigurationPackage {
+    bool hitspree = 1;
+    uint32 size_y = 2;
+    uint32 size_x = 3;
+    repeated uint32 ship_length = 5;
+}
+
+
+message GameEndedPackage {
+    bool won = 1;
+    repeated ShipData enemy_ships = 2;
+}
+
+message GameReadyPackage {
+    string enemy_name = 1;
+}
+
+message PlayerJoinPackage {
+    string player_name = 1;
+}
+
+message PlayerJoinAnswerPackage {
+    bytes identity = 1;
+}
+
+message ShipPlacementPackage {
+    bytes identity = 1;
+    repeated ShipData ship_data = 2;
+}
+
+message ShipPlacementResponsePackage {
+    bool valid = 1;
+    bool out_of_bounds = 2;
+    bool ships_overlap = 3;
+    bool remaining_ships = 4;
+}
+
+message TurnRequestPackage {
+}
+
+message TurnPackage {
+    bytes identity = 1;
+    Position position = 2;
+}
+
+message EnemyHitPackage {
+    bool enemy_hit = 1;
+    Position position = 2;
+}
+
+message TurnResponsePackage {
+    bool valid = 1;
+    bool ship_hit = 2;
+    int32 ship_of_length_destroyed = 3;
+}

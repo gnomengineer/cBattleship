@@ -1,9 +1,7 @@
 #ifndef _TEXTCLIENT_H
 #define _TEXTCLIENT_H
 
-
 #include <clientlib/ClientStateMachine.h>
-
 
 class TextClient {
     private:
@@ -11,7 +9,7 @@ class TextClient {
         ClientStateMachine client_state_machine;
 
     public:
-        TextClient(std::string connection_string);
+        TextClient(std::string host, unsigned int port);
         virtual ~TextClient();
 
         void run();
@@ -22,7 +20,7 @@ class TextClient {
         void ask_ship_placement(Player &you);
         unsigned int ask_ship_length(Player &you);
         orientation_t ask_ship_orientation();
-        position_t ask_position();
+        position_t ask_position(Player &you);
         position_coordinate_t ask_coord(std::string coord_name);
         position_t ask_turn(Player &you, Player &enemy);
         void print_ships_available(BattleField &battle_field);

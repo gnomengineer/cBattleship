@@ -1,17 +1,20 @@
 #include "BattleFieldTest.h"
+#include <common/GameConfiguration.h>
 
 CPPUNIT_TEST_SUITE_REGISTRATION(BattleFieldTest);
 
 
 void BattleFieldTest::setUp()
 {
-    battleField = new BattleField();
+    config = new GameConfiguration();
+    battleField = new BattleField(*config);
 }
 
 
 void BattleFieldTest::tearDown()
 {
     delete battleField;
+    delete config;
 }
 
 void BattleFieldTest::test_add_ship_length()

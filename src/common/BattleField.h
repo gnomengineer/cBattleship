@@ -1,43 +1,44 @@
 #ifndef _BATTLEFIELD_H
 #define _BATTLEFIELD_H
 
-#include "Field.h"
-#include <array>
+#include "position.h"
+
 #include <list>
 #include <map>
 #include <memory>
 #include <vector>
+#include <ShipData.pb.h>
 
-#ifndef _SHIP_H
-struct ShipData;
 class Ship;
-#endif
-
-#define BATTLEFIELD_WIDTH 10
-#define BATTLEFIELD_HEIGHT 10
+class Field;
+class GameConfiguration;
 
 #define FIELD_WATER '~'
 #define FIELD_SHIP 'O'
 #define FIELD_HIT 'X'
 #define FIELD_DESTROYED '#'
 
-#define PLAYER_NAME_MAX_LENGTH (BATTLEFIELD_WIDTH * 2 - 1)
+#define PLAYER_NAME_MAX_LENGTH (16)
 
 
 // This class provides the functionality of a battle
 // field. It gives methods for reading position of ships
 class BattleField {
     private:
-        std::array<std::array<std::shared_ptr<Field>, BATTLEFIELD_WIDTH>, BATTLEFIELD_HEIGHT> fields;
-        std::list<std::shared_ptr<Ship>> ships;
+        unsigned int size_y;
+        unsigned int size_x;
+
+        std::vector<std::vector<std::shared_ptr<Field> > > fields;
+        std::list<std::shared_ptr<Ship> > ships;
         //key: ship length, value: max ship quantity
-        std::map<unsigned int, int> ships_available;
+        std::map<unsigned int, unsigned int> ships_available;
 
     public:
-        BattleField();
+        BattleField(GameConfiguration &config);
         BattleField(const BattleField& other);
 
-        void clear();
+        unsigned int get_size_y() const;
+        unsigned int get_size_x() const;
 
         void add_ship(unsigned int length, orientation_t orientation, position_t position);
         bool all_ships_destroyed() const;
@@ -52,7 +53,7 @@ class BattleField {
 
         void add_ship_data(std::vector<ShipData> ship_data);
 
-        std::map<unsigned int, int> get_ships_available();
+        std::map<unsigned int, unsigned int> get_ships_available();
         bool all_ships_placed();
 
         std::shared_ptr<Ship> get_ship_at_position(position_t position);

@@ -1,15 +1,12 @@
 #include "Ship.h"
 #include <algorithm>
 #include "BattleField.h"
-
-Ship::Ship(ShipData ship_data, BattleField &battle_field)
-    : Ship(ship_data.length, ship_data.orientation, ship_data.start_position, battle_field) {
-}
+#include "Field.h"
 
 Ship::Ship(unsigned int length, orientation_t orientation, position_t start_position, BattleField &battle_field) {
-    ship_data.length = length;
-    ship_data.orientation = orientation;
-    ship_data.start_position = start_position;
+    this->length = length;
+    this->orientation = orientation;
+    this->start_position = start_position;
 
     if(!is_valid_orientation(orientation)) throw std::invalid_argument("invalid orientation");
 
@@ -30,7 +27,7 @@ bool Ship::is_destroyed() const {
 }
 
 unsigned int Ship::get_length() const {
-    return ship_data.length;
+    return length;
 }
 
 
@@ -39,6 +36,8 @@ std::list<std::shared_ptr<Field>> Ship::get_ship_parts() const {
     return ship_parts;
 }
 
-ShipData Ship::get_data() const {
-    return ship_data;
+void Ship::to_package(ShipData &ship) const {
+    ship.set_length(length);
+    ship.set_orientation(orientation);
+    ship.set_allocated_start_position(new Position(start_position.as_package()));
 }

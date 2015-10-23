@@ -2,12 +2,17 @@
 #define _GAMESERVER_H
 
 #include "ConnectionServer.h"
+#include "GameServerConfiguration.h"
 #include <common/state-machine/StateMachine.h>
-#include <common/packages/NetworkPackageManager.h>
+#include <common/position.h>
 #include "PlayerNetworkPackage.h"
+#include <list>
 #include <map>
 #include <queue>
 #include <mutex>
+
+class Player;
+class NetworkPackage;
 
 enum GameServerState {
     CHECK_FOR_CONNECTIONS,
@@ -21,9 +26,9 @@ class GameServer {
     private:
         typedef StateMachine<GameServerState, GameServer, PlayerNetworkPackage> StateMachineType;
 
+        GameServerConfiguration &config;
         StateMachineType state_machine;
         ConnectionServer server;
-
 
         std::list<Player*> players_playing;
         std::list<Player*>::iterator current_player;
@@ -32,7 +37,7 @@ class GameServer {
         std::mutex queue_lock;
 
     public:
-        GameServer();
+        GameServer(GameServerConfiguration &config);
         virtual ~GameServer();
 
         StateMachineType::StateMap get_state_map();
@@ -53,6 +58,8 @@ class GameServer {
         void next_player();
         Player& get_enemy();
         void request_turn(bool enemy_hit, position_t position);
+        bool is_game_finished();
+        void send_game_ended_packages();
 
 };
 

@@ -1,12 +1,15 @@
 #include "ConnectionServer.h"
+#include <common/Connection.h>
 #include <boost/thread/thread.hpp> 
+#include <boost/log/trivial.hpp>
 
-ConnectionServer::ConnectionServer(NewConnectionHandler handler)
+ConnectionServer::ConnectionServer(NewConnectionHandler handler, std::string address, unsigned short port)
     : socket(io_service),
-      endpoint(asio::ip::tcp::v4(), 13477),
+      endpoint(asio::ip::address().from_string(address), port),
       acceptor(io_service, endpoint),
       conn_id_gen(0),
       handler(handler) {
+    BOOST_LOG_TRIVIAL(info) << "cbattleship-server listening on " << address << ":" << port << " ...";
     accept_connections();
 
     boost::thread thread(boost::bind(&boost::asio::io_service::run, &io_service));
