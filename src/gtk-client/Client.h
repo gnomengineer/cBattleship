@@ -4,6 +4,7 @@
 #include <glibmm/dispatcher.h>
 #include <glibmm/threads.h>
 #include <memory>
+#include <string>
 
 class MainWindow;
 class ClientStateMachine;
@@ -26,6 +27,10 @@ class Client {
         sigc::connection dispatch_connection;
 
         Glib::Thread *state_machine_thread;
+
+        std::string player_name;
+        std::string ip_address;
+        unsigned int port;
     private:
         Client();
         virtual ~Client();
@@ -39,7 +44,8 @@ class Client {
 
         void log(std::string text);
 
-        void connect(std::string name, std::string ip_address, unsigned short port);
+        void run_state_machine(std::string name, std::string ip_address, unsigned short port);
+        void initialize_state_machine();
 };
 
 #endif /* _CLIENT_H */

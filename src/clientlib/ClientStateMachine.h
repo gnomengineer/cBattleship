@@ -41,6 +41,9 @@ class ClientStateMachine {
 
         position_t last_turn_position;
 
+        std::string host_ip_address;
+        unsigned short host_port;
+
     public:
         GameEvents events;
 

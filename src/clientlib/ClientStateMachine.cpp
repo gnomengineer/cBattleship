@@ -7,14 +7,12 @@
 #include <packages.pb.h>
 
 ClientStateMachine::ClientStateMachine(std::string host, unsigned int port)
-    : io_service(), resolver(io_service), query(host, boost::lexical_cast<std::string>(port)),
+    : io_service(), resolver(io_service),
+      query(host, boost::lexical_cast<std::string>(port)),
       state_machine(INITIALIZE, *this),
+      host_ip_address(host),
+      host_port(port),
       last_turn_position() {
-    events.connecting(host, port);
-    boost::asio::ip::tcp::socket socket(io_service);
-    boost::asio::connect(socket, resolver.resolve(query));
-    connection = std::unique_ptr<Connection>(new Connection(1, std::move(socket)));
-    events.connected();
 }
 
 ClientStateMachine::~ClientStateMachine() {
@@ -30,6 +28,12 @@ ClientStateMachine::StateMachineType::StateMap ClientStateMachine::get_state_map
 }
 
 void ClientStateMachine::run() {
+    events.connecting(host_ip_address, host_port);
+    boost::asio::ip::tcp::socket socket(io_service);
+    boost::asio::connect(socket, resolver.resolve(query));
+    connection = std::unique_ptr<Connection>(new Connection(1, std::move(socket)));
+    events.connected();
+
     static std::function<void(void)> get_input;
     get_input = [this]() -> void {
         connection->read([this](std::shared_ptr<NetworkPackage> package) {

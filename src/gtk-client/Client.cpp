@@ -7,6 +7,8 @@
 #include "MainWindow.h"
 #include <clientlib/ClientStateMachine.h>
 
+#include <boost/log/trivial.hpp>
+
 Client::Client()
     : builder(Gtk::Builder::create_from_resource("/gui/gui-design.glade")),
     main_window(nullptr),
@@ -46,15 +48,28 @@ void Client::log(std::string text) {
     });
 }
 
-void Client::connect(std::string name, std::string ip_address, unsigned short port) {
+void Client::run_state_machine(std::string name, std::string ip_address, unsigned short port) {
+    this->player_name = name;
+    this->ip_address = ip_address;
+    this->port = port;
+
     if(state_machine_thread != nullptr) {
         state_machine->stop();
         state_machine_thread->join();
     }
 
+    state_machine_thread = Glib::Thread::create(
+        sigc::mem_fun(*this, &Client::initialize_state_machine),
+        true
+    );
+}
+
+void Client::initialize_state_machine() {
+
     state_machine = std::unique_ptr<ClientStateMachine>(new ClientStateMachine(ip_address, port));
 
     state_machine->events.connecting.connect([this](std::string host, unsigned short port) {
+        BOOST_LOG_TRIVIAL(info) << "connecting() event";
         log("connecting to " + host);
     });
 
@@ -62,12 +77,10 @@ void Client::connect(std::string name, std::string ip_address, unsigned short po
         log("connected");
     });
 
-    state_machine->events.get_player_name.connect([name, this](std::string &player_name) {
-        player_name = name;
+    state_machine->events.get_player_name.connect([this](std::string &player_name) {
+        player_name = this->player_name;
     });
 
-    state_machine_thread = Glib::Thread::create(
-        sigc::mem_fun(*state_machine, &ClientStateMachine::run),
-        true
-    );
+    state_machine->run();
+
 }

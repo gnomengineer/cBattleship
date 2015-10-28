@@ -40,8 +40,8 @@ void ConnectDialog::on_connect_cancel_button_clicked() {
 }
 
 void ConnectDialog::on_connect_ok_button_clicked() {
-    Client::get().connect(name_entry->get_text(),
-                          ipaddress_entry->get_text(),
-                          atoi(port_entry->get_text().c_str()));
+    Client::get().run_state_machine(name_entry->get_text(),
+                                    ipaddress_entry->get_text(),
+                                    atoi(port_entry->get_text().c_str()));
     this->hide();
 }
