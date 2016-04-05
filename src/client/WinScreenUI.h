@@ -6,7 +6,7 @@
 
 class WinScreenUI {
     public:
-void draw_message(std::string info);
+
 }
 
 #endif
