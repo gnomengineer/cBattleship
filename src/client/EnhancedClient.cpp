@@ -2,24 +2,72 @@
 #include <boost/log/trivial.hpp>
 #include <sstream>
 
-EnhancedClient::EnhancedClient(){
+/** DEPRECATED **/
+
+EnhancedClient::EnhancedClient()
+{
     
     visible_home = true;
     initscr();
+    //read the width from the standard screen
     int width = getmaxx(stdscr) / 3; 
     int height = getmaxy(stdscr);
 
-    //instatiate the 4 main windows
-    //furthest right 1st from top
+    //init statistic window
     statistics = std::unique_ptr<CommandCenterStatistics>(new CommandCenterStatistics(STATISTIC_HEIGHT, width, 2*width,0));
-    //furthest right 2nd from top
+    //init logging window
     combat_log = std::unique_ptr<CommandCenterCombatLog>(new CommandCenterCombatLog(height-STATISTIC_HEIGHT-2,width,2*width,STATISTIC_HEIGHT+1));
-    //furthest left
+    //init the players battlefield window
     home_field = std::unique_ptr<BattleFieldUI>(new BattleFieldUI(10,height/3,stdscr));
     mvprintw(height/3-1,10,"YOUR FIELD");
-    //midst window
+    //init the enemys battlefield window
     enemy_field = std::unique_ptr<BattleFieldUI>(new BattleFieldUI(width+10,height/3,stdscr));
     mvprintw(height/3-1,width+10,"ENEMY FIELD");
+
+
+    /*** connect events to methods ***/
+
+    // event during connection establishment
+    client_state_machine.events.connecting.connect([](std::string host, unsigned int port){
+            combat_log->log_message("connecting to " + host + " on port " + port);
+        });
+
+    // event when connect successful
+    client_state_machine.events.connected.connect([](){
+            combat_log->log_message("connected... game started");
+        });
+
+    // event when asked for ship placement
+    client_state_machine.events.place_ships.connect([](Player &you){
+            you->get_battle_field() = home_field->get_player().get_battle_field();
+        });
+
+    // event when asked for name
+    client_state_machine.events.get_player_name.connect([](std::string &name){
+            combat_log->log_message("write your name");
+            std::cin >> name;
+        });
+
+    //connect event for game configuration
+    client_state_machine.events.get_turn.conect([](Player &you, Player &enemy, position_t &position){
+            position = set_target();
+        });
+    client_state_machine.events.turn_ok.connect([](bool did_you_hit, int ship_of_length_destroyed){
+            combat_log->log_message("shot fired!")
+            update_field(enemy_field,did_you_hit,target_position);
+        });
+    client_state_machine.events.enemy_hit.connect([](bool hit, position_t position){
+            //update home_field -> player.battlefield && update ui
+            update_field(home_field,hit,position);
+        });
+    client_state_machine.events.enemy_wait([](void){
+            combat_log->log_message("... wait for enemys turn to end");
+        });
+    client_state_machine.events.game_ended([](void){
+            end_ui = std::unique_ptr<WinScreenUI>(new WinScreenUI());
+            end_ui.show();
+        });
+
 }
 
 EnhancedClient::~EnhancedClient(){
@@ -49,7 +97,7 @@ void EnhancedClient::setup() {
                 //check connection string
                 //std::string connection_string = "";
                 combat_log->log_message("Ready!");
-                //run(connection_string);
+                //start clientstatemachine
                 break;
             case 'v':
                 home_field->toggle_field_visibility(visible_home);
@@ -63,7 +111,8 @@ void EnhancedClient::setup() {
     endwin();
 }
 
-void EnhancedClient::run(std::string connection_string){
+void EnhancedClient::run(std::string connection_string)
+{
     //connect to server
     //
     //while connected stay
@@ -84,7 +133,8 @@ void EnhancedClient::run(std::string connection_string){
     }
 }
 
-void EnhancedClient::set_fleet(){
+void EnhancedClient::set_fleet()
+{
     bool begin_ship = true;
     bool quit_insert_ship = false;
     int x,y;
@@ -157,13 +207,15 @@ void EnhancedClient::set_fleet(){
     curs_set(0);
 }
 
-void EnhancedClient::draw_game_ui(){
+void EnhancedClient::draw_game_ui()
+{
     home_field->draw_content();
     enemy_field->draw_content();
     statistics->print_ships(home_field->get_players_battle_field());
 }
 
-void EnhancedClient::add_ship_to_field(position_t start_pos, position_t end_pos){
+void EnhancedClient::add_ship_to_field(position_t start_pos, position_t end_pos)
+{
     int length = 0;
     orientation_t orientation;
     if(start_pos.x == end_pos.x){
@@ -193,7 +245,10 @@ void EnhancedClient::add_ship_to_field(position_t start_pos, position_t end_pos)
     combat_log->log_message(log_msg.str());
 }
 
-void EnhancedClient::toggle_home(){
+void EnhancedClient::toggle_home()
+{
     home_field->toggle_field_visibility(visible_home);
     visible_home = !visible_home;
 }
+
+
