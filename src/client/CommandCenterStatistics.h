@@ -11,11 +11,13 @@ class CommandCenterStatistics : public CursesWindow{
         float shots;
         float hits;
         float calculate_hit_rate();
+        std::map<unsigned int, unsigned int> ship_list;
     public:
         CommandCenterStatistics(int height, int width, int x, int y);
         virtual ~CommandCenterStatistics();
         void increase_shots(bool is_hit);
-        void print_ships(BattleField &battle_field);
+        int print_ships();
         void print_keys();
+        void set_ship_list(std::map<unsigned int, unsigned int> new_list);
 };
 #endif

@@ -1,4 +1,5 @@
 #include "BattleFieldUI.h"
+#include <common/GameConfiguration>
 #include <common/BattleField.h>
 
 /* @TODO: dummy default definitions, remove if not needed anymore
@@ -7,8 +8,8 @@
 #define BATTLEFIELD_HEIGHT 10
 #define BATTLEFIELD_WIDTH 10
 
-BattleFieldUI::BattleFieldUI(int x, int y, WINDOW *parent) :
-    CursesWindow(x,y,BATTLEFIELD_HEIGHT+1,2*BATTLEFIELD_WIDTH+2,parent)
+BattleFieldUI::BattleFieldUI(int x, int y, WINDOW *parent, const GameConfiguration config) :
+    CursesWindow(x,y,config.get_size_y()+1,2*config.get_size_x()+2,,parent)
 {
     this->set_scroll(false);
     start_color();

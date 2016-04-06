@@ -6,12 +6,13 @@
 #include <clientlib/Player.h>
 #include "CursesWindow.h"
 #include <common/position.h>
+#include <common/GameConfiguration.h>
 
 class BattleFieldUI : public CursesWindow {
     private:
         Player player;
     public: 
-        BattleFieldUI(int x, int y, WINDOW *parent_window);
+        BattleFieldUI(int x, int y, WINDOW *parent_window, const GameConfiguration config);
         virtual ~BattleFieldUI();
         void draw_content();
         void draw_hit_mark(bool isShip, position_t position);

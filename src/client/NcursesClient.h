@@ -9,6 +9,7 @@
 #include <common/position.h>
 
 #define STATISTIC_HEIGHT 14
+#define CORRECTOUR 2
 
 class NcursesClient
 {

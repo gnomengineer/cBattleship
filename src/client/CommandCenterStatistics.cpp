@@ -23,9 +23,14 @@ void CommandCenterStatistics::increase_shots(bool is_hit){
         ++this->hits;
 }
 
-void CommandCenterStatistics::print_ships(BattleField &battle_field){
-    std::map<unsigned int, unsigned int> ship_list = battle_field.get_ships_available();
+int CommandCenterStatistics::print_ships(){
+    
     std::string ship_names[] = {"Cruiser","Destroyer","Battleship","Aircraft Carrier"};
+
+    if(ship_names.length() == ship_list.length())
+    {
+        return 0;
+    }
     int y = 1;
     for(auto iterator = ship_list.begin(); iterator != ship_list.end(); ++iterator){
         wattron(window,COLOR_PAIR(RED));
@@ -36,6 +41,8 @@ void CommandCenterStatistics::print_ships(BattleField &battle_field){
 
     mvwprintw(window,y+=2,3,"hit ratio: %.2f %%", calculate_hit_rate());
     wrefresh(window);
+
+    return 1;
 }
 
 void CommandCenterStatistics::print_keys(){
@@ -43,4 +50,9 @@ void CommandCenterStatistics::print_keys(){
     mvwprintw(window,y++,3,"i - insert your fleet");
     
     wrefresh(window);
+}
+
+void CommandCenterStatistics::set_ship_list(std::map<unsigned int, unsigned int> new_list)
+{
+    ship_list = new_list;
 }

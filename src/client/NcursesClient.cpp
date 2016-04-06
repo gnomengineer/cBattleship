@@ -3,18 +3,20 @@
 
 NcursesClient::NcursesClient()
 {
-
+    visible_home = true;
+    initscr();
 }
 
 NcursesClient::~NcursesClient()
 {
-
+    endwin();
+    delscreen(stdscr);
 }
 
 /**
  * This function connects the events to the corresponding functionality
  */
-NcursesClient::setup()
+void NcursesClient::setup()
 {
     /********************************
      * START connecting Game Events *
@@ -113,3 +115,78 @@ NcursesClient::setup()
      * STOP connecting Game Events *
      ******************************/
 }
+
+/**
+ * calculates the position and the draws the general part of the UI.
+ * general parts are:
+ *  - empty space for 2 battle fields
+ *  - command center statitics
+ *  - command center log
+ *
+ */
+void NcursesClient::draw_general_UI()
+{
+    int width = getmaxx(stdscr) / 3;
+    int height = getmaxy(stdscr);
+    int log_height = height-STATISTIC_HEIGHT-CORRECTOUR;
+    statistics = std::unique_ptr<CommandCenterStatistics>
+        (
+            new CommandCenterStatistics(STATISTIC_HEIGHT, width, 2*width,0)
+        );
+
+    combat_log = std::unique_ptr<CommandCenterCombatLog>
+        (
+            new CommandCenterCombatLog(log_height, width, 2*width,STATISTIC_HEIGHT+1)
+        );
+}
+
+/**
+ * given the GameConfiguration 'config' it calculates the field size and position
+ * and draws the 2 battlefields into the empty space.
+ *
+ */
+void NcursesClient::draw_battlefield_UI(GameConfiguration config)
+{
+    home_field = std::unique_ptr<BattleFieldUI>
+        (
+            new BattleFieldUI(10,height/3,stdscr,config)
+        );
+
+    enemy_field = std::unique_ptr<BattleFieldUI>
+        (
+            new BattleFieldUI(width + 10, height/3,stdscr,config)
+        );
+}
+
+/**
+ * moves the cursor around on the own battle field to read cursor position
+ * and adds a ship to the field at start_pos and end_pos.
+ * The field of the server's player and UI player object.
+ *
+ * @param - Player object 'you' given from the server
+ */
+void NcursesClient::set_fleet(Player &you)
+{
+
+}
+
+/**
+ * checks the validation of the ship andn defines its orientation.
+ * then it adds the ship to the players battle field
+ */
+void NcursesClient::add_ship_to_field(position_t start_pos, position_t end_pos)
+{
+
+}
+
+/**
+ * is called to read the position of target 
+ *
+ * @return - the position from type position_t
+ */
+position_t NcursesClient::set_target()
+{
+
+}
+
+
