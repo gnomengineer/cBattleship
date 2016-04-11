@@ -10,7 +10,7 @@
 
 class BattleFieldUI : public CursesWindow {
     private:
-        Player player;
+        Player& player;
     public: 
         BattleFieldUI(int x, int y, WINDOW *parent_window, const GameConfiguration config);
         virtual ~BattleFieldUI();

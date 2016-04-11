@@ -25,6 +25,7 @@ private:
 
     ClientStateMachine client_state_machine;
 
+    position_t last_target;
     bool visible_home;
 public:
     NcursesClient();
@@ -53,10 +54,11 @@ private:
     //marks the target field previously shot according to hit
     //connected to the 'turn_ok' event
     void update_after_turn(bool did_you_hit);
+    void update_after_turn(bool was_hit, BattleFieldUI& battlefield, position_t position);
 
     //displays the game over screen with win/loose
     //is connected to the 'game_ended' event
-    void game_end_UI();
+    void game_end_UI(bool win);
 
     //toggles visibility of the players own field
     //@TODO make this function available during the turn, wait and init state

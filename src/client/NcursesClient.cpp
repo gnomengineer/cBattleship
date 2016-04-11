@@ -92,7 +92,15 @@ void NcursesClient::setup()
     client_state_machine.events.turn_ok.connect(
         [](bool did_you_hit, int ship_of_length_destroyed)
         {
-            update_after_turn(did_you_hit);
+            update_after_turn(did_you_hit, home_field);
+        }
+    );
+
+    //when the enemy has hit you
+    client_state_machine.events.enemy_hit.connect(
+        [](bool hit, position_t position)
+        {
+            update_after_turn(hit, enemy_field, position);
         }
     );
 
@@ -180,7 +188,7 @@ void NcursesClient::add_ship_to_field(position_t start_pos, position_t end_pos)
 }
 
 /**
- * is called to read the position of target 
+ * is called to read the position of target. It returns the position for the game server and writes the position also into 'last_target' for processing later. 
  *
  * @return - the position from type position_t
  */
@@ -189,4 +197,47 @@ position_t NcursesClient::set_target()
 
 }
 
+/**
+ * This method is called from the event turn_ok when your shot was valid.
+ * in the parameter is the value if you hit or not.
+ * 
+ * This method calls a second 'update_after_turn' with additional parameters
+ * like 'enemy_field' as battlefieldUI object and 'last_target' as position_t
+ *
+ * 
+ * @param - bool if shot has hit a target (true) or not (false)
+ */
+void NcursesClient::update_after_turn(bool did_you_hit)
+{
+   update_after_turn(did_you_hit, home_field, last_target); 
+}
 
+/**
+ * This method reprints the given 'battlefield' and updates the given 'position' on the field before print according to the 'was_hit' parameter.
+ *
+ * @param - was_hit if the last shot on the given battle field was successful
+ * @param - battlefield object of the current battle field the shot refers to
+ * @param - position where the shot has hit on the battle field
+ */
+void NcursesClient::update_after_turn(bool was_hit, BattleFieldUI& battlefield, position_t position)
+{
+
+}
+
+/**
+ * when all ships of one participant are destroyed the end window UI is printed.
+ * It requries a boolean to print either loose or won on the screen
+ */
+void NcursesClient::game_end_UI(bool win)
+{
+
+}
+
+/**
+ * Toggles the visibility of the home_field
+ */
+void NcursesClient::toggle_home()
+{
+
+    
+}
