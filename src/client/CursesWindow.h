@@ -19,6 +19,7 @@ class CursesWindow{
         void set_attributes(int attributes);
         void create_box(int side, int top);
         WINDOW *get_window();
+        void update();
 };
 #endif
 

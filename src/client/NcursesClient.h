@@ -34,6 +34,8 @@ public:
 private:
     void run(std::string connection_string);
 
+    //draws the command center (right part) onto the screen
+    //leaves an empty space for the battle field ui
     void draw_general_UI();
 
     //calculates position and displays UI

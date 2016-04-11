@@ -92,7 +92,7 @@ void NcursesClient::setup()
     client_state_machine.events.turn_ok.connect(
         [](bool did_you_hit, int ship_of_length_destroyed)
         {
-            update_after_turn(did_you_hit, home_field);
+            update_after_turn(did_you_hit);
         }
     );
 
@@ -100,7 +100,7 @@ void NcursesClient::setup()
     client_state_machine.events.enemy_hit.connect(
         [](bool hit, position_t position)
         {
-            update_after_turn(hit, enemy_field, position);
+            update_after_turn(hit, home_field, position);
         }
     );
 
@@ -175,7 +175,69 @@ void NcursesClient::draw_battlefield_UI(GameConfiguration config)
  */
 void NcursesClient::set_fleet(Player &you)
 {
+    bool begin_ship = true;
+    bool quit_insert_ship = false;
 
+    position_t start_pos;
+    position_t end_pos;
+
+    home_field->move_cursor(1,1);
+    curs_set(1);
+
+    while(!(quit_insert_ship)
+    {
+        int input = getch();
+        int x = getcurx(home_field->get_window());
+        int y = getcury(home_field->get_window());
+        switch (input)
+        {
+            case '\n':
+                if(begin_ship)
+                {
+                    start_pos = home_field->get_position();
+                    begin_ship = false;
+                }
+                else
+                {
+                    end_pos = home_field->get_position();
+                    begin_ship = true;
+                    try
+                    {
+                        add_ship_to_field(start_pos,end_pos);
+                        home_field->draw_content();
+                    }
+                    catch(std::out_of_range &ex)
+                    {
+                        combat_log->log_message(ex.what());
+                    }
+                    catch(std::invalid_argument &ex)
+                    {
+                        combat_log->log_message(ex.what());
+                    }
+                }
+                
+                break;
+            case KEY_RIGHT:
+                home_field->move_cursor(++x,y);
+                break;
+            case KEY_LEFT:
+                home_field->move_cursor(--x,y);
+                break;
+            case KEY_UP:
+                home_field->move_cursor(x,--y);
+                break;
+            case KEY_DOWN:
+                home_field->move_cursor(x,++y);
+                break;
+            case 'q':
+                quit_insert_ship = true;
+                combat_log->log_message("Fleet is positioned");
+                break; 
+            default:
+                break;
+        }
+    }
+    curs_set(0);
 }
 
 /**
@@ -209,7 +271,7 @@ position_t NcursesClient::set_target()
  */
 void NcursesClient::update_after_turn(bool did_you_hit)
 {
-   update_after_turn(did_you_hit, home_field, last_target); 
+   update_after_turn(did_you_hit, enemy_field, last_target); 
 }
 
 /**

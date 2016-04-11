@@ -33,3 +33,8 @@ WINDOW* CursesWindow::get_window(){
 void CursesWindow::create_box(int top,int side){
     box(window,top,side);
 }
+
+void CursesWindow::update()
+{
+    wrefresh(window);
+}
